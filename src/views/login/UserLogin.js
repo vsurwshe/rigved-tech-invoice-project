@@ -1,42 +1,45 @@
 import React from 'react';
 import { CircularProgress, Typography, Button, TextField, Fade, } from "@material-ui/core";
+import { connect } from 'react-redux';
+import * as actionsCre from '../../redux/actions/LoginAction'
 
 const Login=(props)=>{
-    return <> 
-    <Fade in={props.error}>
-        <Typography color="secondary" className={props.classes.errorMessage}> Something is wrong with your login or password :( </Typography>
+const {error, classes, loginValue, setLoginValue, passwordValue,setPasswordValue}=props.data
+return <> 
+    <Fade in={error}>
+        <Typography color="secondary" className={classes.errorMessage}> Something is wrong with your login or password :( </Typography>
     </Fade>
     <TextField
         id="email"
         InputProps={{
-            classes: { underline: props.classes.textFieldUnderline, input: props.classes.textField } 
+            classes: { underline: classes.textFieldUnderline, input: classes.textField } 
         }}
-        value={props.loginValue}
-        onChange={e => props.setLoginValue(e.target.value)}
+        value={loginValue}
+        onChange={e => setLoginValue(e.target.value)}
         margin="normal"
-        placeholder="Email Adress"
+        placeholder="Email Address or Registerd Mobile Number"
         type="email"
         fullWidth
     />
     <TextField
         id="password"
         InputProps={{
-            classes: { underline: props.classes.textFieldUnderline, input: props.classes.textField }
+            classes: { underline: classes.textFieldUnderline, input: classes.textField }
         }}
-        value={props.passwordValue}
-        onChange={e => props.setPasswordValue(e.target.value)}
+        value={passwordValue}
+        onChange={e => setPasswordValue(e.target.value)}
         margin="normal"
         placeholder="Password"
         type="password"
         fullWidth
     />
-    <div className={props.classes.formButtons}>
+    <div className={classes.formButtons}>
         {props.isLoading ? (
             <CircularProgress size={26} className={props.classes.loginLoader} />
         ) : (
                 <Button
                     disabled={
-                        props.loginValue.length === 0 || props.passwordValue.length === 0
+                        loginValue.length === 0 || passwordValue.length === 0
                     }
                     onClick={() => loginUserActions(props)}
                     variant="contained"
@@ -44,19 +47,17 @@ const Login=(props)=>{
                     size="large"
                 > Login </Button>
             )}
-        <Button color="primary" size="large" className={props.classes.forgetButton} > Forget Password </Button>
+        <Button color="primary" size="large" className={classes.forgetButton} > Forget Password </Button>
     </div></>
 }
 
 const loginUserActions=(props)=>{
-    console.log(
-        props.userDispatch,
-        props.loginValue,
-        props.passwordValue,
-        props.history,
-        props.setIsLoading,
-        props.setError,
-    )
+    const loginData={
+        userName: props.loginValue,
+        password: props.passwordValue
+    }
+    props.LoginUser(loginData);
 }
 
-export default Login;
+const mapStateToProps = state => { return state; };
+export default connect(mapStateToProps, actionsCre)(Login);

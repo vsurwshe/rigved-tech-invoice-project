@@ -23,6 +23,20 @@ const  UserActions=(props)=>{
     var [loginValue, setLoginValue] = useState("");
     var [passwordValue, setPasswordValue] = useState("");
 
+    const data={
+        loginValue,
+        passwordValue,
+        isLoading,
+        props,
+        error,
+        setIsLoading,
+        setLoginValue,
+        setPasswordValue,
+        setError,
+        classes,
+        userDispatch
+    }
+
     return (
         <Grid container className={classes.container}>
             {/* <div className={classes.logotypeContainer}>
@@ -34,9 +48,12 @@ const  UserActions=(props)=>{
                         <Tab label="Login" classes={{ root: classes.tab }} />
                         {/* <Tab label="New User" classes={{ root: classes.tab }} /> */}
                     </Tabs>
-                    {activeTabId === 0 && (
-                        <React.Fragment>
-                        { Login({
+                    {/* {activeTabId === 0 && (
+                        <React.Fragment> */}
+                    
+                    <Login data={data} />
+                    
+                        {/* { Login({
                             loginValue,
                             passwordValue,
                             isLoading,
@@ -49,9 +66,9 @@ const  UserActions=(props)=>{
                             classes,
                             userDispatch
                             })  
-                        }          
-                        </React.Fragment>
-                    )}
+                        }           */}
+                        {/* </React.Fragment>
+                    )} */}
                 </div>
                 <Typography color="primary" className={classes.copyright}>
                     © 2020-Rigved Technologies. All rights reserved.
