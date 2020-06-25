@@ -8,6 +8,7 @@ import Themes from "./themes";
 import UserActions from './views/login/UserActions';
 import { Provider } from 'react-redux';
 import store from './redux/store';
+import Dashborad from './views/dashborad/Dashborad';
 
 const App=(prpos)=>{
   return (
@@ -16,7 +17,8 @@ const App=(prpos)=>{
     <Provider store={store}>
       <ThemeProvider theme={Themes.default}>
         <CssBaseline />
-        <UserActions />
+        {/* <UserActions /> */}
+        <Dashborad />
       </ThemeProvider>
       </Provider>
     </UserProvider>
