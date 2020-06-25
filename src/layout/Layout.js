@@ -1,11 +1,11 @@
 import React from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
 import classnames from "classnames";
-
+import Sidebar from "../views/Sidebar/Sidebar";
+import Header from '../views/Header/Header'
 // styles
 import useStyles from "./styles";
 import { useLayoutState } from "../context/LayoutContext";
-import Sidebar from "../views/Sidebar/Sidebar";
 import { Dashboard } from '@material-ui/icons';
 
 
@@ -17,7 +17,7 @@ const Layout = (props) => {
 
     return <div className={classes.root}>
         <>
-            {/* <Header history={props.history} /> */}
+            <Header history={props.history} />
             <Sidebar />
             <div
                 className={classnames(classes.content, {
