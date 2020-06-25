@@ -6,6 +6,8 @@ const LoginUser=(userData) =>{
             return axios.post(API_URL + "/authentication/signIn", {
                 userName: userData.userName,
                 password: userData.password
+            },{
+                "Content-Type":"application/json"
             }).then(response => {
                     dispatch(loadMessage('success', 'Login Successfull'))
                     dispatch(setAuthrizations(response.data))

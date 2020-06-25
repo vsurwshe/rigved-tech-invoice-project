@@ -38,9 +38,7 @@ return <>
             <CircularProgress size={26} className={props.classes.loginLoader} />
         ) : (
                 <Button
-                    disabled={
-                        loginValue.length === 0 || passwordValue.length === 0
-                    }
+                    disabled={ loginValue.length === 0 || passwordValue.length === 0}
                     onClick={() => loginUserActions(props)}
                     variant="contained"
                     color="primary"
@@ -53,8 +51,8 @@ return <>
 
 const loginUserActions=(props)=>{
     const loginData={
-        userName: props.loginValue,
-        password: props.passwordValue
+        userName: props.data.loginValue,
+        password: props.data.passwordValue
     }
     props.LoginUser(loginData);
 }
