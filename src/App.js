@@ -3,11 +3,12 @@ import React from 'react';
 import { ThemeProvider } from "@material-ui/styles";
 import { CssBaseline } from "@material-ui/core";
 import { LayoutProvider } from "./context/LayoutContext";
-import { UserProvider } from "./context/UserContext";
+import { UserProvider, loginUser } from "./context/UserContext";
 import Themes from "./themes";
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import Layout from './layout/Layout';
+import UserActions from './views/login/UserActions';
 
 const App=(prpos)=>{
   return (
@@ -17,6 +18,7 @@ const App=(prpos)=>{
       <ThemeProvider theme={Themes.default}>
         <CssBaseline />
         <Layout />
+        {/* <UserActions /> */}
       </ThemeProvider>
       </Provider>
     </UserProvider>
