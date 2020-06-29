@@ -3,7 +3,7 @@ import React from 'react';
 import { ThemeProvider } from "@material-ui/styles";
 import { CssBaseline } from "@material-ui/core";
 import { LayoutProvider } from "./context/LayoutContext";
-import { UserProvider, loginUser } from "./context/UserContext";
+import { UserProvider } from "./context/UserContext";
 import Themes from "./themes";
 import { Provider } from 'react-redux';
 import store from './redux/store';

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Popover from '@material-ui/core/Popover';
-import Box from '@material-ui/core/Box';
 import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
-import { CircularProgress, Typography, Button, TextField, Fade, Card, Grid, Paper, } from "@material-ui/core";
+import { Typography, Button, TextField, Card, Grid} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -21,15 +20,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Register = (props) => {
-    const [spacing, setSpacing] = useState(3);
     var classes = useStyles();
     return <>
         <Card>
             <h1>Register User</h1>
-            {RegsiterFrom({
-                classes,
-                spacing
-            })}
+            {RegsiterFrom({ classes })}
         </Card>
         {/* <TextField
             id="name"
@@ -122,7 +117,7 @@ const RegisterUser = (props) => {
 }
 
 const RegsiterFrom = (props) => {
-    const { classes, spacing } = props
+    const { classes } = props
     return <div className={classes.girdContainer}>
         <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
@@ -159,40 +154,10 @@ const SectionsOne = (props) => {
 const PersonalInfo=(props)=>{
     const {classes} =props
     return<>
-    <TextField
-                label="First Name"
-                id="margin-dense"
-                defaultValue=""
-                className={classes.textField}
-                helperText="Ex. Jon"
-                margin="dense"
-            />
-            <TextField
-                label="Last Name"
-                id="margin-dense"
-                className={classes.textField}
-                helperText="Ex. Sena"
-                margin="dense"
-            />
-            <TextField
-                label="Job Title"
-                id="standard-full-width"
-                style={{ margin: 8 }}
-                fullWidth
-                helperText="Ex. Java Full Stack Developer"
-                margin="normal"
-                InputLabelProps={{
-                    shrink: true,
-                }}
-            />
-            <TextField
-                label="Expriance"
-                type="Number"
-                id="margin-normal"
-                className={classes.textField}
-                helperText="Ex. 2"
-                margin="normal"
-            />
+    <TextField label="First Name" id="margin-dense" defaultValue="" className={classes.textField} helperText="Ex. Jon" margin="dense" />
+    <TextField label="Last Name" id="margin-dense" className={classes.textField} helperText="Ex. Sena" margin="dense" />
+    <TextField label="Job Title" id="standard-full-width" style={{ margin: 8 }} fullWidth helperText="Ex. Java Full Stack Developer" margin="normal" InputLabelProps={{     shrink: true, }} />
+    <TextField label="Expriance" type="Number" id="margin-normal" className={classes.textField} helperText="Ex. 2" margin="normal" />
     </>
 }
 
