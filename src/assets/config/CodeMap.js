@@ -1,0 +1,5 @@
+const UNAUTHORIZED = "401 UNAUTHORIZED";
+
+export {
+    UNAUTHORIZED
+}

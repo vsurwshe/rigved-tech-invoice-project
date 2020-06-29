@@ -9,6 +9,10 @@ return <>
     <Fade in={error}>
         <Typography color="secondary" className={classes.errorMessage}> Something is wrong with your login or password :( </Typography>
     </Fade>
+    <Fade in={props.message}>
+        <Typography color="secondary" className={classes.successMessage}>{props.message}</Typography>
+    </Fade>
+    
     <TextField
         id="email"
         InputProps={{
@@ -49,12 +53,14 @@ return <>
     </div></>
 }
 
-const loginUserActions=(props)=>{
+const loginUserActions= async(props)=>{
     const loginData={
         userName: props.data.loginValue,
         password: props.data.passwordValue
     }
-    props.LoginUser(loginData);
+   await props.LoginUser(loginData);
+    console.log("Mess", props.message)
+
 }
 
 const mapStateToProps = state => { return state; };

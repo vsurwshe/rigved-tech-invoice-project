@@ -17,8 +17,8 @@ const App=(prpos)=>{
     <Provider store={store}>
       <ThemeProvider theme={Themes.default}>
         <CssBaseline />
-        <Layout />
-        {/* <UserActions /> */}
+        {/* <Layout /> */}
+        <UserActions />
       </ThemeProvider>
       </Provider>
     </UserProvider>
