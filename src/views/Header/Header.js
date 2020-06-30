@@ -17,8 +17,9 @@ import {Typography } from "../Wrappers/Wrappers";
 // context
 import { useLayoutState, useLayoutDispatch, toggleSidebar } from "../../context/LayoutContext";
 import { useUserDispatch, signOut } from "../../context/UserContext";
+import { connect } from "react-redux";
 
-export default function Header(props) {
+const Header=(props)=> {
   var classes = useStyles();
 
   // global
@@ -115,19 +116,10 @@ export default function Header(props) {
             <AccountIcon className={classes.profileMenuIcon} /> Tasks
           </MenuItem>
           <MenuItem
-            className={classNames(
-              classes.profileMenuItem,
-              classes.headerMenuItem,
-            )}
-          >
-            <AccountIcon className={classes.profileMenuIcon} /> Messages
-          </MenuItem>
+            className={classNames( classes.profileMenuItem, classes.headerMenuItem, )} >
+            <AccountIcon className={classes.profileMenuIcon} /> Messages </MenuItem>
           <div className={classes.profileMenuUser}>
-            <Typography
-              className={classes.profileMenuLink}
-              color="primary"
-              onClick={() => signOut(userDispatch, props.history)}
-            >
+            <Typography className={classes.profileMenuLink} color="primary" onClick={() => signOut(userDispatch, props.history)} >
               Sign Out
             </Typography>
           </div>
@@ -144,13 +136,10 @@ const SerachOptions=(props)=>{
   <div className={classNames(classes.searchIcon, { [classes.searchIconOpened]: isSearchOpen })} onClick={() => setSearchOpen(!isSearchOpen)} >
     <SearchIcon classes={{ root: classes.headerIcon }} />
   </div>
-  <InputBase
-    placeholder="Search…"
-    classes={{
-      root: classes.inputRoot,
-      input: classes.inputInput,
-    }}
-  />
+  <InputBase placeholder="Search…" classes={{ root: classes.inputRoot, input: classes.inputInput, }} />
 </div>
 
 }
+
+const mapStateToProps = state => { return state; };
+export default connect(mapStateToProps)(Header);

@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { Grid, Typography, Tabs, Tab } from "@material-ui/core";
-
 // styles
 import useStyles from "./styles";
-
 // context
 import { useUserDispatch } from "../../context/UserContext";
 import Login from "./UserLogin";
@@ -12,10 +10,8 @@ import Layout from "../../layout/Layout";
 
 const UserActions = (props) => {
     var classes = useStyles();
-
     // global
     var userDispatch = useUserDispatch();
-
     // local
     var [isLoading, setIsLoading] = useState(false);
     var [error, setError] = useState(null);
@@ -37,7 +33,7 @@ const UserActions = (props) => {
         userDispatch
     }
 
-    if(props.authorization && props.authorization !== "" ){
+    if(props.LoginState.authorization && props.LoginState.authorization !== "" ){
         return <Layout />
     }
     return (

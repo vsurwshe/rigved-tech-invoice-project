@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Popover from '@material-ui/core/Popover';
 import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
-import { Typography, Button, TextField, Card, Grid} from "@material-ui/core";
+import { Typography, Button, TextField, Card, Grid, ClickAwayListener} from "@material-ui/core";
+import MaterialUiForm from "../utilites/ReduxForm";
+import { Field, reduxForm } from 'redux-form';
+import { renderTextField, renderSelectField } from '../utilites/FromUtilites';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -16,117 +19,75 @@ const useStyles = makeStyles((theme) => ({
     },
     girdContainer: {
         flexGrow: 1,
-    }
+    },
+    clickAwayListenerRoot: {
+        position: 'relative',
+    },
+    clickAwayListenerDropdown: {
+      position: 'absolute',
+      top: 28,
+      right: 0,
+      left: 0,
+      zIndex: 1,
+      padding: theme.spacing(1),
+      backgroundColor: theme.palette.background.paper,
+    },
 }));
+
+const Skills=[
+    "Java",
+    "React JS",
+    "Angular Js",
+    "Dot Net"
+]
+
+const Roles=[
+    "Administrator",
+    "Project Manager",
+    "Employee"
+]
+
+const Domain=[
+    "SAP Technical",
+    "SAP Non-Technical",
+    "Non SAP-Technical"
+]
+
 
 const Register = (props) => {
     var classes = useStyles();
     return <>
         <Card>
             <h1>Register User</h1>
-            {RegsiterFrom({ classes })}
+            {RegsiterFrom({ 
+                classes ,
+                data: props
+            })}
         </Card>
-        {/* <TextField
-            id="name"
-            InputProps={{
-                classes: {
-                    underline: props.classes.textFieldUnderline,
-                    input: props.classes.textField,
-                },
-            }}
-            value={props.nameValue}
-            onChange={e => props.setNameValue(e.target.value)}
-            margin="normal"
-            placeholder="Full Name"
-            type="text"
-            fullWidth
-        /> */}
-        {/* <TextField
-            id="email"
-            InputProps={{
-                classes: {
-                    underline: props.classes.textFieldUnderline,
-                    input: props.classes.textField,
-                },
-            }}
-            value={props.loginValue}
-            onChange={e => props.setLoginValue(e.target.value)}
-            margin="normal"
-            placeholder="Email Adress"
-            type="email"
-            fullWidth
-        />
-        <TextField
-            id="password"
-            InputProps={{
-                classes: {
-                    underline: props.classes.textFieldUnderline,
-                    input: props.classes.textField,
-                },
-            }}
-            value={props.passwordValue}
-            onChange={e => props.setPasswordValue(e.target.value)}
-            margin="normal"
-            placeholder="Password"
-            type="password"
-            fullWidth
-        /> */}
-        {/* <div className={props.classes.creatingButtonContainer}>
-            {props.isLoading ? (
-                <CircularProgress size={26} />
-            ) : (
-                    <Button
-                        onClick={() =>
-                            RegisterUser(props)
-                        }
-                        disabled={
-                            props.loginValue.length === 0 ||
-                            props.passwordValue.length === 0 ||
-                            props.nameValue.length === 0
-                        }
-                        size="large"
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        className={props.classes.createAccountButton}
-                    >
-                        Register User Account
-                    </Button>
-                )}
-        </div> */}
-        {/* <div className={props.classes.formDividerContainer}>
-            <div className={props.classes.formDivider} />
-            <Typography className={props.classes.formDividerWord}>or</Typography>
-            <div className={props.classes.formDivider} />
-        </div>
-        <Button
-            size="large"
-            className={classnames(
-                props.classes.googleButton,
-                props.classes.googleButtonCreating,
-            )}
-        >
-            {/* <img src={google} alt="google" className={classes.googleIcon} />
-&nbsp;Sign in with Google */}
-        {/* </Button> */}
     </>
 }
 
 const RegisterUser = (props) => {
-    console.log(props);
+    console.log("Register User Data : ",props);
 }
 
 const RegsiterFrom = (props) => {
-    const { classes } = props
+    const {classes}=props
+    const { pristine, reset, submitting} = props.data
     return <div className={classes.girdContainer}>
+        <form onSubmit={RegisterUser}>
         <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
                 {SectionsOne({ classes })}
             </Grid>
             <Grid item xs={12} sm={6}>
-                {SectionsOne({ classes })}
             </Grid>
         </Grid>
+        <center>
+            <Button type="submit" coloe="primary" disabled={pristine || submitting}> Submit </Button>
+            <Button type="button" disabled={pristine || submitting} onClick={reset}> Clear Values</Button>
+        </center>
+        </form>
     </div>
 }
 
@@ -134,19 +95,11 @@ const SectionsOne = (props) => {
     const { classes } = props
     return <div className={classes.root}>
         <div>
-            <input
-                type="file"
-                id="standard-full-width"
-                label="Choose Prfile Photo"
-                style={{ margin: 8 }}
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-            />
-            <div
-                id="margin-none"
-            />
+            <input type="file" id="standard-full-width" label="Choose Prfile Photo" style={{ margin: 8 }} fullWidth InputLabelProps={{ shrink: true }} />
+            <div id="margin-none" />
               {PersonalInfo({classes})}
               {SkillSet({classes})}
+              {Assign({classes})}
         </div>
     </div>
 }
@@ -154,39 +107,63 @@ const SectionsOne = (props) => {
 const PersonalInfo=(props)=>{
     const {classes} =props
     return<>
-    <TextField label="First Name" id="margin-dense" defaultValue="" className={classes.textField} helperText="Ex. Jon" margin="dense" />
-    <TextField label="Last Name" id="margin-dense" className={classes.textField} helperText="Ex. Sena" margin="dense" />
-    <TextField label="Job Title" id="standard-full-width" style={{ margin: 8 }} fullWidth helperText="Ex. Java Full Stack Developer" margin="normal" InputLabelProps={{     shrink: true, }} />
-    <TextField label="Expriance" type="Number" id="margin-normal" className={classes.textField} helperText="Ex. 2" margin="normal" />
+    <Field name="firstName" className={classes.textField} component={renderTextField} label="First Name" />
+    <Field name="lastName" className={classes.textField} component={renderTextField} label="Last Name" />
+    <Field name="jobTitle" component={renderTextField} label="Job Title" id="standard-full-width" style={{ margin: 8 }} fullWidth helperText="Ex. Java Full Stack Developer" margin="normal" InputLabelProps={{shrink: true}} />
+    <Field name="expriance" component={renderTextField} id="margin-normal" className={classes.textField} helperText="Ex. 2" margin="normal"/>
     </>
 }
 
 const SkillSet=(props)=>{
-    const {}=props
-    return <PopupState variant="popover" popupId="demo-popup-popover">
-    {(popupState) => (
-      <div>
-        <Button variant="contained" color="primary" {...bindTrigger(popupState)}>
-          Open Popover
-        </Button>
-        <Popover
-          {...bindPopover(popupState)}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
-          }}
-        >
-          {/* <Box p={2}> */}
-            <Typography>The content of the Popover.</Typography>
-          {/* </Box> */}
-        </Popover>
-      </div>
-    )}
-  </PopupState>
+    const {classes}=props
+    const [open, setOpen] = useState(false);
+    const handleClick = () => { setOpen((prev) => !prev); };
+    const handleClickAway = () => { setOpen(false); };
+
+    return <ClickAwayListener onClickAway={handleClickAway}>
+    <div className={classes.clickAwayListenerRoot}>
+      <Button type="button" onClick={handleClick}>
+        Skills
+      </Button>
+      {open ? (
+        <div className={classes.clickAwayListenerDropdown}>
+          <Field classes={classes.textField} name="primarySkill" component={renderSelectField} label="primary Skill" >
+            {Skills.map((item ,key)=> <option key={key} value={item}>{item}</option> )}
+         </Field>
+         &nbsp;&nbsp;&nbsp;
+         <Field classes={classes.textField} name="secondarySkill" component={renderSelectField} label="Secondary Skill" >
+            {Skills.map((item ,key)=> <option key={key} value={item}>{item}</option> )}
+         </Field>
+        </div>
+      ) : null}
+    </div>
+  </ClickAwayListener>
 }
 
-export default Register;
+
+const Assign=(props)=>{
+    const {classes}=props
+    const [open, setOpen] = useState(false);
+    const handleClick = () => { setOpen((prev) => !prev); };
+    const handleClickAway = () => { setOpen(false); };
+
+    return <ClickAwayListener onClickAway={handleClickAway}>
+    <div className={classes.clickAwayListenerRoot}>
+      <Button type="button" onClick={handleClick}> Assign </Button>
+      {open ? (
+        <div className={classes.clickAwayListenerDropdown}>
+          <Field classes={classes.textField} name="roles" component={renderSelectField} label="Roles" >
+            {Roles.map((item ,key)=> <option key={key} value={item}>{item}</option> )}
+         </Field>
+         &nbsp;&nbsp;&nbsp;
+         <Field classes={classes.textField} name="domain" component={renderSelectField} label="Domain" >
+            {Domain.map((item ,key)=> <option key={key} value={item}>{item}</option> )}
+         </Field>
+        </div>
+      ) : null}
+    </div>
+  </ClickAwayListener>
+}
+
+
+export default  reduxForm({ form: 'Register'})(Register);

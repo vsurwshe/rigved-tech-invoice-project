@@ -7,7 +7,6 @@ import { UserProvider } from "./context/UserContext";
 import Themes from "./themes";
 import { Provider } from 'react-redux';
 import store from './redux/store';
-import Layout from './layout/Layout';
 import UserActions from './views/login/UserActions';
 
 const App=(prpos)=>{
@@ -17,7 +16,6 @@ const App=(prpos)=>{
     <Provider store={store}>
       <ThemeProvider theme={Themes.default}>
         <CssBaseline />
-        {/* <Layout /> */}
         <UserActions />
       </ThemeProvider>
       </Provider>

@@ -23,8 +23,14 @@ const LoginUser=(userData) =>{
         }
 }
 
+const LogoutUser=()=>{
+    return (dispatch) => {
+        dispatch(clearData())
+    }
+}
 
 
+//--------------------- Types Actions
 export function setAuthrizations(data){
     return{
         type:"SET_ACCOUNT_ID",
@@ -33,6 +39,11 @@ export function setAuthrizations(data){
     }
 }
 
+export function clearData(){
+    return{
+        type:"CLEAR_DATA"
+    }
+}
 
 export function loadMessage(message){
     return{

@@ -28,12 +28,7 @@ const Layout = (props) => {
             <div className={classnames(classes.content, { [classes.contentShift]: layoutState.isSidebarOpened})}>
                 <div className={classes.fakeToolbar} />
                 <Switch>
-                    {/* <Route path="/app/dashboard" component={Dashboard} /> */}
-                    {
-                        RoutesPath.map((route,key)=>{
-                            return <Route path={route.path} component={route.component} />
-                        })
-                    }
+                    { RoutesPath.map((route,key)=>{ return <Route key={key} path={route.path} component={route.component} />})}
                 </Switch>
             </div>
         </>

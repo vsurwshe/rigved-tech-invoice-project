@@ -1,6 +1,8 @@
-import { createStore, applyMiddleware, compose } from 'redux';
+import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
 import thunk from "redux-thunk";
 import logger from 'redux-logger';
+import { reducer as reduxFormReducer } from 'redux-form';
+import LoginState from "./reducer/LoginState";
 
 // this function save state into local storage.
 const saveToLocalStorage=(state)=>{
@@ -29,33 +31,16 @@ const loadFormLocalStorgae=()=>{
 // this is creating perseting state values with store
 const persistedState= loadFormLocalStorgae();
 
-const initialState = {
-  sidebarShow: 'responsive',
-  role: "",
-  account_id: "",
-  authorization: "",
-  common_message: ""
-}
 
-const changeState = (state = initialState, action) => {
-  switch (action.type) {
-    case 'set':
-      return { ...state }
-    case 'USER_LOGIN':
-      return { ...state, role: action.role }
-    case "SET_ACCOUNT_ID":
-      localStorage.setItem('account_id',action.account_id)
-      return { ...state, account_id: action.account_id, authorization: action.authorization }
-    case "CHANGE_MASSAGE":
-      return { ...state, common_message: action.message }
-    default:
-      return state
-  }
-}
+
+const reducer = combineReducers({
+  form: reduxFormReducer, // mounted under "form"
+  LoginState
+});
 
 const enhancer= compose(applyMiddleware(thunk, logger));
 
-const store = createStore(changeState, persistedState, enhancer);
+const store = createStore(reducer, persistedState, enhancer);
 
 store.subscribe(()=> saveToLocalStorage(store.getState()))
 
