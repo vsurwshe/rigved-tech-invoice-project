@@ -78,10 +78,27 @@ const renderSelectField = ({
   </FormControl>
 )
 
+// this render date time picker filed
+const renderDateTimePicker = ({
+    label,
+    input,
+    meta: { touched, invalid, error },
+    ...custom
+}) => <TextField
+      label={label}
+      type="date"
+      placeholder={label}
+      error={touched && invalid}
+      helperText={touched && error}
+      {...input}
+      {...custom}
+    />
+
 
   export{
       renderTextField,
       renderCheckbox,
       renderSelectField,
-      radioButton
+      radioButton,
+      renderDateTimePicker
   }
