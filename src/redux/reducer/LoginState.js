@@ -10,6 +10,8 @@ const initialState = {
     switch (action.type) {
       case 'set':
         return { ...state }
+      case 'CLEAR_DATA':
+        return initialState;
       case 'USER_LOGIN':
         return { ...state, role: action.role }
       case "SET_ACCOUNT_ID":

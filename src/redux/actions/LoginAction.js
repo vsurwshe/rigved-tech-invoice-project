@@ -57,5 +57,6 @@ export function loadMessage(message){
 
 
 export {
-    LoginUser
+    LoginUser,
+    LogoutUser
 }
