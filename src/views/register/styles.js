@@ -23,5 +23,10 @@ export default makeStyles(theme => ({
         zIndex: 1,
         padding: theme.spacing(2),
         backgroundColor: theme.palette.background.paper,
+    },
+    buttonStyle : {
+        marginTop: 10,
+        marginBottom: 10,
+        margin: theme.spacing(1)
     }
 }))

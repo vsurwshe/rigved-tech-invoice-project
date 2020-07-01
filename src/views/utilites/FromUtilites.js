@@ -19,22 +19,44 @@ const renderTextField = ({
   )
 
 // this is render text filed
-const renderFile = ({
-  label,
-  style,
-  input,
-  meta: { touched, invalid, error },
-  ...custom
-}) => (
-  <Input
-    accept="image/*" 
-    type="file"  
-    style={style}
-    fullWidth
-    {...input}
-    {...custom}
-    InputLabelProps={{ shrink: true }} 
-  />
+const renderFile = (
+  field
+//   {
+//   label,
+//   style,
+//   field,
+//   meta: { touched, invalid, error },
+//   ...custom
+// }
+) => (
+
+  <div className="input-row">
+  <input
+  type="file"
+  onChange={
+    ( e ) => {      
+      e.preventDefault();
+      const { fields } = this.props;
+      // convert files to an array
+      const files = [ ...e.target.files ];
+      fields.yourField.handleChange(files);
+    }
+  }
+  value={null}
+/>
+  {field.meta.touched && field.meta.error && 
+   <span className="error">{field.meta.error}</span>}
+</div>
+
+  // <input
+  // accept="image/*"
+  // id="contained-button-file"
+  // multiple
+  // type="file"
+  //   {...input}
+  //   {...custom}
+  //   InputLabelProps={{ shrink: true }} 
+  // />
 )
 
 // this is render the checkbox 
