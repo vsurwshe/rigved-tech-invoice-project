@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, FormControlLabel, Checkbox, FormControl, RadioGroup, Radio, FormHelperText, InputLabel, Select } from "@material-ui/core"
+import { Input, TextField, FormControlLabel, Checkbox, FormControl, RadioGroup, Radio, FormHelperText, InputLabel, Select, FormLabel } from "@material-ui/core"
 
 // this is render text filed
 const renderTextField = ({
@@ -18,6 +18,25 @@ const renderTextField = ({
     />
   )
 
+// this is render text filed
+const renderFile = ({
+  label,
+  style,
+  input,
+  meta: { touched, invalid, error },
+  ...custom
+}) => (
+  <Input
+    accept="image/*" 
+    type="file"  
+    style={style}
+    fullWidth
+    {...input}
+    {...custom}
+    InputLabelProps={{ shrink: true }} 
+  />
+)
+
 // this is render the checkbox 
 const renderCheckbox = ({ input, label }) => (
   <div>
@@ -34,12 +53,12 @@ const renderCheckbox = ({ input, label }) => (
 )
 
 // this is render the radio button
-const radioButton = ({ input, ...rest }) => (
+const radioButton = ({ input,label,mainLableName, ...rest }) => (
   <FormControl>
+    {console.log("123",mainLableName)}
+    <FormLabel component="legend">{mainLableName}</FormLabel>
     <RadioGroup {...input} {...rest}>
-      <FormControlLabel value="female" control={<Radio />} label="Female" />
-      <FormControlLabel value="male" control={<Radio />} label="Male" />
-      <FormControlLabel value="other" control={<Radio />} label="Other" />
+      {(label && label.length > 0) && label.map((item ,key)=> <FormControlLabel value={item} control={<Radio />} label={item} />)}
     </RadioGroup>
   </FormControl>
 )
@@ -100,5 +119,6 @@ const renderDateTimePicker = ({
       renderCheckbox,
       renderSelectField,
       radioButton,
-      renderDateTimePicker
+      renderDateTimePicker,
+      renderFile
   }

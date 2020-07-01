@@ -3,7 +3,8 @@ const initialState = {
     role: "",
     account_id: "",
     authorization: "",
-    common_message: ""
+    common_message: "",
+    saveUserData: []
   }
   
   const LoginState = (state = initialState, action) => {
@@ -19,6 +20,8 @@ const initialState = {
         return { ...state, account_id: action.account_id, authorization: action.authorization }
       case "CHANGE_MASSAGE":
         return { ...state, common_message: action.message }
+      case "USER_SAVED":
+        return {...state, saveUserData: action.saveUserData}
       default:
         return state
     }
