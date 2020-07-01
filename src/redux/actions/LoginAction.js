@@ -1,17 +1,20 @@
 import axios from "axios"
 import {API_URL} from '../../assets/config/Config';
-import { UNAUTHORIZED } from "../../assets/config/CodeMap";
+import { UNAUTHORIZED, OKSTATUS } from "../../assets/config/CodeMap";
 
 const LoginUser=(userData) =>{
-        return (dispatch) => {
-            return axios.post(API_URL + "/authentication/signIn", {
-                userName: userData.userName,
-                password: userData.password
-            },{
-                "Content-Type":"application/json"
-            }).then(response => {
+    const newUserData={
+        userName: userData.userName,
+        password: userData.password
+    }
+    const headerConfig={
+        headers:{ "Content-Type":"application/json" }
+    }
+    return (dispatch) => {
+            return axios.post(API_URL + "/authentication/signIn", newUserData,headerConfig)
+            .then(response => {
                     console.log(response.headers)
-                    if(response.headers.status=== UNAUTHORIZED){
+                    if(response.status=== UNAUTHORIZED){
                         dispatch(loadMessage(response.headers.message));
                     }else{
                         dispatch(loadMessage(response.headers.message))
@@ -36,18 +39,20 @@ const RegisterUser=(userData, authorizationKey)=>{
     }
 
     const headerConfig={
-        "Content-Type":"application/json" ,
-        "Authorization": authorizationKey
+        headers: { 
+            "Content-Type":"application/json" ,
+            "Authorization": authorizationKey
+        }
     }
 
     return(dispatch)=>{
         return axios.post(API_URL + "/registration/registration", newUserData,headerConfig).then(response => {
                 console.log(response.headers)
-                if(response.headers.status=== UNAUTHORIZED){
+                if(response.data.status !== OKSTATUS){
                     dispatch(loadMessage(response.headers.message));
                 }else{
                     dispatch(loadMessage(response.headers.message))
-                    dispatch(setAuthrizations(response.data))
+                    dispatch(saveUser(newUserData))
                 }
         }).catch(err => {
                 dispatch(loadMessage('danger', 'Something went worng..!'));

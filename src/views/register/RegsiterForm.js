@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Grid, Accordion, AccordionSummary, AccordionDetails } from "@material-ui/core";
 import { Field, reduxForm } from 'redux-form';
-import { renderTextField, renderSelectField, renderDateTimePicker, radioButton, renderFile } from '../utilites/FromUtilites';
+import { renderTextField, renderSelectField, renderDateTimePicker, radioButton, renderFile, renderNumberField } from '../utilites/FromUtilites';
 
 // this is maping skills
 const Skills = [
@@ -72,8 +72,8 @@ const PersonalInfo = (props) => {
                 <Field name="firstName" className={classes.textField} component={renderTextField} label="First Name" />
                 <Field name="lastName" className={classes.textField} component={renderTextField} label="Last Name" />
                 <Field name="designation" component={renderTextField} label="Job Title" id="standard-full-width" style={{ margin: 8 }} fullWidth helperText="Ex. Java Full Stack Developer" margin="normal" InputLabelProps={{ shrink: true }} />
-                <Field name="expInYears" className={classes.textField} component={renderTextField} label="Expriance" helperText="Ex. 2 years" id="margin-normal" margin="normal" />
-                <Field name="password" className={classes.textField} component={renderTextField} label="Password" id="margin-normal" margin="normal" />
+                <Field name="expInYears" className={classes.textField} component={renderNumberField} label="Expriance" helperText="Ex. 2 years" id="margin-normal" margin="normal" />
+                <Field name="password" className={classes.textField} component={renderTextField} label="Password" id="margin-normal" margin="normal" helperText="Password must contain [1...9][A...Z] and any special symbol" />
                 <Field name="gender" className={classes.textField} component={radioButton} mainLableName="Gender" label={["male", "female"]} />
             </div>
         </AccordionDetails>

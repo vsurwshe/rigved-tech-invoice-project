@@ -17,7 +17,7 @@ const Register = (props) => {
 
 const RegisterUser = (sendUserValues, props) => {
     console.log("Register User Data : ", sendUserValues, props);
-
+    props.RegisterUser(sendUserValues, props.LoginState.authorization)
 }
 
 const mapStateToProps = state => { return state; };

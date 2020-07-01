@@ -19,6 +19,24 @@ const renderTextField = ({
   )
 
 // this is render text filed
+const renderNumberField = ({
+  label,
+  input,
+  meta: { touched, invalid, error },
+  ...custom
+}) => (
+  <TextField
+    type="number"
+    label={label}
+    placeholder={label}
+    error={touched && invalid}
+    helperText={touched && error}
+    {...input}
+    {...custom}
+  />
+)
+
+// this is render text filed
 const renderFile = (
   field
 //   {
@@ -142,5 +160,6 @@ const renderDateTimePicker = ({
       renderSelectField,
       radioButton,
       renderDateTimePicker,
-      renderFile
+      renderFile,
+      renderNumberField
   }
