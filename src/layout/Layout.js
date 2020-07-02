@@ -8,11 +8,13 @@ import useStyles from "./styles";
 import { useLayoutState } from "../context/LayoutContext";
 import { Dashboard } from '@material-ui/icons';
 import Register from '../views/register/UserRegister';
+import ClientManagment from '../views/client/ClientManage';
 
 
 const RoutesPath=[
     {path:"/register",component: Register},
     {path:"/app/dashborad",component: Dashboard},
+    {path:"/client",component: ClientManagment},
 ]
 
 const Layout = (props) => {

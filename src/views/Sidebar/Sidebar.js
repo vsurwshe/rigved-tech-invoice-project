@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Drawer, IconButton, List } from "@material-ui/core";
 import {
-  Home as HomeIcon,
+  VerifiedUserTwoTone as RegisterIcon,
   NotificationsNone as NotificationsIcon,
-  BorderAll as TableIcon,
   QuestionAnswer as SupportIcon,
   HelpOutline as FAQIcon,
   ArrowBack as ArrowBackIcon,
+  SupervisedUserCircle as UserIcon
 } from "@material-ui/icons";
 import { useTheme } from "@material-ui/styles";
 import { withRouter } from "react-router-dom";
@@ -26,14 +26,9 @@ import {
 } from "../../context/LayoutContext";
 
 const structure = [
-  { id: 0, label: "Register", link: "/register", icon: <HomeIcon /> },
-  { id: 2, label: "Project", link: "/project", icon: <TableIcon /> },
-  {
-    id: 3,
-    label: "Rate Card",
-    link: "/ratecard",
-    icon: <NotificationsIcon />,
-  },
+  { id: 0, label: "Register", link: "/register", icon: <RegisterIcon /> },
+  { id: 2, label: "Client Managment", link: "/client", icon: <UserIcon /> },
+  { id: 3, label: "Rate Card", link: "/ratecard", icon: <NotificationsIcon />},
   { id: 5, type: "divider" },
   { id: 6, type: "title", label: "HELP" },
   { id: 8, label: "Support", link: "", icon: <SupportIcon /> },
