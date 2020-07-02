@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Grid, Accordion, AccordionSummary, AccordionDetails } from "@material-ui/core";
-import { Field, reduxForm } from 'redux-form';
-import { renderTextField, renderSelectField, renderDateTimePicker, radioButton, renderFile, renderNumberField } from '../utilites/FromUtilites';
+import { Field, reduxForm, reset } from 'redux-form';
+import { renderTextField, renderSelectField, renderDateTimePicker, radioButton, renderNumberField, renderFileInput } from '../utilites/FromUtilites';
 
 // this is maping skills
 const Skills = [
@@ -68,7 +68,8 @@ const PersonalInfo = (props) => {
         <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content"> PERSONAL INFORMATION</AccordionSummary>
         <AccordionDetails>
             <div>
-                <Field name="profilePic" component="input" style={{ margin: 8 }} fullWidth type="file" />
+                {/* <Field name="profilePic" component="input" style={{ margin: 8 }} fullWidth type="file" /> */}
+                <Field name="profilePic" className={classes.textField} type="file"  lable="Choose Profile Image" component={renderFileInput} />
                 <Field name="firstName" className={classes.textField} component={renderTextField} label="First Name" />
                 <Field name="lastName" className={classes.textField} component={renderTextField} label="Last Name" />
                 <Field name="designation" component={renderTextField} label="Job Title" style={{ margin: 8 }} fullWidth helperText="Ex. Java Full Stack Developer" margin="normal" InputLabelProps={{ shrink: true }} />
@@ -124,7 +125,7 @@ const SectionTwo = (props) => {
 }
 
 const ContactInfo = (props) => {
-    return <Accordion>
+    return <Accordion expanded={true}>
         <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content" > CONTACT INFORMATION</AccordionSummary>
         <AccordionDetails>
             <div>
@@ -148,4 +149,6 @@ const OtherInfo = (props) => {
     </Accordion>
 }
 
-export default reduxForm({ form: 'RegisterFrom' })(RegisterFrom);
+const afterSubmit = (result, dispatch) => dispatch(reset('RegisterFrom'));
+
+export default reduxForm({ form: 'RegisterFrom', onSubmitSuccess: afterSubmit })(RegisterFrom);

@@ -17,7 +17,13 @@ const Register = (props) => {
 }
 
 const RegisterUser = async(sendUserValues, props) => {
-    await props.RegisterUser(sendUserValues, props.LoginState.authorization)
+    console.log("Mes ",props)
+    const newUserData={
+        ...sendUserValues,
+        "profilePic": sendUserValues.profilePic.name,
+        "companyName": "RVTech Pvt Ltd"
+    }
+    await props.RegisterUser(newUserData, props.LoginState.authorization)
     setTimeout(async () => {
         await props.loadMessage()
         // await setLoading(loading = !loading);

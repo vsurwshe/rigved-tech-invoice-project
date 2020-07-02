@@ -1,13 +1,8 @@
 import React from 'react';
-import { Input, TextField, FormControlLabel, Checkbox, FormControl, RadioGroup, Radio, FormHelperText, InputLabel, Select, FormLabel } from "@material-ui/core"
+import { TextField, FormControlLabel, Checkbox, FormControl, RadioGroup, Radio, FormHelperText, InputLabel, Select, FormLabel } from "@material-ui/core"
 
 // this is render text filed
-const renderTextField = ({
-    label,
-    input,
-    meta: { touched, invalid, error },
-    ...custom
-  }) => (
+const renderTextField = ({ label, input, meta: { touched, invalid, error }, ...custom }) => (
     <TextField
       label={label}
       placeholder={label}
@@ -19,12 +14,7 @@ const renderTextField = ({
   )
 
 // this is render text filed
-const renderNumberField = ({
-  label,
-  input,
-  meta: { touched, invalid, error },
-  ...custom
-}) => (
+const renderNumberField = ({ label, input, meta: { touched, invalid, error }, ...custom }) => (
   <TextField
     type="number"
     label={label}
@@ -36,59 +26,34 @@ const renderNumberField = ({
   />
 )
 
-// this is render text filed
-const renderFile = (
-  field
-//   {
-//   label,
-//   style,
-//   field,
-//   meta: { touched, invalid, error },
-//   ...custom
-// }
-) => (
+// this will render the file input
+const renderFileInput = ({ input, lable, type, meta, ...custom }) => {
+  return (
+    <div>{lable} : <input name={input.name} {...custom} type={type} accept="image/*" onChange={event =>handleChange(event, input)} /></div>
+  );
+};
 
-  <div className="input-row">
-  <input
-  type="file"
-  onChange={
-    ( e ) => {      
-      e.preventDefault();
-      const { fields } = this.props;
-      // convert files to an array
-      const files = [ ...e.target.files ];
-      fields.yourField.handleChange(files);
-    }
+const handleChange = (event, input) => {
+  event.preventDefault();
+  let imageFile = event.target.files[0];
+  if (imageFile) {
+    const localImageUrl = URL.createObjectURL(imageFile);
+    const imageObject = new window.Image();
+    imageObject.onload = () => {
+      imageFile.width = imageObject.naturalWidth;
+      imageFile.height = imageObject.naturalHeight;
+      input.onChange(imageFile);
+      URL.revokeObjectURL(imageFile);
+    };
+    imageObject.src = localImageUrl;
   }
-  value={null}
-/>
-  {field.meta.touched && field.meta.error && 
-   <span className="error">{field.meta.error}</span>}
-</div>
+};
 
-  // <input
-  // accept="image/*"
-  // id="contained-button-file"
-  // multiple
-  // type="file"
-  //   {...input}
-  //   {...custom}
-  //   InputLabelProps={{ shrink: true }} 
-  // />
-)
 
 // this is render the checkbox 
 const renderCheckbox = ({ input, label }) => (
   <div>
-    <FormControlLabel
-      control={
-        <Checkbox
-          checked={input.value ? true : false}
-          onChange={input.onChange}
-        />
-      }
-      label={label}
-    />
+    <FormControlLabel control={ <Checkbox checked={input.value ? true : false} onChange={input.onChange} /> } label={label} />
   </div>
 )
 
@@ -112,36 +77,17 @@ const renderFromHelper = ({ touched, error }) => {
 }
 
 // this is the render selected filed
-const renderSelectField = ({
-  input,
-  label,
-  meta: { touched, error },
-  children,
-  ...custom
-}) => (
+const renderSelectField = ({ input, label, meta: { touched, error }, children, ...custom }) => (
   <FormControl error={touched && error}>
     <InputLabel htmlFor="age-native-simple">{label}</InputLabel>
-    <Select
-      native
-      {...input}
-      {...custom}
-      inputProps={{
-        name: label,
-      }}
-    >
-      {children}
-    </Select>
+    <Select native {...input} {...custom} inputProps={{ name: label, }} > {children} </Select>
     {renderFromHelper({ touched, error })}
   </FormControl>
 )
 
 // this render date time picker filed
-const renderDateTimePicker = ({
-    label,
-    input,
-    meta: { touched, invalid, error },
-    ...custom
-}) => <TextField
+const renderDateTimePicker = ({ label, input, meta: { touched, invalid, error }, ...custom }) => 
+    <TextField
       label={label}
       type="date"
       placeholder={label}
@@ -151,13 +97,12 @@ const renderDateTimePicker = ({
       {...custom}
     />
 
-
-  export{
-      renderTextField,
-      renderCheckbox,
-      renderSelectField,
-      radioButton,
-      renderDateTimePicker,
-      renderFile,
-      renderNumberField
-  }
+export{
+    renderTextField,
+    renderCheckbox,
+    renderSelectField,
+    radioButton,
+    renderDateTimePicker,
+    renderNumberField,
+    renderFileInput
+}

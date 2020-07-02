@@ -28,11 +28,6 @@ const LogoutUser=()=>{
 }
 
 const RegisterUser=(userData, authorizationKey)=>{
-    const newUserData={
-        ...userData,
-        "companyName": "RVTech Pvt Ltd",
-    }
-
     const headerConfig={
         headers: { 
             "Content-Type":"application/json" ,
@@ -41,13 +36,13 @@ const RegisterUser=(userData, authorizationKey)=>{
     }
 
     return(dispatch)=>{
-        return axios.post(API_URL + "/registration/registration", newUserData,headerConfig)
+        return axios.post(API_URL + "/registration/registration", userData,headerConfig)
         .then(response => {
                 if(response.data.status !== OKSTATUS){
                     dispatch(loadMessage(AlertColor.danger,response.headers.message));
                 }else{
                     dispatch(loadMessage(AlertColor.success,response.headers.message))
-                    dispatch(saveUser(newUserData))
+                    dispatch(saveUser(userData))
                 }})
         .catch(error => { 
             if(error.response.status.toString() === CONFLICTSTATUS){
