@@ -54,8 +54,7 @@ const SectionOne = (props) => {
         <div>
             {/* <input type="file" id="standard-full-width" label="Choose Prfile Photo" style={{ margin: 8 }} fullWidth InputLabelProps={{ shrink: true }} /> */}
             {/* <Field name="profilePic" value="profilePic" component="input" type="file" style={{ margin: 8 }} /> */}
-            <Field name="profilePic" component="input" type="file" />
-            <div id="margin-none" />
+            {/* <div id="margin-none" /> */}
             {PersonalInfo({ classes })}
             {SkillSet({ classes })}
             {Assign({ classes })}
@@ -66,14 +65,15 @@ const SectionOne = (props) => {
 const PersonalInfo = (props) => {
     const { classes } = props
     return <Accordion expanded={true}>
-        <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content" id="additional-actions1-header"> PERSONAL INFORMATION</AccordionSummary>
+        <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content"> PERSONAL INFORMATION</AccordionSummary>
         <AccordionDetails>
             <div>
+                <Field name="profilePic" component="input" style={{ margin: 8 }} fullWidth type="file" />
                 <Field name="firstName" className={classes.textField} component={renderTextField} label="First Name" />
                 <Field name="lastName" className={classes.textField} component={renderTextField} label="Last Name" />
-                <Field name="designation" component={renderTextField} label="Job Title" id="standard-full-width" style={{ margin: 8 }} fullWidth helperText="Ex. Java Full Stack Developer" margin="normal" InputLabelProps={{ shrink: true }} />
-                <Field name="expInYears" className={classes.textField} component={renderNumberField} label="Expriance" helperText="Ex. 2 years" id="margin-normal" margin="normal" />
-                <Field name="password" className={classes.textField} component={renderTextField} label="Password" id="margin-normal" margin="normal" helperText="Password must contain [1...9][A...Z] and any special symbol" />
+                <Field name="designation" component={renderTextField} label="Job Title" style={{ margin: 8 }} fullWidth helperText="Ex. Java Full Stack Developer" margin="normal" InputLabelProps={{ shrink: true }} />
+                <Field name="expInYears" className={classes.textField} component={renderNumberField} label="Expriance" helperText="Ex. 2 years" margin="normal" />
+                <Field name="password" className={classes.textField} component={renderTextField} label="Password" margin="normal" helperText="Password must contain [1...9][A...Z] and any special symbol" />
                 <Field name="gender" className={classes.textField} component={radioButton} mainLableName="Gender" label={["male", "female"]} />
             </div>
         </AccordionDetails>
@@ -83,12 +83,12 @@ const PersonalInfo = (props) => {
 const SkillSet = (props) => {
     const { classes } = props
     return <Accordion>
-        <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content" id="additional-actions1-header" > SKILLS INFORMATION</AccordionSummary>
+        <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content"> SKILLS INFORMATION</AccordionSummary>
         <AccordionDetails>
-            <Field name="primerySkill" component={renderSelectField} className={classes.textField} id="margin-normal" margin="normal" label="primary Skill" >
+            <Field name="primerySkill" component={renderSelectField} className={classes.textField} margin="normal" label="primary Skill" >
                 {Skills.map((item, key) => <option key={key} value={item}>{item}</option>)}
             </Field>
-            <Field name="secounderySkill" component={renderSelectField} className={classes.textField} id="margin-normal" margin="normal" label="Secondary Skill" >
+            <Field name="secounderySkill" component={renderSelectField} className={classes.textField} margin="normal" label="Secondary Skill" >
                 {Skills.map((item, key) => <option key={key} value={item}>{item}</option>)}
             </Field>
         </AccordionDetails>
@@ -98,13 +98,13 @@ const SkillSet = (props) => {
 const Assign = (props) => {
     const { classes } = props
     return <Accordion>
-        <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content" id="additional-actions1-header" > ASSIGN INFORMATION</AccordionSummary>
+        <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content"> ASSIGN ROLES</AccordionSummary>
         <AccordionDetails>
             <div>
-                <Field name="roles" component={renderSelectField} className={classes.textField} id="margin-normal" margin="normal" label="Roles" >
+                <Field name="roles" component={renderSelectField} className={classes.textField} margin="normal" label="Roles" >
                     {Roles.map((item, key) => <option key={key} value={item}>{item}</option>)}
                 </Field>
-                <Field name="domain" component={renderSelectField} className={classes.textField} id="margin-normal" margin="normal" label="Domain" >
+                <Field name="domain" component={renderSelectField} className={classes.textField} margin="normal" label="Domain" >
                     {Domain.map((item, key) => <option key={key} value={item}>{item}</option>)}
                 </Field>
             </div>
@@ -116,7 +116,7 @@ const SectionTwo = (props) => {
     const { classes } = props
     return <div>
         <div>
-            <div id="margin-none" />
+            <div />
             {ContactInfo({ classes })}
             {OtherInfo({ classes })}
         </div>
@@ -125,10 +125,10 @@ const SectionTwo = (props) => {
 
 const ContactInfo = (props) => {
     return <Accordion>
-        <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content" id="additional-actions1-header" > CONTACT INFORMATION</AccordionSummary>
+        <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content" > CONTACT INFORMATION</AccordionSummary>
         <AccordionDetails>
             <div>
-                <Field name="emailId" component={renderTextField} label="Work Mail" id="standard-full-width" style={{ margin: 8 }} fullWidth helperText="Ex. admin@rigvedtech.com" margin="normal" InputLabelProps={{ shrink: true }} />
+                <Field name="emailId" component={renderTextField} label="Work Mail"  style={{ margin: 8 }} fullWidth helperText="Ex. admin@rigvedtech.com" margin="normal" InputLabelProps={{ shrink: true }} />
                 <Field name="mobileNumber" component={renderTextField} label="Phone" style={{ margin: 8 }} fullWidth helperText="Ex. 7653434533" margin="normal" InputLabelProps={{ shrink: true }} />
             </div>
         </AccordionDetails>
@@ -140,9 +140,9 @@ const OtherInfo = (props) => {
         <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content" id="additional-actions1-header" > OTHER INFORMATION</AccordionSummary>
         <AccordionDetails>
             <div>
-                <Field name="employeeNumber" component={renderTextField} label="Employee Code" id="standard-full-width" style={{ margin: 8 }} fullWidth helperText="Ex. RV0001 " margin="normal" InputLabelProps={{ shrink: true }} />
-                <Field name="dob" component={renderDateTimePicker} label="Date of Birth" id="standard-full-width" style={{ margin: 8 }} fullWidth helperText="Ex. 15/02/2020" margin="normal" InputLabelProps={{ shrink: true }} />
-                <Field name="ctc" component={renderTextField} label="CTC" id="standard-full-width" style={{ margin: 8 }} fullWidth helperText="Ex. 5000" margin="normal" InputLabelProps={{ shrink: true }} />
+                <Field name="employeeNumber" component={renderTextField} label="Employee Code" style={{ margin: 8 }} fullWidth helperText="Ex. RV0001 " margin="normal" InputLabelProps={{ shrink: true }} />
+                <Field name="dob" component={renderDateTimePicker} label="Date of Birth" style={{ margin: 8 }} fullWidth helperText="Ex. 15/02/2020" margin="normal" InputLabelProps={{ shrink: true }} />
+                <Field name="ctc" component={renderTextField} label="CTC" style={{ margin: 8 }} fullWidth helperText="Ex. 5000" margin="normal" InputLabelProps={{ shrink: true }} />
             </div>
         </AccordionDetails>
     </Accordion>

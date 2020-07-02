@@ -1,27 +1,22 @@
 import axios from "axios"
-import {API_URL} from '../../assets/config/Config';
-import { UNAUTHORIZED, OKSTATUS } from "../../assets/config/CodeMap";
+import {API_URL, AlertColor} from '../../assets/config/Config';
+import { UNAUTHORIZED, OKSTATUS, CONFLICTSTATUS } from "../../assets/config/CodeMap";
 
 const LoginUser=(userData) =>{
-    const newUserData={
-        userName: userData.userName,
-        password: userData.password
-    }
     const headerConfig={
         headers:{ "Content-Type":"application/json" }
     }
     return (dispatch) => {
-            return axios.post(API_URL + "/authentication/signIn", newUserData,headerConfig)
+            return axios.post(API_URL + "/authentication/signIn", userData,headerConfig)
             .then(response => {
-                    console.log(response.headers)
                     if(response.status=== UNAUTHORIZED){
-                        dispatch(loadMessage(response.headers.message));
+                        dispatch(loadMessage(AlertColor.danger ,response.headers.message));
                     }else{
-                        dispatch(loadMessage(response.headers.message))
+                        dispatch(loadMessage(AlertColor.success,response.headers.message))
                         dispatch(setAuthrizations(response.data))
                     }
             }).catch(err => {
-                    dispatch(loadMessage('danger', 'Something went worng..!'));
+                    dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
             })
         }
 }
@@ -46,16 +41,20 @@ const RegisterUser=(userData, authorizationKey)=>{
     }
 
     return(dispatch)=>{
-        return axios.post(API_URL + "/registration/registration", newUserData,headerConfig).then(response => {
-                console.log(response.headers)
+        return axios.post(API_URL + "/registration/registration", newUserData,headerConfig)
+        .then(response => {
                 if(response.data.status !== OKSTATUS){
-                    dispatch(loadMessage(response.headers.message));
+                    dispatch(loadMessage(AlertColor.danger,response.headers.message));
                 }else{
-                    dispatch(loadMessage(response.headers.message))
+                    dispatch(loadMessage(AlertColor.success,response.headers.message))
                     dispatch(saveUser(newUserData))
-                }
-        }).catch(err => {
-                dispatch(loadMessage('danger', 'Something went worng..!'));
+                }})
+        .catch(error => { 
+            if(error.response.status.toString() === CONFLICTSTATUS){
+                dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+            }else{
+                dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+            }
         })
     }
 }
@@ -76,10 +75,11 @@ export function clearData(){
     }
 }
 
-export function loadMessage(message){
+export function loadMessage(color,message){
     return{
         type:"CHANGE_MASSAGE",
-        message
+        message,
+        color
     }
 }
 

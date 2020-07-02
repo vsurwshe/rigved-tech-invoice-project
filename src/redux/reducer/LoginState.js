@@ -4,6 +4,7 @@ const initialState = {
     account_id: "",
     authorization: "",
     common_message: "",
+    color:"",
     saveUserData: []
   }
   
@@ -19,7 +20,7 @@ const initialState = {
         localStorage.setItem('account_id',action.account_id)
         return { ...state, account_id: action.account_id, authorization: action.authorization }
       case "CHANGE_MASSAGE":
-        return { ...state, common_message: action.message }
+        return { ...state, common_message: action.message, color: action.color }
       case "USER_SAVED":
         return {...state, saveUserData: action.saveUserData}
       default:

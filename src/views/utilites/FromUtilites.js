@@ -95,10 +95,9 @@ const renderCheckbox = ({ input, label }) => (
 // this is render the radio button
 const radioButton = ({ input,label,mainLableName, ...rest }) => (
   <FormControl>
-    {console.log("123",mainLableName)}
     <FormLabel component="legend">{mainLableName}</FormLabel>
     <RadioGroup {...input} {...rest}>
-      {(label && label.length > 0) && label.map((item ,key)=> <FormControlLabel value={item} control={<Radio />} label={item} />)}
+      {(label && label.length > 0) && label.map((item ,key)=> <FormControlLabel key={key} value={item} control={<Radio />} label={item} />)}
     </RadioGroup>
   </FormControl>
 )
@@ -128,7 +127,6 @@ const renderSelectField = ({
       {...custom}
       inputProps={{
         name: label,
-        id: 'age-native-simple'
       }}
     >
       {children}
