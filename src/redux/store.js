@@ -3,6 +3,8 @@ import thunk from "redux-thunk";
 import logger from 'redux-logger';
 import { reducer as reduxFormReducer } from 'redux-form';
 import LoginState from "./reducer/LoginState";
+import ClientState from "./reducer/ClientState";
+
 
 // this function save state into local storage.
 const saveToLocalStorage=(state)=>{
@@ -35,7 +37,8 @@ const persistedState= loadFormLocalStorgae();
 
 const reducer = combineReducers({
   form: reduxFormReducer, // mounted under "form"
-  LoginState
+  LoginState,
+  ClientState
 });
 
 const enhancer= compose(applyMiddleware(thunk, logger));
