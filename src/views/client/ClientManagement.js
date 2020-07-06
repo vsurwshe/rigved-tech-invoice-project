@@ -30,11 +30,11 @@ class ClientManagment extends Component {
     }
 
     loadClientForm = () => <ClientForm SaveClient={this.SaveClientDetails} cancle={this.handleCreateClient} />
-    loadClientTable = () => <>
+    loadClientTable = () => < div style={{paddingRight:10}}>
         <h1>Client Management</h1>
         <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={this.handleCreateClient} > Create Client</Button>
         <ClientTable />
-    </>
+    </div>
 
 SaveClientDetails = async(sendUserValues, props) => {
     console.log("Mes ",props)

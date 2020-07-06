@@ -1,6 +1,5 @@
-import axios from "axios"
 import {API_URL, AlertColor} from '../../assets/config/Config';
-import { UNAUTHORIZED, OKSTATUS, CONFLICTSTATUS } from "../../assets/config/CodeMap";
+import { OKSTATUS, CONFLICTSTATUS } from "../../assets/config/CodeMap";
 import Axios from "axios";
 
 
@@ -20,14 +19,20 @@ const GetClientList=(firstIndex, lastIndex,authroizationKey)=>{
         return createInstance()
             .get('/client/clientList/'+firstIndex+'/'+lastIndex,HeaderConfig(authroizationKey))
             .then(response => {
-                if(response.status=== UNAUTHORIZED){
+                if(response.data.status !== OKSTATUS){
                     dispatch(loadMessage(AlertColor.danger ,response.headers.message));
                 }else{
                     dispatch(loadMessage(AlertColor.success,response.headers.message))
                     dispatch(SaveClientList(response.data))
                 }
             })
-            .catch(err => { dispatch(loadMessage(AlertColor.danger, 'Something went worng..!')); })
+            .catch(error => { 
+                if(error.response.status.toString() === CONFLICTSTATUS){
+                    dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+                }else{
+                    dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+                }
+            })
     }
 }
 

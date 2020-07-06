@@ -11,19 +11,19 @@ const ClientForm=(props)=>{
     return <div className={classes.girdContainer}>
     <form onSubmit={handleSubmit(SaveClient)}>
          <Grid container spacing={5}>
-            <Grid item >
+            <Grid item style={{paddingLeft:30}}>
                 {Profile({ classes })}
             </Grid>
          </Grid>
         <Grid container spacing={5}>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} style={{paddingLeft:30}}>
                 {SectionOne({ classes })}
             </Grid>
             <Grid item xs={12} sm={6}>
                 {SectionTwo({ classes })}
             </Grid>
         </Grid>
-        <Grid container spacing={5}>
+        <Grid container spacing={5} style={{paddingLeft:10}}>
             <Grid item >
                 {SectionThree({ classes })}
             </Grid>
@@ -42,7 +42,7 @@ const ClientForm=(props)=>{
 
 const Profile=(props)=>{
     return <Grid item container direction="row" justify="center" alignItems="center" > 
-    <div >Company Logo</div>
+    <div >Company Logo</div> &nbsp; &nbsp;&nbsp;
     <h3> Rigved Technologies</h3>
     </Grid>
 }
@@ -50,7 +50,7 @@ const Profile=(props)=>{
 // section one
 const SectionOne=(props)=>{
     return <>
-    <Field name="address"  component={renderTextAreaField} maxRows={2}  label="HQ Address" fullWidth helperText="Ex. PDES03028F"/>
+    <Field name="address"  component={renderTextAreaField} maxRows={2}  label="HQ Address" fullWidth helperText="Ex. Sector 1, Mahape, Navi Mumbai, Maharashtra 400701"/>
     <Field name="tanNo"  component={renderTextField} label="TAN No." fullWidth helperText="Ex. PDES03028F"/>
     <Field name="gstNo"  component={renderTextField} label="GST No." fullWidth helperText="Ex. 24AAACC1206D1ZM"/>
     </>
