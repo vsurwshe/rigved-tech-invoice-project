@@ -150,5 +150,4 @@ const OtherInfo = (props) => {
 }
 
 const afterSubmit = (result, dispatch) => dispatch(reset('RegisterFrom'));
-
 export default reduxForm({ form: 'RegisterFrom', onSubmitSuccess: afterSubmit })(RegisterFrom);

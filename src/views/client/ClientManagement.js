@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Card, Button } from '@material-ui/core';
+import { Card, Button } from '@material-ui/core'
+
 import ClientTable from './ClientTable';
 import { connect } from 'react-redux';
 import ClientRegister from "./ClientRegister"
