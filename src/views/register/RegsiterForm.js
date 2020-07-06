@@ -52,9 +52,6 @@ const SectionOne = (props) => {
     const { classes } = props
     return <div className={classes.root}>
         <div>
-            {/* <input type="file" id="standard-full-width" label="Choose Prfile Photo" style={{ margin: 8 }} fullWidth InputLabelProps={{ shrink: true }} /> */}
-            {/* <Field name="profilePic" value="profilePic" component="input" type="file" style={{ margin: 8 }} /> */}
-            {/* <div id="margin-none" /> */}
             {PersonalInfo({ classes })}
             {SkillSet({ classes })}
             {Assign({ classes })}
