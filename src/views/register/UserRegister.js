@@ -17,7 +17,6 @@ const Register = (props) => {
 }
 
 const RegisterUser = async(sendUserValues, props) => {
-    console.log("Mes ",props)
     const newUserData={
         ...sendUserValues,
         "profilePic": sendUserValues.profilePic.name,

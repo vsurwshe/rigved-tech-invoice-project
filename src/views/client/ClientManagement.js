@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Card, Button } from '@material-ui/core'
-
 import ClientTable from './ClientTable';
 import { connect } from 'react-redux';
 import ClientRegister from "./ClientRegister"
@@ -26,10 +25,7 @@ class ClientManagment extends Component {
 
     render() {
         const { createClient } = this.state
-        const { listOfClient } = this.props.ClientState;
-        return <Card>
-            {createClient ? this.loadClientForm() : this.loadClientTable()}
-        </Card>
+        return <Card> {createClient ? this.loadClientForm() : this.loadClientTable()} </Card>
     }
 
     loadClientForm = () => <ClientRegister />
