@@ -2,12 +2,19 @@ import React from 'react';
 import { Grid, Button } from '@material-ui/core';
 import { reset, reduxForm, Field } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
-import { renderTextField } from '../utilites/FromUtilites';
+import { renderTextField, renderTextAreaField } from '../utilites/FromUtilites';
+import useStyles from "../register/styles";
 
 const ClientForm=(props)=>{
-    const { classes, SaveClient, pristine, reset, submitting, handleSubmit } = props
+    var classes = useStyles();
+    const { SaveClient, pristine, reset, submitting, handleSubmit, cancle } = props
     return <div className={classes.girdContainer}>
     <form onSubmit={handleSubmit(SaveClient)}>
+         <Grid container spacing={5}>
+            <Grid item >
+                {Profile({ classes })}
+            </Grid>
+         </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6}>
                 {SectionOne({ classes })}
@@ -24,7 +31,8 @@ const ClientForm=(props)=>{
         <div className={classes.buttonStyle}>
             <center>
                 <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;
-                <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button>
+                <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button> &nbsp;&nbsp;
+                <Button type="button" variant="outlined" color="secondary" onClick={cancle}> Cancle</Button>
             </center>
         </div>
 
@@ -32,9 +40,17 @@ const ClientForm=(props)=>{
 </div>
 }
 
+const Profile=(props)=>{
+    return <Grid item container direction="row" justify="center" alignItems="center" > 
+    <div >Company Logo</div>
+    <h3> Rigved Technologies</h3>
+    </Grid>
+}
+
 // section one
 const SectionOne=(props)=>{
     return <>
+    <Field name="address"  component={renderTextAreaField} maxRows={2}  label="HQ Address" fullWidth helperText="Ex. PDES03028F"/>
     <Field name="tanNo"  component={renderTextField} label="TAN No." fullWidth helperText="Ex. PDES03028F"/>
     <Field name="gstNo"  component={renderTextField} label="GST No." fullWidth helperText="Ex. 24AAACC1206D1ZM"/>
     </>

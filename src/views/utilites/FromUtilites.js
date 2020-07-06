@@ -13,6 +13,20 @@ const renderTextField = ({ label, input, meta: { touched, invalid, error }, ...c
     />
   )
 
+// this is render text area filed
+const renderTextAreaField = ({ maxRows,label, input, meta: { touched, invalid, error }, ...custom }) => (
+  <TextField
+    label={label}
+    placeholder={label}
+    multiline
+    rows={maxRows}
+    error={touched && invalid}
+    helperText={touched && error}
+    {...input}
+    {...custom}
+  />
+)
+
 // this is render text filed
 const renderNumberField = ({ label, input, meta: { touched, invalid, error }, ...custom }) => (
   <TextField
@@ -104,5 +118,6 @@ export{
     radioButton,
     renderDateTimePicker,
     renderNumberField,
+    renderTextAreaField,
     renderFileInput
 }
