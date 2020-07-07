@@ -2,8 +2,9 @@ import React from 'react';
 import { Grid, Button } from '@material-ui/core';
 import { reset, reduxForm, Field } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
-import { renderTextField, renderTextAreaField } from '../utilites/FromUtilites';
+import { renderTextField, renderTextAreaField, renderFileInput } from '../utilites/FromUtilites';
 import useStyles from "../register/styles";
+import RateCardTable from '../rateCard/RateCardTable';
 
 const ClientForm=(props)=>{
     var classes = useStyles();
@@ -42,17 +43,20 @@ const ClientForm=(props)=>{
 
 const Profile=(props)=>{
     return <Grid item container direction="row" justify="center" alignItems="center" > 
-    <div >Company Logo</div> &nbsp; &nbsp;&nbsp;
+    <div>Company Logo</div> &nbsp; &nbsp;&nbsp;
     <h3> Rigved Technologies</h3>
     </Grid>
 }
 
 // section one
 const SectionOne=(props)=>{
+    const { classes}=props
     return <>
-    <Field name="address"  component={renderTextAreaField} maxRows={2}  label="HQ Address" fullWidth helperText="Ex. Sector 1, Mahape, Navi Mumbai, Maharashtra 400701"/>
-    <Field name="tanNo"  component={renderTextField} label="TAN No." fullWidth helperText="Ex. PDES03028F"/>
-    <Field name="gstNo"  component={renderTextField} label="GST No." fullWidth helperText="Ex. 24AAACC1206D1ZM"/>
+        <Field name="address"  component={renderTextAreaField} maxRows={2}  label="HQ Address" fullWidth helperText="Ex. Sector 1, Mahape, Navi Mumbai, Maharashtra 400701"/>
+        <Field name="tanNo"  component={renderTextField} fullWidth label="TAN No." helperText="Ex. PDES03028F"/>
+        <Field name="tanUrl" component={renderFileInput} className={classes.textField} type="file" lable="Choose TAN Card Image" />
+        <Field name="gstNo"  component={renderTextField} fullWidth label="GST No." helperText="Ex. 24AAACC1206D1ZM"/>
+        <Field name="gstUrl" component={renderFileInput} className={classes.textField} type="file" lable="Choose GST Card Image" />
     </>
 }
 
@@ -60,14 +64,18 @@ const SectionOne=(props)=>{
 
 // section two
 const SectionTwo=(props)=>{
-    return ContactInfo(props);
-}
-
-const ContactInfo=(props)=>{
     return <>
     <Field name="phone" component={renderTextField} label="Phone" fullWidth helperText="Ex. 8709653423" />
     <Field name="mobile" component={renderTextField} label="Mobile" fullWidth helperText="Ex. 7834652312" />
     <Field name="email" component={renderTextField} label="Email" fullWidth helperText="Ex. admin@rigvedtech.com"/>
+    </>
+}
+
+const ContactInfo=(props)=>{
+    return <>
+    <Field name="clientPhone" component={renderTextField} label="Phone" fullWidth helperText="Ex. 8709653423" />
+    <Field name="clientMobile" component={renderTextField} label="Mobile" fullWidth helperText="Ex. 7834652312" />
+    <Field name="clientEmail" component={renderTextField} label="Email" fullWidth helperText="Ex. admin@rigvedtech.com"/>
     </>
 }
 
@@ -96,9 +104,18 @@ const Financials=(props)=>{
     </>
 }
 
+const rateCardData=[
+    {Domain:"SAP", Category: "Functional", Skills:"MM", Experience:"0-2", Rate:2500},
+    {Domain:"SAP", Category: "Technical", Skills:"ABAP", Experience:"0-2", Rate:3000},
+    {Domain:"Non-SAP", Category: "Technical", Skills:"Angular", Experience:"0-2", Rate:3500}
+]
+
 // rate card
 const RateCard=(props)=>{
-    return <h3> RateCard</h3>
+    return<> 
+    <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={()=>console.log("Adding Rate Card")}>ADD</Button>
+    <RateCardTable data={rateCardData}/>
+    </>
 }
 
 

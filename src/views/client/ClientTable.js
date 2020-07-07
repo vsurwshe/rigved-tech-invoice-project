@@ -18,16 +18,16 @@ import { TableHead } from '@material-ui/core';
 import useStyles from "./Styles";
 
 const columns = [
-    { id: 'name', label: 'Name', minWidth: 170 },
-    { id: 'code', label: 'ISO\u00a0Code', minWidth: 100 },
+    { id: 'key', label: 'Sr. No.', minWidth: 30 },
+    { id: 'name', label: 'Client Name', minWidth: 170 },
+    { id: 'gstNumber', label: 'GST\u00a0Number'},
     {
-      id: 'population',
-      label: 'Population',
-      minWidth: 170,
+      id: 'tanNumber',
+      label: 'TAN Number',
       align: 'right',
       format: (value) => value.toLocaleString('en-US'),
     }  
-  ];
+];
   
 function TablePaginationActions(props) {
   const classes = useStyles();
@@ -56,14 +56,14 @@ function TablePaginationActions(props) {
   );
 }
 
-function createData(name, calories, fat) { return { name, calories, fat }; }
+// this function is used for the create the row data
+function createData(key, clientName, gstNum, tanNum) { return { key, clientName, gstNum, tanNum }; }
 
 const  ClientTable=(props)=>{
   const {listOfClient}= props.ClientState
-  console.log("Mes ", listOfClient)
   // Creating rows
-  const rows=(listOfClient && listOfClient.length >0 )&& listOfClient.map((item,key)=>{ return  createData(item.clientName,item.gstNum,item.active) });  
-  (rows && rows.length > 0) && rows.sort((a, b) => (a.calories < b.calories ? -1 : 1));
+  const rows=(listOfClient && listOfClient.length >0 )&& listOfClient.map((item,key)=>{ return  createData((key+1),item.clientName,item.gstNum,item.tanNum) });  
+  (rows && rows.length > 0) && rows.sort((a, b) => (a.key < b.key ? -1 : 1));
   const classes = useStyles();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -79,21 +79,18 @@ const  ClientTable=(props)=>{
       <Table className={classes.clientTableTable} aria-label="custom pagination table">
         <TableHead>
             <TableRow>
-              {columns.map((column) => (
-                <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }} >
-                  {column.label}
-                </TableCell>
-              ))}
+              {columns.map((column) => (<TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }} > {column.label} </TableCell>))}
             </TableRow>
         </TableHead>
         <TableBody>
           {/* this condition checking wheter rows is avilable or not */}
           {(rows && rows.length > 0) && (rowsPerPage > 0 ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage): rows)
-          .map((row) => (
-            <TableRow key={row.name}>
-              <TableCell component="th" scope="row"> {row.name} </TableCell>
-              <TableCell style={{ width: 160 }}> {row.calories} </TableCell>
-              <TableCell style={{ width: 160 }} > {row.fat} </TableCell>
+          .map((row,key) => (
+            <TableRow key={key}>
+              <TableCell component="th" scope="row"> {row.key} </TableCell>
+              <TableCell> {row.clientName} </TableCell>
+              <TableCell> {row.gstNum} </TableCell>
+              <TableCell> {row.tanNum} </TableCell>
             </TableRow>
           ))}
           {emptyRows > 0 && (   <TableRow style={{ height: 53 * emptyRows }}> <TableCell colSpan={6} /> </TableRow> )}

@@ -47,8 +47,8 @@ class ClientManagment extends Component {
 
     loadingCircle=()=> <center><CircularProgress size={80} /></center>
 
-    SaveClientDetails = async (sendUserValues, props) => {
-        console.log("Mes ", props)
+    SaveClientDetails = async (sendUserValues) => {
+        console.log("Mes ", sendUserValues)
         //     const newUserData={
         //         ...sendUserValues,
         //         "profilePic": sendUserValues.profilePic.name,
