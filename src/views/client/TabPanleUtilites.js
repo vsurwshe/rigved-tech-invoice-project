@@ -32,7 +32,7 @@ const SimpleTabs = (props) => {
                {tabData.map((item, key) => { return <Tab label={item.label} {...a11yProps(key)} /> })}
            </Tabs>
        </AppBar>
-       {tabData.map((item, key) => { return <TabPanel value={value} index={key}>{item.component()}</TabPanel> })}
+       {tabData.map((item, key) => { return <TabPanel value={value} index={key}>{item.component}</TabPanel> })}
    </div>
 }
 

@@ -61,12 +61,12 @@ function createData(key, domain, category, skills, experience, rate) { return { 
 const RateCardTable=(props)=>{
     const {data}=props
     // Creating rows
-    const rows=(data && data.length >0 )&& data.map((item,key)=>{ return  createData((key+1),item.Domain,item.Category,item.Skills,item.Experience,item.Rate) });  
+    const rows=(data && data.length >0 )&& data.map((item,key)=>{ return  createData((key+1),item.domain,item.category,item.skills,item.experience,item.rate) });  
     (rows && rows.length > 0) && rows.sort((a, b) => (a.key < b.key ? -1 : 1));
     const classes = useStyles();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+    const emptyRows = rows && rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
     const handleChangePage = (event, newPage) => { setPage(newPage); };
     
     const handleChangeRowsPerPage = (event) => {
@@ -100,7 +100,7 @@ const RateCardTable=(props)=>{
           <TablePagination
             rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
             colSpan={3}
-            count={rows.length}
+            count={rows && rows.length}
             rowsPerPage={rowsPerPage}
             page={page}
             SelectProps={{ inputProps: { 'aria-label': 'rows per page' }, native: true }}
