@@ -34,17 +34,27 @@ const loadFormLocalStorgae=()=>{
 const persistedState= loadFormLocalStorgae();
 
 
-
+// in this function we combine the differnt reducer for single store
 const reducer = combineReducers({
   form: reduxFormReducer, // mounted under "form"
   LoginState,
   ClientState
 });
 
+// this functions apply logger funtionality during development mode 
 const enhancer= compose(applyMiddleware(thunk, logger));
 
-const store = createStore(reducer, persistedState, enhancer);
-
+// this is common action through out application will be used
+const initialState = reducer({}, {},{})
+const rootReducer = (state, action) => {
+  if (action.type === 'CLEAR_DATA') {
+    state = initialState
+  }
+  return reducer(state, action)
+}
+// this function will be createing store
+const store = createStore(rootReducer, persistedState, enhancer);
+// this function get the store from local storage
 store.subscribe(()=> saveToLocalStorage(store.getState()))
 
 export default store

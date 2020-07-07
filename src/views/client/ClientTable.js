@@ -1,6 +1,5 @@
 import React,{useState} from 'react';
-import PropTypes from 'prop-types';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { useTheme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -16,13 +15,7 @@ import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import { connect } from 'react-redux';
 import { TableHead } from '@material-ui/core';
-
-const useStyles1 = makeStyles((theme) => ({
-  root: {
-    flexShrink: 0,
-    marginLeft: theme.spacing(2.5),
-  },
-}));
+import useStyles from "./Styles";
 
 const columns = [
     { id: 'name', label: 'Name', minWidth: 170 },
@@ -33,27 +26,11 @@ const columns = [
       minWidth: 170,
       align: 'right',
       format: (value) => value.toLocaleString('en-US'),
-    },
-    // {
-    //   id: 'size',
-    //   label: 'Size\u00a0(km\u00b2)',
-    //   minWidth: 170,
-    //   align: 'right',
-    //   format: (value) => value.toLocaleString('en-US'),
-    // },
-    // {
-    //   id: 'density',
-    //   label: 'Density',
-    //   minWidth: 170,
-    //   align: 'right',
-    //   format: (value) => value.toFixed(2),
-    // },
+    }  
   ];
   
-
-
 function TablePaginationActions(props) {
-  const classes = useStyles1();
+  const classes = useStyles();
   const theme = useTheme();
   const { count, page, rowsPerPage, onChangePage } = props;
   const handleFirstPageButtonClick = (event) => { onChangePage(event, 0); };
@@ -62,7 +39,7 @@ function TablePaginationActions(props) {
   const handleLastPageButtonClick = (event) => { onChangePage(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1)); };
 
   return (
-    <div className={classes.root}>
+    <div className={classes.clientTableRoot}>
       <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0} aria-label="first page" >
         {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
       </IconButton>
@@ -79,44 +56,15 @@ function TablePaginationActions(props) {
   );
 }
 
-TablePaginationActions.propTypes = {
-  count: PropTypes.number.isRequired,
-  onChangePage: PropTypes.func.isRequired,
-  page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
-};
-
-function createData(name, calories, fat) {
-  return { name, calories, fat };
-}
-
-// const rows = [
-//   createData('Cupcake', 305, 3.7),
-//   createData('Donut', 452, 25.0),
-//   createData('Eclair', 262, 16.0),
-//   createData('Frozen yoghurt', 159, 6.0),
-//   createData('Gingerbread', 356, 16.0),
-//   createData('Honeycomb', 408, 3.2),
-//   createData('Ice cream sandwich', 237, 9.0),
-//   createData('Jelly Bean', 375, 0.0),
-//   createData('KitKat', 518, 26.0),
-//   createData('Lollipop', 392, 0.2),
-//   createData('Marshmallow', 318, 0),
-//   createData('Nougat', 360, 19.0),
-//   createData('Oreo', 437, 18.0),
-// ].sort((a, b) => (a.calories < b.calories ? -1 : 1));
-
-const useStyles2 = makeStyles({
-  table: { minWidth: 500 }
-});
+function createData(name, calories, fat) { return { name, calories, fat }; }
 
 const  ClientTable=(props)=>{
   const {listOfClient}= props.ClientState
+  console.log("Mes ", listOfClient)
   // Creating rows
   const rows=(listOfClient && listOfClient.length >0 )&& listOfClient.map((item,key)=>{ return  createData(item.clientName,item.gstNum,item.active) });  
-  rows.sort((a, b) => (a.calories < b.calories ? -1 : 1));
-  console.log("Mod ",rows);
-  const classes = useStyles2();
+  (rows && rows.length > 0) && rows.sort((a, b) => (a.calories < b.calories ? -1 : 1));
+  const classes = useStyles();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
@@ -128,7 +76,7 @@ const  ClientTable=(props)=>{
   };
 
   return <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label="custom pagination table">
+      <Table className={classes.clientTableTable} aria-label="custom pagination table">
         <TableHead>
             <TableRow>
               {columns.map((column) => (
@@ -139,8 +87,9 @@ const  ClientTable=(props)=>{
             </TableRow>
         </TableHead>
         <TableBody>
-          {(rowsPerPage > 0 ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage): rows
-          ).map((row) => (
+          {/* this condition checking wheter rows is avilable or not */}
+          {(rows && rows.length > 0) && (rowsPerPage > 0 ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage): rows)
+          .map((row) => (
             <TableRow key={row.name}>
               <TableCell component="th" scope="row"> {row.name} </TableCell>
               <TableCell style={{ width: 160 }}> {row.calories} </TableCell>

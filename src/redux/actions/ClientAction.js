@@ -1,5 +1,5 @@
 import {API_URL, AlertColor} from '../../assets/config/Config';
-import { OKSTATUS, CONFLICTSTATUS } from "../../assets/config/CodeMap";
+import {CONFLICTSTATUS, STATUS200 } from "../../assets/config/CodeMap";
 import Axios from "axios";
 
 
@@ -19,7 +19,7 @@ const GetClientList=(firstIndex, lastIndex,authroizationKey)=>{
         return createInstance()
             .get('/client/clientList/'+firstIndex+'/'+lastIndex,HeaderConfig(authroizationKey))
             .then(response => {
-                if(response.data.status !== OKSTATUS){
+                if(response.status !== STATUS200){
                     dispatch(loadMessage(AlertColor.danger ,response.headers.message));
                 }else{
                     dispatch(loadMessage(AlertColor.success,response.headers.message))
@@ -90,6 +90,5 @@ export{
     GetClientList,
     SaveClient,
     GetClientDetailsById
-
 }
 

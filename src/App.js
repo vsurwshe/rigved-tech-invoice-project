@@ -6,7 +6,7 @@ import { LayoutProvider } from "./context/LayoutContext";
 import { UserProvider } from "./context/UserContext";
 import Themes from "./themes";
 import { Provider } from 'react-redux';
-import store from './redux/store';
+import store from './redux/Store';
 import UserActions from './views/login/UserActions';
 
 const App=(prpos)=>{
