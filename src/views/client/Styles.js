@@ -6,5 +6,17 @@ export default makeStyles(theme => ({
     },
     clientTableTable: { 
         minWidth: 500 
-    }
+    },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120,
+    },
+    selectContainer: {
+        display: 'flex',
+        flexWrap: 'wrap',
+    },
+    selectTextField: {
+        marginRight: theme.spacing(0.8),
+        width: '9ch',
+    },
 }))

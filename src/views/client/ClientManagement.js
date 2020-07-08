@@ -47,10 +47,14 @@ class ClientManagment extends Component {
         const { loadClientList } = this.state
         return < div style={{ paddingRight: 10 }}>
             <h1>Client Management</h1>
-            <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={this.handleCreateClient} > Create Client</Button>
-            {loadClientList ? this.loadingCircle() : <ClientTable />}
+            {loadClientList ? this.loadingCircle() : this.loadingClientTable() }
         </div>
     }
+
+    loadingClientTable=()=><>
+        <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={this.handleCreateClient} > Create Client</Button>
+        <ClientTable />
+    </>
 
     loadingCircle=()=> <center><CircularProgress size={80} /></center>
 

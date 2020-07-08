@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import { reset, reduxForm, Field, FieldArray, formValueSelector } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
-import { renderTextField, renderTextAreaField, renderFileInput } from '../utilites/FromUtilites';
-import useStyles from "../register/styles";
+import { renderTextField, renderTextAreaField, renderFileInput, renderSelectField } from '../utilites/FromUtilites';
+import useStyles from "../client/Styles";
 import { connect } from 'react-redux';
 import RateCardTable from '../rateCard/RateCardTable';
 
 let ClientForm = (props) => {
     var classes = useStyles();
     const { SaveClient, pristine, reset, submitting, rateCardDtos, handleSubmit, cancle } = props
+    const { Domains, SkillCategory, SkillSet}= props.MasterDataSet
+    console.log(props.MasterDataSet)
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(SaveClient)}>
             <Grid container spacing={5}>
@@ -27,7 +29,7 @@ let ClientForm = (props) => {
             </Grid>
             <Grid container spacing={5} style={{ paddingLeft: 10 }}>
                 <Grid item >
-                    {SectionThree({ classes, rateCardDtos })}
+                    {SectionThree({ classes, rateCardDtos, Domains, SkillCategory, SkillSet })}
                 </Grid>
             </Grid>
             <div className={classes.buttonStyle}>
@@ -102,7 +104,7 @@ const Financials = (props) => {
     </>
 }
 
-const RenderMembers = ({ fields, meta: { error, submitFailed } }) => {
+const RenderMembers = ({ classes, domains, skillCategory, skillSet, fields, meta: { error, submitFailed } }) => {
     const [open, setOpen] = useState(false);
     const handleClickOpen = () => {
         setOpen(true)
@@ -111,18 +113,30 @@ const RenderMembers = ({ fields, meta: { error, submitFailed } }) => {
     const handleClose = () => { setOpen(false) };
     return <>
         <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>
-        <Dialog open={open} onClose={handleClose} aria-labelledby="responsive-dialog-title" >
+        <Dialog open={open} onClose={handleClose} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
             <DialogTitle id="responsive-dialog-title">{"Adding Rate Card"}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
                     {fields.map((member, index) => (
-                        <tr key={index}>
-                            <td><Field name={`${member}.domainName`} type="text" component={renderTextField} label="Domain" /></td>
-                            <td><Field name={`${member}.skillCategory`} type="text" component={renderTextField} label="Category" /></td>
-                            <td><Field name={`${member}.skillSet`} type="text" component={renderTextField} label="Skills" /></td>
-                            <td><Field name={`${member}.yearOfExp`} type="text" component={renderTextField} label="Experience" /></td>
-                            <td><Field name={`${member}.rate`} type="text" component={renderTextField} label="Rate" /></td>
-                            <td><Button type="button" onClick={() => fields.remove(index)}> Remove</Button></td>
+                        <tr key={index} className={classes.selectContainer}>
+                            <td>
+                                <Field name={`${member}.domainName`} className={classes.selectTextField} component={renderSelectField} label="Domain" >
+                                    {(domains && domains.length >0) && domains.map((item, key) => <option key={key} value={item.name}>{item.name}</option>)}
+                                </Field>
+                            </td>
+                            <td>
+                                <Field name={`${member}.skillCategory`} className={classes.selectTextField} component={renderSelectField} label="Category" >
+                                    {(skillCategory && skillCategory.length >0) && skillCategory.map((item, key) => <option key={key} value={item.name}>{item.name}</option>)}
+                                </Field>
+                            </td>
+                            <td>
+                                <Field name={`${member}.skillSet`} className={classes.selectTextField} component={renderSelectField} label="Skills" >
+                                    {(skillSet && skillSet.length >0) && skillSet.map((item, key) => <option key={key} value={item.name}>{item.name}</option>)}
+                                </Field>
+                            </td>
+                            <td><Field name={`${member}.yearOfExp`} type="text" className={classes.selectTextField} component={renderTextField} label="Experience" /></td>
+                            <td><Field name={`${member}.rate`} type="text" className={classes.selectTextField} component={renderTextField} label="Rate" /></td>
+                            <td><Button type="button" variant="contained" color="secondary" onClick={() => fields.remove(index)}> Remove</Button></td>
                         </tr>
                     ))}
                 </DialogContentText>
@@ -137,9 +151,9 @@ const RenderMembers = ({ fields, meta: { error, submitFailed } }) => {
 
 // rate card
 const RateCard = (props) => {
-    const { rateCardDtos } = props
+    const { rateCardDtos,  Domains, SkillCategory, SkillSet, classes } = props
     return <>
-        <FieldArray name="rateCardDtos" component={RenderMembers} />
+        <FieldArray name="rateCardDtos" classes={classes} domains={Domains}  skillCategory={SkillCategory} skillSet={SkillSet}  component={RenderMembers} />
         <RateCardTable data={rateCardDtos} />
     </>
 }
@@ -149,7 +163,7 @@ const selector = formValueSelector('ClientForm')
 ClientForm = connect(state => {
     // can select values individually
     const rateCardDtos = selector(state, 'rateCardDtos')
-    return { rateCardDtos }
+    return { rateCardDtos, ...state }
 })(ClientForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ClientForm'));
