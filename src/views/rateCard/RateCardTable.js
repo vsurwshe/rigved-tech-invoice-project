@@ -54,14 +54,12 @@ function TablePaginationActions(props) {
 }
 
 // this function is used for the create the row data
-function createData(key, domain, category, skills, experience, rate) { return { key, domain, category, skills, experience, rate }; }
-
-
+function createData(key, domainName, skillCategory, skillSet, yearOfExp, rate) { return { key, domainName, skillCategory, skillSet, yearOfExp, rate }; }
 
 const RateCardTable=(props)=>{
     const {data}=props
     // Creating rows
-    const rows=(data && data.length >0 )&& data.map((item,key)=>{ return  createData((key+1),item.domain,item.category,item.skills,item.experience,item.rate) });  
+    const rows=(data && data.length >0 )&& data.map((item,key)=>{ return  createData((key+1),item.domainName,item.skillCategory,item.skillSet,item.yearOfExp,item.rate) });  
     (rows && rows.length > 0) && rows.sort((a, b) => (a.key < b.key ? -1 : 1));
     const classes = useStyles();
     const [page, setPage] = useState(0);
@@ -86,10 +84,10 @@ const RateCardTable=(props)=>{
         .map((row,key) => (
           <TableRow key={key}>
             <TableCell component="th" scope="row"> {row.key} </TableCell>
-            <TableCell> {row.domain} </TableCell>
-            <TableCell> {row.category} </TableCell>
-            <TableCell> {row.skills} </TableCell>
-            <TableCell> {row.experience} </TableCell>
+            <TableCell> {row.domainName} </TableCell>
+            <TableCell> {row.skillCategory} </TableCell>
+            <TableCell> {row.skillSet} </TableCell>
+            <TableCell> {row.yearOfExp} </TableCell>
             <TableCell> {row.rate} </TableCell>
           </TableRow>
         ))}

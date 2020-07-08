@@ -9,8 +9,7 @@ import RateCardTable from '../rateCard/RateCardTable';
 
 let ClientForm = (props) => {
     var classes = useStyles();
-    console.log("rtc 6", props)
-    const { SaveClient, pristine, reset, submitting, members, handleSubmit, cancle } = props
+    const { SaveClient, pristine, reset, submitting, rateCardDtos, handleSubmit, cancle } = props
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(SaveClient)}>
             <Grid container spacing={5}>
@@ -28,7 +27,7 @@ let ClientForm = (props) => {
             </Grid>
             <Grid container spacing={5} style={{ paddingLeft: 10 }}>
                 <Grid item >
-                    {SectionThree({ classes, members })}
+                    {SectionThree({ classes, rateCardDtos })}
                 </Grid>
             </Grid>
             <div className={classes.buttonStyle}>
@@ -60,8 +59,6 @@ const SectionOne = (props) => {
         <Field name="gstUrl" component={renderFileInput} className={classes.textField} type="file" lable="Choose GST Card Image" />
     </>
 }
-
-
 
 // section two
 const SectionTwo = (props) => {
@@ -115,15 +112,15 @@ const RenderMembers = ({ fields, meta: { error, submitFailed } }) => {
     return <>
         <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>
         <Dialog open={open} onClose={handleClose} aria-labelledby="responsive-dialog-title" >
-            <DialogTitle id="responsive-dialog-title">{"Use Google's location service?"}</DialogTitle>
+            <DialogTitle id="responsive-dialog-title">{"Adding Rate Card"}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
                     {fields.map((member, index) => (
                         <tr key={index}>
-                            <td><Field name={`${member}.domain`} type="text" component={renderTextField} label="Domain" /></td>
-                            <td><Field name={`${member}.category`} type="text" component={renderTextField} label="Category" /></td>
-                            <td><Field name={`${member}.skills`} type="text" component={renderTextField} label="Skills" /></td>
-                            <td><Field name={`${member}.experience`} type="text" component={renderTextField} label="Experience" /></td>
+                            <td><Field name={`${member}.domainName`} type="text" component={renderTextField} label="Domain" /></td>
+                            <td><Field name={`${member}.skillCategory`} type="text" component={renderTextField} label="Category" /></td>
+                            <td><Field name={`${member}.skillSet`} type="text" component={renderTextField} label="Skills" /></td>
+                            <td><Field name={`${member}.yearOfExp`} type="text" component={renderTextField} label="Experience" /></td>
                             <td><Field name={`${member}.rate`} type="text" component={renderTextField} label="Rate" /></td>
                             <td><Button type="button" onClick={() => fields.remove(index)}> Remove</Button></td>
                         </tr>
@@ -140,10 +137,10 @@ const RenderMembers = ({ fields, meta: { error, submitFailed } }) => {
 
 // rate card
 const RateCard = (props) => {
-    const { members } = props
+    const { rateCardDtos } = props
     return <>
-        <FieldArray name="members" component={RenderMembers} />
-        <RateCardTable data={members} />
+        <FieldArray name="rateCardDtos" component={RenderMembers} />
+        <RateCardTable data={rateCardDtos} />
     </>
 }
 
@@ -151,8 +148,8 @@ const RateCard = (props) => {
 const selector = formValueSelector('ClientForm')
 ClientForm = connect(state => {
     // can select values individually
-    const members = selector(state, 'members')
-    return { members }
+    const rateCardDtos = selector(state, 'rateCardDtos')
+    return { rateCardDtos }
 })(ClientForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ClientForm'));

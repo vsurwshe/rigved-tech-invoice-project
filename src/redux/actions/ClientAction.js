@@ -1,22 +1,10 @@
-import {API_URL, AlertColor} from '../../assets/config/Config';
+import {AlertColor} from '../../assets/config/Config';
 import {CONFLICTSTATUS, STATUS200 } from "../../assets/config/CodeMap";
-import Axios from "axios";
-
-
-const HeaderConfig=(authroizationKey,userData)=>{
-    return{
-        data:userData ? userData : {},
-        headers: { 
-            'Content-Type': 'application/json',
-            Authorization: authroizationKey 
-        }
-    }
-}
-
+import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
 
 const GetClientList=(firstIndex, lastIndex,authroizationKey)=>{
     return(dispatch)=>{
-        return createInstance()
+        return CreateInstance()
             .get('/client/clientList/'+firstIndex+'/'+lastIndex,HeaderConfig(authroizationKey))
             .then(response => {
                 if(response.status !== STATUS200){
@@ -38,7 +26,23 @@ const GetClientList=(firstIndex, lastIndex,authroizationKey)=>{
 
 const SaveClient=(userData,authroizationKey)=>{
     return(dispatch)=>{
-
+        return CreateInstance()
+        .post('/client/create/',HeaderConfig(authroizationKey,userData))
+        .then(response => {
+            if(response.status !== STATUS200){
+                dispatch(loadMessage(AlertColor.danger ,response.headers.message));
+            }else{
+                dispatch(loadMessage(AlertColor.success,response.headers.message))
+                dispatch(SaveClientList(userData))
+            }
+        })
+        .catch(error => { 
+            if(error.response.status.toString() === CONFLICTSTATUS){
+                dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+            }else{
+                dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+            }
+        })
     }
 }
 
@@ -47,15 +51,6 @@ const GetClientDetailsById=(clientId, authroizationKey)=>{
 
     }
 }
-
-
-function createInstance() {
-    let instance = Axios.create({
-      baseURL: API_URL,
-    });
-    return instance;
-}
-
 
 //------------------------------------
 
@@ -82,8 +77,6 @@ export function loadMessage(color,message){
         color
     }
 }
-
-
 
 
 export{

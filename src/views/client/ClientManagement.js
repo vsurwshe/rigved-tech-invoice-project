@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import { Card, Button, CircularProgress } from '@material-ui/core'
 import ClientTable from './ClientTable';
 import { connect } from 'react-redux';
-import * as ClientAction from "../../redux/actions/ClientAction";
 import ClientForm from './ClientForm';
+import { bindActionCreators } from 'redux';
+import * as ClientAction from "../../redux/actions/ClientAction";
+import * as MasterDataAction from "../../redux/actions/MasterDataAction";
 
 class ClientManagment extends Component {
     state = {
@@ -14,9 +16,14 @@ class ClientManagment extends Component {
     componentDidMount = async () => {
         const { listOfClient } = this.props.ClientState;
         const { authorization } = this.props.LoginState;
+        const { GetClientList }= this.props.ClientAction;
+        const { GetSkillSet, GetSkillCategory, GetDomains }= this.props.MasterDataAction;
         if (listOfClient && listOfClient.length === 0) {
             this.handleLoadClientList(true);
-            await this.props.GetClientList(0, 10, authorization)
+            await GetSkillSet(0,10,authorization);
+            await GetSkillCategory(0,10,authorization);
+            await GetDomains(0,10,authorization);
+            await GetClientList(0, 10, authorization);
             await this.handleLoadClientList(false);
         }
     }
@@ -63,4 +70,9 @@ class ClientManagment extends Component {
 }
 
 const mapStateToProps = state => { return state; };
-export default connect(mapStateToProps, ClientAction)(ClientManagment);
+const mapDispatchToProps = (dispatch) => ({
+    ClientAction: bindActionCreators(ClientAction, dispatch),
+    MasterDataAction: bindActionCreators(MasterDataAction, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(ClientManagment);

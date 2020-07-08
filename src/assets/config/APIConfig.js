@@ -1,0 +1,27 @@
+import { API_URL } from './Config';
+import Axios from 'axios';
+
+
+
+const HeaderConfig=(authroizationKey,userData)=>{
+    return{
+        data:userData ? userData : {},
+        headers: { 
+            'Content-Type': 'application/json',
+            Authorization: authroizationKey 
+        }
+    }
+}
+
+const CreateInstance=()=> {
+    let instance = Axios.create({
+      baseURL: API_URL,
+    });
+    return instance;
+}
+
+
+export {
+    CreateInstance,
+    HeaderConfig
+}
