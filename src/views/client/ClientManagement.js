@@ -6,6 +6,7 @@ import ClientForm from './ClientForm';
 import { bindActionCreators } from 'redux';
 import * as ClientAction from "../../redux/actions/ClientAction";
 import * as MasterDataAction from "../../redux/actions/MasterDataAction";
+import { API_EXE_TIME } from '../../assets/config/Config';
 
 class ClientManagment extends Component {
     state = {
@@ -59,17 +60,21 @@ class ClientManagment extends Component {
     loadingCircle=()=> <center><CircularProgress size={80} /></center>
 
     SaveClientDetails = async (sendUserValues) => {
+        const {SaveClient, loadMessage }=this.props.ClientAction;
+        const {authorization }= this.props.LoginState
         console.log("Mes ", sendUserValues)
-        //     const newUserData={
-        //         ...sendUserValues,
-        //         "profilePic": sendUserValues.profilePic.name,
-        //         "companyName": "RVTech Pvt Ltd"
-        //     }
-        //     await props.RegisterUser(newUserData, props.LoginState.authorization)
-        //     setTimeout(async () => {
-        //         await props.loadMessage()
-        //         // await setLoading(loading = !loading);
-        //     }, API_EXE_TIME)
+            const newUserData={
+                ...sendUserValues,
+                "gstUrl": sendUserValues.gstUrl.name,
+                "tanUrl":sendUserValues.tanUrl.name,
+                "addressDtos":[sendUserValues.addressDtos],
+                "bankDetailsDtoList":[sendUserValues.bankDetailsDtoList]
+            }
+            await SaveClient(newUserData, authorization)
+            setTimeout(async () => {
+                await loadMessage()
+                // await setLoading(loading = !loading);
+            }, API_EXE_TIME)
     }
 }
 

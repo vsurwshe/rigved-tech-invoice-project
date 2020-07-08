@@ -27,7 +27,7 @@ const GetClientList=(firstIndex, lastIndex,authroizationKey)=>{
 const SaveClient=(userData,authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
-        .post('/client/create/',HeaderConfig(authroizationKey,userData))
+        .post('/client/create/',userData,HeaderConfig(authroizationKey,userData))
         .then(response => {
             if(response.status !== STATUS200){
                 dispatch(loadMessage(AlertColor.danger ,response.headers.message));

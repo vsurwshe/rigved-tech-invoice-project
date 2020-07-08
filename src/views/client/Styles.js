@@ -19,4 +19,14 @@ export default makeStyles(theme => ({
         marginRight: theme.spacing(0.8),
         width: '9ch',
     },
+    textField1: {
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+        width: '20ch',
+    },
+    textField: {
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+        width: '25ch',
+    },
 }))

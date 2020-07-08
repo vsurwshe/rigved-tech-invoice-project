@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
-import { reset, reduxForm, Field, FieldArray, formValueSelector } from 'redux-form';
+import { reset, reduxForm, Field, FieldArray, formValueSelector} from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
-import { renderTextField, renderTextAreaField, renderFileInput, renderSelectField } from '../utilites/FromUtilites';
+import { renderTextField, renderFileInput, renderSelectField, renderNumberField } from '../utilites/FromUtilites';
 import useStyles from "../client/Styles";
 import { connect } from 'react-redux';
 import RateCardTable from '../rateCard/RateCardTable';
+import ContactTable from '../contact/ContactTable';
 
 let ClientForm = (props) => {
     var classes = useStyles();
-    const { SaveClient, pristine, reset, submitting, rateCardDtos, handleSubmit, cancle } = props
+    const { SaveClient, pristine, reset, submitting, rateCardDtos,contactPersonDtos, handleSubmit, cancle } = props
     const { Domains, SkillCategory, SkillSet}= props.MasterDataSet
-    console.log(props.MasterDataSet)
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(SaveClient)}>
             <Grid container spacing={5}>
@@ -29,7 +29,7 @@ let ClientForm = (props) => {
             </Grid>
             <Grid container spacing={5} style={{ paddingLeft: 10 }}>
                 <Grid item >
-                    {SectionThree({ classes, rateCardDtos, Domains, SkillCategory, SkillSet })}
+                    {SectionThree({ classes, rateCardDtos, contactPersonDtos, Domains, SkillCategory, SkillSet })}
                 </Grid>
             </Grid>
             <div className={classes.buttonStyle}>
@@ -54,57 +54,88 @@ const Profile = (props) => {
 const SectionOne = (props) => {
     const { classes } = props
     return <>
-        <Field name="address" component={renderTextAreaField} maxRows={2} label="HQ Address" fullWidth helperText="Ex. Sector 1, Mahape, Navi Mumbai, Maharashtra 400701" />
-        <Field name="tanNo" component={renderTextField} fullWidth label="TAN No." helperText="Ex. PDES03028F" />
-        <Field name="tanUrl" component={renderFileInput} className={classes.textField} type="file" lable="Choose TAN Card Image" />
-        <Field name="gstNo" component={renderTextField} fullWidth label="GST No." helperText="Ex. 24AAACC1206D1ZM" />
-        <Field name="gstUrl" component={renderFileInput} className={classes.textField} type="file" lable="Choose GST Card Image" />
+        {/* <Field name="address" component={renderTextAreaField} maxRows={2} label="HQ Address" fullWidth helperText="Ex. Sector 1, Mahape, Navi Mumbai, Maharashtra 400701" /> */}
+        <Field name="clientName" component={renderTextField} fullWidth  label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." />
+        <Field name="tanNo" component={renderTextField} className={classes.textField}  label="TAN No." helperText="Ex. PDES03028F" />
+        <Field name="gstNo" component={renderTextField}  className={classes.textField} label="GST No." helperText="Ex. 24AAACC1206D1ZM" />
+        <Field name="tanUrl" component={renderFileInput} style={{padding: 10}} type="file" lable="Choose TAN Card Image" />
+        <Field name="gstUrl" component={renderFileInput} style={{padding: 10}} type="file" lable="Choose GST Card Image" />
+    </>
+}
+
+const AddressDto=(props)=>{
+    const {classes}=props
+    return <>
+         <Field name="addressDtos.addressLine" component={renderTextField}  fullWidth label="Address Line" helperText="Ex. Sector 1" />
+         <Field name="addressDtos.city" component={renderTextField} className={classes.textField} label="City" helperText="Ex. Navi Mumbai" />
+         <Field name="addressDtos.area" component={renderTextField} className={classes.textField} label="Area" helperText="Ex. Mahape" />
+         <Field name="addressDtos.state" component={renderTextField} className={classes.textField} label="State" helperText="Ex. Maharashtra" />
+         <Field name="addressDtos.pincode" component={renderTextField} className={classes.textField} label="Pincode" helperText="Ex. 400001" />
     </>
 }
 
 // section two
 const SectionTwo = (props) => {
     return <>
-        <Field name="phone" component={renderTextField} label="Phone" fullWidth helperText="Ex. 8709653423" />
-        <Field name="mobile" component={renderTextField} label="Mobile" fullWidth helperText="Ex. 7834652312" />
-        <Field name="email" component={renderTextField} label="Email" fullWidth helperText="Ex. admin@rigvedtech.com" />
-    </>
-}
-
-const ContactInfo = (props) => {
-    return <>
-        <Field name="clientPhone" component={renderTextField} label="Phone" fullWidth helperText="Ex. 8709653423" />
-        <Field name="clientMobile" component={renderTextField} label="Mobile" fullWidth helperText="Ex. 7834652312" />
-        <Field name="clientEmail" component={renderTextField} label="Email" fullWidth helperText="Ex. admin@rigvedtech.com" />
+        {AddressDto(props)}
     </>
 }
 
 // section three
 const SectionThree = (props) => {
     const tabsData = [
-        { label: "Contact & Address", component: ContactAddress() },
+        { label: "Contact & Address", component: ContactAddress(props) },
         { label: "Financials", component: Financials() },
         { label: "Rate Card", component: RateCard(props) }
     ]
     return <SimpleTabs tabData={tabsData} />
 }
 
-// contact address
-const ContactAddress = (props) => {
-    return ContactInfo(props)
-}
 
 // financials
 const Financials = (props) => {
     return <>
-        <Field name="accNumber" component={renderTextField} label="Account Number" fullWidth helperText="Ex. 3456231234567" />
-        <Field name="ifscCode" component={renderTextField} label="IFSC Code" fullWidth helperText="Ex. SBI0000345" />
-        <Field name="bankName" component={renderTextField} label="Bank Name" fullWidth helperText="Ex. State Bank of India" />
-        <Field name="branchName" component={renderTextField} label="Branch Name" fullWidth helperText="Ex. Mumbai" />
+        <Field name="bankDetailsDtoList.accNumber" component={renderTextField} label="Account Number" fullWidth helperText="Ex. 3456231234567" />
+        <Field name="bankDetailsDtoList.ifscCode" component={renderTextField} label="IFSC Code" fullWidth helperText="Ex. SBI0000345" />
+        <Field name="bankDetailsDtoList.bankName" component={renderTextField} label="Bank Name" fullWidth helperText="Ex. State Bank of India" />
+        <Field name="bankDetailsDtoList.branchName" component={renderTextField} label="Branch Name" fullWidth helperText="Ex. Mumbai" />
     </>
 }
 
-const RenderMembers = ({ classes, domains, skillCategory, skillSet, fields, meta: { error, submitFailed } }) => {
+// this will be render contact
+const RenderContact = ({ classes, fields, meta: { error, submitFailed } }) => {
+    const [open, setOpen] = useState(false);
+    const handleClickOpen = () => {
+        setOpen(true)
+        fields.push({})
+    };
+    const handleClose = () => { setOpen(false) };
+    return <>
+        <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>
+        <Dialog open={open} onClose={handleClose} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
+            <DialogTitle id="responsive-dialog-title">{"Add Contact"}</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    {fields.map((member, index) => (
+                        <tr key={index}>
+                            <td><Field name={`${member}.name`} component={renderTextField} className={classes.textField} label="Name" helperText="Ex. admin" /></td>
+                            <td><Field name={`${member}.email`} component={renderTextField} className={classes.textField1} label="Email" helperText="Ex. admin@rigvedtech.com" /></td>
+                            <td><Field name={`${member}.mobileNum`} component={renderTextField} className={classes.textField1}  label="Mobile Number" helperText="Ex. 9130253456" /></td>
+                            <td><Button type="button" variant="contained" color="secondary" onClick={() => fields.remove(index)}> Remove</Button></td>
+                        </tr>
+                    ))}
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleClose} color="primary" autoFocus> Cancle   </Button>
+                <Button onClick={handleClose} color="primary" autoFocus> Save  </Button>
+            </DialogActions>
+        </Dialog>
+    </>
+}
+
+// this will be render rate card
+const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, meta: { error, submitFailed } }) => {
     const [open, setOpen] = useState(false);
     const handleClickOpen = () => {
         setOpen(true)
@@ -134,7 +165,7 @@ const RenderMembers = ({ classes, domains, skillCategory, skillSet, fields, meta
                                     {(skillSet && skillSet.length >0) && skillSet.map((item, key) => <option key={key} value={item.name}>{item.name}</option>)}
                                 </Field>
                             </td>
-                            <td><Field name={`${member}.yearOfExp`} type="text" className={classes.selectTextField} component={renderTextField} label="Experience" /></td>
+                            <td><Field name={`${member}.yearOfExp`} className={classes.selectTextField} component={renderNumberField} label="Experience" /></td>
                             <td><Field name={`${member}.rate`} type="text" className={classes.selectTextField} component={renderTextField} label="Rate" /></td>
                             <td><Button type="button" variant="contained" color="secondary" onClick={() => fields.remove(index)}> Remove</Button></td>
                         </tr>
@@ -153,8 +184,18 @@ const RenderMembers = ({ classes, domains, skillCategory, skillSet, fields, meta
 const RateCard = (props) => {
     const { rateCardDtos,  Domains, SkillCategory, SkillSet, classes } = props
     return <>
-        <FieldArray name="rateCardDtos" classes={classes} domains={Domains}  skillCategory={SkillCategory} skillSet={SkillSet}  component={RenderMembers} />
+        <FieldArray name="rateCardDtos" classes={classes} domains={Domains}  skillCategory={SkillCategory} skillSet={SkillSet}  component={RenderRateCard} />
         <RateCardTable data={rateCardDtos} />
+    </>
+}
+
+
+// contact address
+const ContactAddress = (props) => {
+    const {contactPersonDtos, classes} =props
+    return <>
+           <FieldArray name="contactPersonDtos" classes={classes} component={RenderContact} />
+           <ContactTable data={contactPersonDtos} />
     </>
 }
 
@@ -163,8 +204,11 @@ const selector = formValueSelector('ClientForm')
 ClientForm = connect(state => {
     // can select values individually
     const rateCardDtos = selector(state, 'rateCardDtos')
-    return { rateCardDtos, ...state }
+    const contactPersonDtos = selector(state, 'contactPersonDtos')
+    return { rateCardDtos, contactPersonDtos, ...state }
 })(ClientForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ClientForm'));
-export default reduxForm({ form: 'ClientForm', onSubmitSuccess: afterSubmit })(ClientForm);
+export default reduxForm({ form: 'ClientForm', 
+// onSubmitSuccess: afterSubmit 
+})(ClientForm);
