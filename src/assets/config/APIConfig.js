@@ -5,7 +5,6 @@ import Axios from 'axios';
 
 const HeaderConfig=(authroizationKey,userData)=>{
     if(userData){
-        console.log("header",userData)
         return{
             headers: { 
                 'Content-Type': 'application/json',

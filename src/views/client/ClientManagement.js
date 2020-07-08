@@ -60,21 +60,22 @@ class ClientManagment extends Component {
     loadingCircle=()=> <center><CircularProgress size={80} /></center>
 
     SaveClientDetails = async (sendUserValues) => {
-        const {SaveClient, loadMessage }=this.props.ClientAction;
+        const {SaveClient, loadMessage, GetClientList }=this.props.ClientAction;
         const {authorization }= this.props.LoginState
-        console.log("Mes ", sendUserValues)
-            const newUserData={
-                ...sendUserValues,
-                "gstUrl": sendUserValues.gstUrl.name,
-                "tanUrl":sendUserValues.tanUrl.name,
-                "addressDtos":[sendUserValues.addressDtos],
-                "bankDetailsDtoList":[sendUserValues.bankDetailsDtoList]
-            }
-            await SaveClient(newUserData, authorization)
-            setTimeout(async () => {
-                await loadMessage()
-                // await setLoading(loading = !loading);
-            }, API_EXE_TIME)
+        const newUserData={
+            ...sendUserValues,
+            "gstUrl": sendUserValues.gstUrl.name,
+            "tanUrl":sendUserValues.tanUrl.name,
+            "addressDtos":[sendUserValues.addressDtos],
+            "bankDetailsDtoList":[sendUserValues.bankDetailsDtoList]
+        }
+        await SaveClient(newUserData, authorization)
+        setTimeout(async () => {
+            await loadMessage()
+            await GetClientList(0, 10, authorization);
+            this.handleCreateClient();
+            // await setLoading(loading = !loading);
+        }, API_EXE_TIME)
     }
 }
 

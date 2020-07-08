@@ -10,7 +10,6 @@ const GetClientList=(firstIndex, lastIndex,authroizationKey)=>{
                 if(response.status !== STATUS200){
                     dispatch(loadMessage(AlertColor.danger ,response.headers.message));
                 }else{
-                    dispatch(loadMessage(AlertColor.success,response.headers.message))
                     dispatch(SaveClientList(response.data))
                 }
             })
