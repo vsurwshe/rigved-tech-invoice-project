@@ -11,37 +11,46 @@ import { Alert } from '@material-ui/lab';
 
 let ClientForm = (props) => {
     var classes = useStyles();
-    const { SaveClient, pristine, reset, submitting, rateCardDtos, contactPersonDtos, handleSubmit, cancle } = props
-    const { Domains, SkillCategory, SkillSet } = props.MasterDataSet
+    const { SaveClientMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues } = props
     return <div className={classes.girdContainer}>
-        <form onSubmit={handleSubmit(SaveClient)}>
-            <Grid container spacing={5}>
+        <form onSubmit={handleSubmit(SaveClientMethod)}>
+            {LoadGird(props)}
+            <div className={classes.buttonStyle}>
+                <center>
+                    {(initialValues === undefined) && <>
+                        <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;
+                        <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button> &nbsp;&nbsp;
+                    </>}
+                    <Button type="button" variant="outlined" color="secondary" onClick={cancle}> Cancel</Button>
+                </center>
+            </div>
+        </form>
+    </div>
+}
+
+const LoadGird=(props)=>{
+    var classes = useStyles();
+    const { rateCardDtos, contactPersonDtos } = props
+    const { Domains, SkillCategory, SkillSet } = props.MasterDataSet
+return    <><Grid container spacing={5}>
                 <Grid item style={{ paddingLeft: 30 }}>
                     {Profile({ classes, props })}
                 </Grid>
             </Grid>
             <Grid container spacing={5}>
                 <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
-                    {SectionOne({ classes })}
+                    {SectionOne({ classes, props })}
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     {SectionTwo({ classes })}
                 </Grid>
             </Grid>
             <Grid container spacing={5} style={{ paddingLeft: 10 }}>
-                <Grid item >
+                <Grid item xs={12}>
                     {SectionThree({ classes, rateCardDtos, contactPersonDtos, Domains, SkillCategory, SkillSet })}
                 </Grid>
-            </Grid>
-            <div className={classes.buttonStyle}>
-                <center>
-                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;
-                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button> &nbsp;&nbsp;
-                    <Button type="button" variant="outlined" color="secondary" onClick={cancle}> Cancle</Button>
-                </center>
-            </div>
-        </form>
-    </div>
+            </Grid></>
+
 }
 
 const Profile = (props) => {
@@ -54,13 +63,13 @@ const Profile = (props) => {
 }
 
 // section one
-const SectionOne = (props) => {
-    const { classes } = props
+const SectionOne = (data) => {
+    const { classes } = data
     return <>
         {/* <Field name="address" component={renderTextAreaField} maxRows={2} label="HQ Address" fullWidth helperText="Ex. Sector 1, Mahape, Navi Mumbai, Maharashtra 400701" /> */}
-        <Field name="clientName" component={renderTextField} fullWidth label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." />
-        <Field name="tanNo" component={renderTextField} className={classes.textField} label="TAN No." helperText="Ex. PDES03028F" />
-        <Field name="gstNo" component={renderTextField} className={classes.textField} label="GST No." helperText="Ex. 24AAACC1206D1ZM" />
+        <Field name="clientName" value="Vishva" component={renderTextField} fullWidth label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." />
+        <Field name="tanNum" component={renderTextField} className={classes.textField} label="TAN No." helperText="Ex. PDES03028F" />
+        <Field name="gstNum" component={renderTextField} className={classes.textField} label="GST No." helperText="Ex. 24AAACC1206D1ZM" />
         <Field name="tanUrl" component={renderFileInput} style={{ padding: 10 }} type="file" lable="Choose TAN Card Image" />
         <Field name="gstUrl" component={renderFileInput} style={{ padding: 10 }} type="file" lable="Choose GST Card Image" />
     </>
@@ -87,7 +96,7 @@ const SectionTwo = (props) => {
 // section three
 const SectionThree = (props) => {
     const tabsData = [
-        { label: "Contact & Address", component: ContactAddress(props) },
+        { label: "Contact Person", component: ContactAddress(props) },
         { label: "Financials", component: Financials() },
         { label: "Rate Card", component: RateCard(props) }
     ]
@@ -98,7 +107,7 @@ const SectionThree = (props) => {
 // financials
 const Financials = (props) => {
     return <>
-        <Field name="bankDetailsDtoList.accNumber" component={renderTextField} label="Account Number" fullWidth helperText="Ex. 3456231234567" />
+        <Field name="bankDetailsDtoList.accountNumber" component={renderTextField} label="Account Number" fullWidth helperText="Ex. 3456231234567" />
         <Field name="bankDetailsDtoList.ifscCode" component={renderTextField} label="IFSC Code" fullWidth helperText="Ex. SBI0000345" />
         <Field name="bankDetailsDtoList.bankName" component={renderTextField} label="Bank Name" fullWidth helperText="Ex. State Bank of India" />
         <Field name="bankDetailsDtoList.branchName" component={renderTextField} label="Branch Name" fullWidth helperText="Ex. Mumbai" />
@@ -124,13 +133,14 @@ const RenderContact = ({ classes, fields, meta: { error, submitFailed } }) => {
                             <td><Field name={`${member}.name`} component={renderTextField} className={classes.textField} label="Name" helperText="Ex. admin" /></td>
                             <td><Field name={`${member}.email`} component={renderTextField} className={classes.textField1} label="Email" helperText="Ex. admin@rigvedtech.com" /></td>
                             <td><Field name={`${member}.mobileNum`} component={renderTextField} className={classes.textField1} label="Mobile Number" helperText="Ex. 9130253456" /></td>
+                            <td><Field name={`${member}.jobDesc`} component={renderTextField} className={classes.textField1} label="Job Description" helperText="Ex. Developer" /></td>
                             <td><Button type="button" variant="contained" color="secondary" onClick={() => fields.remove(index)}> Remove</Button></td>
                         </tr>
                     ))}
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose} color="primary" autoFocus> Cancle   </Button>
+                <Button onClick={handleClose} color="primary" autoFocus> Cancel   </Button>
                 <Button onClick={handleClose} color="primary" autoFocus> Save  </Button>
             </DialogActions>
         </Dialog>
@@ -212,4 +222,6 @@ ClientForm = connect(state => {
 })(ClientForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ClientForm'));
-export default reduxForm({ form: 'ClientForm', onSubmitSuccess: afterSubmit })(ClientForm);
+export default reduxForm({ form: 'ClientForm', 
+// onSubmitSuccess: afterSubmit 
+})(ClientForm);

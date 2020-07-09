@@ -18,9 +18,10 @@ import useStyles from "../client/Styles";
 
 const columns = [
     { id: 'key', label: 'Sr. No.', minWidth: 30 },
-    { id: 'name', label: 'Client Name', minWidth: 170 },
-    { id: 'email', label: 'Client Email'},
-    { id: 'mobileNum', label: 'Client Mobile Number'},
+    { id: 'name', label: 'Name', minWidth: 170 },
+    { id: 'email', label: 'Email'},
+    { id: 'mobileNum', label: 'Mobile Number'},
+    { id: 'jobDesc', label: 'Job Description'},
 ];
   
 function TablePaginationActions(props) {
@@ -51,12 +52,12 @@ function TablePaginationActions(props) {
 }
 
 // this function is used for the create the row data
-function createData(key, name, email, mobileNum) { return { key,name, email, mobileNum }; }
+function createData(key, name, email, mobileNum, jobDesc) { return { key,name, email, mobileNum, jobDesc }; }
 
 const  ContactTable=(props)=>{
   const {data}= props
   // Creating rows
-  const rows=(data && data.length >0 )&& data.map((item,key)=>{ return  createData((key+1),item.name,item.email,item.mobileNum) });  
+  const rows=(data && data.length >0 )&& data.map((item,key)=>{ return  createData((key+1),item.name,item.email,item.mobileNum, item.jobDesc) });  
   (rows && rows.length > 0) && rows.sort((a, b) => (a.key < b.key ? -1 : 1));
   const classes = useStyles();
   const [page, setPage] = useState(0);
@@ -85,6 +86,7 @@ const  ContactTable=(props)=>{
               <TableCell> {row.name} </TableCell>
               <TableCell> {row.email} </TableCell>
               <TableCell> {row.mobileNum} </TableCell>
+              <TableCell> {row.jobDesc} </TableCell>
             </TableRow>
           ))}
           {emptyRows > 0 && (   <TableRow style={{ height: 53 * emptyRows }}> <TableCell colSpan={6} /> </TableRow> )}

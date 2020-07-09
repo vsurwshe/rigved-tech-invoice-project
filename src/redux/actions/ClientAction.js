@@ -25,8 +25,12 @@ const GetClientList=(firstIndex, lastIndex,authroizationKey)=>{
 
 const SaveClient=(userData,authroizationKey)=>{
     return(dispatch)=>{
+        console.log("Ca-1 ",userData)
         return CreateInstance()
-        .post('/client/create/',userData,HeaderConfig(authroizationKey,userData))
+        .post('/client/create/',userData,{headers: { 
+            'Content-Type': 'application/json',
+            Authorization: authroizationKey 
+        }})
         .then(response => {
             if(response.status !== STATUS200){
                 dispatch(loadMessage(AlertColor.danger ,response.headers.message));
@@ -36,7 +40,8 @@ const SaveClient=(userData,authroizationKey)=>{
             }
         })
         .catch(error => { 
-            if(error.response.status.toString() === CONFLICTSTATUS){
+            console.log("Ero - 1",error)
+            if(error.response && error.response.status.toString() === CONFLICTSTATUS){
                 dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
             }else{
                 dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));

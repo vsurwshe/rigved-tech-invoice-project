@@ -11,7 +11,8 @@ import { API_EXE_TIME } from '../../assets/config/Config';
 class ClientManagment extends Component {
     state = {
         createClient: false,
-        loadClientList: false
+        loadClientList: false,
+        clientData: []
     }
 
     componentDidMount = async () => {
@@ -24,25 +25,33 @@ class ClientManagment extends Component {
             await GetSkillSet(0,10,authorization);
             await GetSkillCategory(0,10,authorization);
             await GetDomains(0,10,authorization);
-            await GetClientList(0, 10, authorization);
+            await GetClientList(0, 20, authorization);
             await this.handleLoadClientList(false);
         }
     }
 
-    handleCreateClient = () => {
-        this.setState({ createClient: !this.state.createClient })
+    handleCreateClient = (clientData) => { 
+        this.setState({ createClient: !this.state.createClient, clientData }) 
     }
 
-    handleLoadClientList = (loadValue) => {
-        this.setState({ loadClientList: loadValue })
-    }
+    handleLoadClientList = (loadValue) => { this.setState({ loadClientList: loadValue }) }
 
     render() {
-        const { createClient } = this.state
-        return <Card> {createClient ? this.loadClientForm() : this.loadClientTable()} </Card>
+        const { createClient , clientData } = this.state
+        return <Card> {createClient  ? this.loadClientForm(clientData) : this.loadClientTable()} </Card>
     }
 
-    loadClientForm = () => <ClientForm SaveClient={this.SaveClientDetails} cancle={this.handleCreateClient} />
+    loadClientForm = (clientData) => {
+        let newClientData=undefined;
+        if(clientData ){
+            newClientData={
+                ...clientData,
+                "addressDtos": clientData.addressDtos[0],
+                "bankDetailsDtoList": clientData.bankDetailsDtoList[0]
+            }
+        }
+        return <ClientForm initialValues={newClientData} SaveClientMethod={this.SaveClientDetails} cancle={this.handleCreateClient} />
+    }
     
     loadClientTable = () => {
         const { loadClientList } = this.state
@@ -53,28 +62,33 @@ class ClientManagment extends Component {
     }
 
     loadingClientTable=()=><>
-        <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={this.handleCreateClient} > Create Client</Button>
-        <ClientTable />
+        <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={()=>this.handleCreateClient()} > Create Client</Button>
+        <ClientTable viewClientDetails={this.viewClientDetails} />
     </>
 
+    // this method used for the show circular progress bar 
     loadingCircle=()=> <center><CircularProgress size={80} /></center>
 
+    // this method called when we click the view button in client table
+    viewClientDetails=(props)=>{ this.handleCreateClient(props.rowData) }
+   
     SaveClientDetails = async (sendUserValues) => {
         const {SaveClient, loadMessage, GetClientList }=this.props.ClientAction;
         const {authorization }= this.props.LoginState
+        console.log("CL- 2 ",sendUserValues)
         const newUserData={
             ...sendUserValues,
             "gstUrl": sendUserValues.gstUrl.name,
             "tanUrl":sendUserValues.tanUrl.name,
             "addressDtos":[sendUserValues.addressDtos],
+            "active":true,
             "bankDetailsDtoList":[sendUserValues.bankDetailsDtoList]
         }
         await SaveClient(newUserData, authorization)
         setTimeout(async () => {
             await loadMessage()
-            await GetClientList(0, 10, authorization);
+            await GetClientList(0, 20, authorization);
             this.handleCreateClient();
-            // await setLoading(loading = !loading);
         }, API_EXE_TIME)
     }
 }

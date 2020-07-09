@@ -14,17 +14,16 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import { connect } from 'react-redux';
-import { TableHead } from '@material-ui/core';
+import { TableHead, Button } from '@material-ui/core';
 import useStyles from "./Styles";
 
 const columns = [
     { id: 'key', label: 'Sr. No.', minWidth: 30 },
-    { id: 'name', label: 'Client Name', minWidth: 170 },
+    { id: 'name', label: 'Name', minWidth: 170 },
     { id: 'gstNumber', label: 'GST\u00a0Number'},
     {
       id: 'tanNumber',
       label: 'TAN Number',
-      align: 'right',
       format: (value) => value.toLocaleString('en-US'),
     }  
 ];
@@ -57,12 +56,13 @@ function TablePaginationActions(props) {
 }
 
 // this function is used for the create the row data
-function createData(key, clientName, gstNum, tanNum) { return { key, clientName, gstNum, tanNum }; }
+function createData(key,rowData,clientName, gstNum, tanNum) { return { key, rowData, clientName, gstNum, tanNum }; }
 
 const  ClientTable=(props)=>{
   const {listOfClient}= props.ClientState
+  const {viewClientDetails}= props
   // Creating rows
-  const rows=(listOfClient && listOfClient.length >0 )&& listOfClient.map((item,key)=>{ return  createData((key+1),item.clientName,item.gstNum,item.tanNum) });  
+  const rows=(listOfClient && listOfClient.length >0 )&& listOfClient.map((item,key)=>{ return  createData((key+1),item,item.clientName,item.gstNum,item.tanNum) });  
   (rows && rows.length > 0) && rows.sort((a, b) => (a.key < b.key ? -1 : 1));
   const classes = useStyles();
   const [page, setPage] = useState(0);
@@ -91,9 +91,10 @@ const  ClientTable=(props)=>{
               <TableCell> {row.clientName} </TableCell>
               <TableCell> {row.gstNum} </TableCell>
               <TableCell> {row.tanNum} </TableCell>
+              <TableCell><Button style={{ float: "Right" }} variant="contained" color="primary" onClick={()=>viewClientDetails(row)}>View</Button> </TableCell>
             </TableRow>
           ))}
-          {emptyRows > 0 && (   <TableRow style={{ height: 53 * emptyRows }}> <TableCell colSpan={6} /> </TableRow> )}
+          {emptyRows > 0 && ( <TableRow style={{ height: 53 * emptyRows }}> <TableCell colSpan={6} /> </TableRow> )}
         </TableBody>
         <TableFooter>
           <TableRow>
