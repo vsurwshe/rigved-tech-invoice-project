@@ -25,7 +25,6 @@ const GetClientList=(firstIndex, lastIndex,authroizationKey)=>{
 
 const SaveClient=(userData,authroizationKey)=>{
     return(dispatch)=>{
-        console.log("Ca-1 ",userData)
         return CreateInstance()
         .post('/client/create/',userData,{headers: { 
             'Content-Type': 'application/json',
@@ -40,7 +39,6 @@ const SaveClient=(userData,authroizationKey)=>{
             }
         })
         .catch(error => { 
-            console.log("Ero - 1",error)
             if(error.response && error.response.status.toString() === CONFLICTSTATUS){
                 dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
             }else{

@@ -96,7 +96,7 @@ const  ContactTable=(props)=>{
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
               colSpan={3}
-              count={rows && rows.length}
+              count={rows ? rows.length : 0}
               rowsPerPage={rowsPerPage}
               page={page}
               SelectProps={{ inputProps: { 'aria-label': 'rows per page' }, native: true }}

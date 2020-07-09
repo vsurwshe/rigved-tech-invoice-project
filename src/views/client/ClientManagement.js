@@ -30,7 +30,7 @@ class ClientManagment extends Component {
         }
     }
 
-    handleCreateClient = (clientData) => { 
+    handleCreateClient = (clientData) => {
         this.setState({ createClient: !this.state.createClient, clientData }) 
     }
 
@@ -41,18 +41,20 @@ class ClientManagment extends Component {
         return <Card> {createClient  ? this.loadClientForm(clientData) : this.loadClientTable()} </Card>
     }
 
+    // this method used for the loading client form
     loadClientForm = (clientData) => {
         let newClientData=undefined;
         if(clientData ){
             newClientData={
                 ...clientData,
-                "addressDtos": clientData.addressDtos[0],
-                "bankDetailsDtoList": clientData.bankDetailsDtoList[0]
+                "addressDtos": clientData.addressDtos && clientData.addressDtos[0],
+                "bankDetailsDtoList": clientData.bankDetailsDtoList && clientData.bankDetailsDtoList[0]
             }
         }
         return <ClientForm initialValues={newClientData} SaveClientMethod={this.SaveClientDetails} cancle={this.handleCreateClient} />
     }
     
+    // this method main framework which calling load client table method
     loadClientTable = () => {
         const { loadClientList } = this.state
         return < div style={{ paddingRight: 10 }}>
@@ -61,6 +63,7 @@ class ClientManagment extends Component {
         </div>
     }
 
+    // this method used for load the client table
     loadingClientTable=()=><>
         <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={()=>this.handleCreateClient()} > Create Client</Button>
         <ClientTable viewClientDetails={this.viewClientDetails} />
@@ -71,15 +74,15 @@ class ClientManagment extends Component {
 
     // this method called when we click the view button in client table
     viewClientDetails=(props)=>{ this.handleCreateClient(props.rowData) }
-   
+    
+    // this method used for the save the client details
     SaveClientDetails = async (sendUserValues) => {
         const {SaveClient, loadMessage, GetClientList }=this.props.ClientAction;
         const {authorization }= this.props.LoginState
-        console.log("CL- 2 ",sendUserValues)
         const newUserData={
             ...sendUserValues,
-            "gstUrl": sendUserValues.gstUrl.name,
-            "tanUrl":sendUserValues.tanUrl.name,
+            "gstUrl":sendUserValues.gstUrl && sendUserValues.gstUrl.name,
+            "tanUrl": sendUserValues.tanUrl && sendUserValues.tanUrl.name,
             "addressDtos":[sendUserValues.addressDtos],
             "active":true,
             "bankDetailsDtoList":[sendUserValues.bankDetailsDtoList]

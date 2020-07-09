@@ -21,7 +21,7 @@ let ClientForm = (props) => {
                         <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;
                         <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button> &nbsp;&nbsp;
                     </>}
-                    <Button type="button" variant="outlined" color="secondary" onClick={cancle}> Cancel</Button>
+                    <Button type="button" variant="outlined" color="secondary" onClick={async()=>{await reset();cancle()}}> Cancel</Button>
                 </center>
             </div>
         </form>
@@ -222,6 +222,4 @@ ClientForm = connect(state => {
 })(ClientForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ClientForm'));
-export default reduxForm({ form: 'ClientForm', 
-// onSubmitSuccess: afterSubmit 
-})(ClientForm);
+export default reduxForm({ form: 'ClientForm', onSubmitSuccess: afterSubmit})(ClientForm);
