@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import { reset, reduxForm, Field, FieldArray, formValueSelector } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
-import { renderTextField, renderFileInput, renderSelectField, renderNumberField } from '../utilites/FromUtilites';
+import { renderTextField, renderFileInput, renderSelectField, renderNumberField, renderTextAreaField } from '../utilites/FromUtilites';
 import useStyles from "../client/Styles";
 import { connect } from 'react-redux';
 import RateCardTable from '../rateCard/RateCardTable';
@@ -21,39 +21,39 @@ let ClientForm = (props) => {
                         <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;
                         <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button> &nbsp;&nbsp;
                     </>}
-                    <Button type="button" variant="outlined" color="secondary" onClick={async()=>{await reset();cancle()}}> Cancel</Button>
+                    <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button>
                 </center>
             </div>
         </form>
     </div>
 }
 
-const LoadGird=(props)=>{
+const LoadGird = (props) => {
     var classes = useStyles();
     const { rateCardDtos, contactPersonDtos } = props
     const { Domains, SkillCategory, SkillSet } = props.MasterDataSet
-return    <><Grid container spacing={5}>
+    return <><Grid container spacing={5}>
                 <Grid item style={{ paddingLeft: 30 }}>
-                    {Profile({ classes, props })}
+                    {HeaderPart({ classes, props })}
                 </Grid>
-            </Grid>
-            <Grid container spacing={5}>
-                <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
-                    {SectionOne({ classes, props })}
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    {SectionTwo({ classes })}
-                </Grid>
-            </Grid>
-            <Grid container spacing={5} style={{ paddingLeft: 10 }}>
-                <Grid item xs={12}>
-                    {SectionThree({ classes, rateCardDtos, contactPersonDtos, Domains, SkillCategory, SkillSet })}
-                </Grid>
-            </Grid></>
-
+             </Grid>
+             <Grid container spacing={5}>
+                 <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
+                     {SectionOne({ classes, props })}
+                 </Grid>
+                 <Grid item xs={12} sm={6}>
+                     {SectionTwo({ classes, props })}
+                 </Grid>
+             </Grid>
+             <Grid container spacing={5} style={{ paddingLeft: 10 }}>
+                 <Grid item xs={12}>
+                     {SectionThree({ classes, rateCardDtos, contactPersonDtos, Domains, SkillCategory, SkillSet })}
+                 </Grid>
+             </Grid>
+            </>
 }
-
-const Profile = (props) => {
+// this method used for the load header part
+const HeaderPart = (props) => {
     const { color, common_message } = props.props.ClientState
     return <Grid item container direction="row" justify="center" alignItems="center" >
         <div>Company Logo</div> &nbsp; &nbsp;&nbsp;
@@ -66,15 +66,29 @@ const Profile = (props) => {
 const SectionOne = (data) => {
     const { classes } = data
     return <>
-        {/* <Field name="address" component={renderTextAreaField} maxRows={2} label="HQ Address" fullWidth helperText="Ex. Sector 1, Mahape, Navi Mumbai, Maharashtra 400701" /> */}
-        <Field name="clientName" value="Vishva" component={renderTextField} fullWidth label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." />
+        <Field name="clientName" component={renderTextField} fullWidth label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." />
         <Field name="tanNum" component={renderTextField} className={classes.textField} label="TAN No." helperText="Ex. PDES03028F" />
         <Field name="gstNum" component={renderTextField} className={classes.textField} label="GST No." helperText="Ex. 24AAACC1206D1ZM" />
-        <Field name="tanUrl" component={renderFileInput} style={{ padding: 10 }} type="file" lable="Choose TAN Card Image" />
-        <Field name="gstUrl" component={renderFileInput} style={{ padding: 10 }} type="file" lable="Choose GST Card Image" />
     </>
 }
 
+// section two
+const SectionTwo = (data) => {
+    const { initialValues } = data.props
+    return (initialValues === undefined) ? AddressDto(data) : AddressTextArea();
+}
+
+// this method used for the load the address into text area
+const AddressTextArea = () => {
+    return <Field
+        name="addressDtos"
+        format={address => address ? ("" + address.addressLine + "," + address.area + "," + address.city + "," + address.state + "," + address.pincode) : ""}
+        parse={value => JSON.parse(value)}
+        component={renderTextAreaField}
+        maxRows={2} label="HQ Address"
+        fullWidth helperText="Ex. Sector 1, Mahape, Navi Mumbai, Maharashtra 400701" />
+}
+// this method used for the show the address inputs 
 const AddressDto = (props) => {
     const { classes } = props
     return <>
@@ -83,13 +97,6 @@ const AddressDto = (props) => {
         <Field name="addressDtos.area" component={renderTextField} className={classes.textField} label="Area" helperText="Ex. Mahape" />
         <Field name="addressDtos.state" component={renderTextField} className={classes.textField} label="State" helperText="Ex. Maharashtra" />
         <Field name="addressDtos.pincode" component={renderTextField} className={classes.textField} label="Pincode" helperText="Ex. 400001" />
-    </>
-}
-
-// section two
-const SectionTwo = (props) => {
-    return <>
-        {AddressDto(props)}
     </>
 }
 
@@ -107,11 +114,23 @@ const SectionThree = (props) => {
 // financials
 const Financials = (props) => {
     return <>
-        <Field name="bankDetailsDtoList.accountNumber" component={renderTextField} label="Account Number" fullWidth helperText="Ex. 3456231234567" />
+        <Grid container spacing={5}>
+            <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
+                {BankDetailsDto()}
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <Field name="tanUrl" component={renderFileInput} style={{ padding: 10 }} type="file" lable="Choose TAN Card Image" />
+                <Field name="gstUrl" component={renderFileInput} style={{ padding: 10 }} type="file" lable="Choose GST Card Image" />
+            </Grid>
+        </Grid>
+    </>
+}
+
+const BankDetailsDto = () => {
+    return <> <Field name="bankDetailsDtoList.accountNumber" component={renderTextField} label="Account Number" fullWidth helperText="Ex. 3456231234567" />
         <Field name="bankDetailsDtoList.ifscCode" component={renderTextField} label="IFSC Code" fullWidth helperText="Ex. SBI0000345" />
         <Field name="bankDetailsDtoList.bankName" component={renderTextField} label="Bank Name" fullWidth helperText="Ex. State Bank of India" />
-        <Field name="bankDetailsDtoList.branchName" component={renderTextField} label="Branch Name" fullWidth helperText="Ex. Mumbai" />
-    </>
+        <Field name="bankDetailsDtoList.branchName" component={renderTextField} label="Branch Name" fullWidth helperText="Ex. Mumbai" />  </>
 }
 
 // this will be render contact
@@ -202,7 +221,6 @@ const RateCard = (props) => {
     </>
 }
 
-
 // contact address
 const ContactAddress = (props) => {
     const { contactPersonDtos, classes } = props
@@ -222,4 +240,4 @@ ClientForm = connect(state => {
 })(ClientForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ClientForm'));
-export default reduxForm({ form: 'ClientForm', onSubmitSuccess: afterSubmit})(ClientForm);
+export default reduxForm({ form: 'ClientForm', onSubmitSuccess: afterSubmit })(ClientForm);
