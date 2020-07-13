@@ -75,7 +75,7 @@ const RateCardTable=(props)=>{
     <Table className={classes.clientTableTable} aria-label="custom pagination table">
       <TableHead>
           <TableRow>
-            {columns.map((column) => (<TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }} > {column.label} </TableCell>))}
+            {columns.map((column) => (<TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }}>{column.label}</TableCell>))}
           </TableRow>
       </TableHead>
       <TableBody>
@@ -83,15 +83,15 @@ const RateCardTable=(props)=>{
         {(rows && rows.length > 0) && (rowsPerPage > 0 ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage): rows)
         .map((row,key) => (
           <TableRow key={key}>
-            <TableCell component="th" scope="row"> {row.key} </TableCell>
-            <TableCell> {row.domainName} </TableCell>
-            <TableCell> {row.skillCategory} </TableCell>
-            <TableCell> {row.skillSet} </TableCell>
-            <TableCell> {row.yearOfExp} </TableCell>
-            <TableCell> {row.rate} </TableCell>
+            <TableCell component="th" scope="row">{row.key}</TableCell>
+            <TableCell>{row.domainName}</TableCell>
+            <TableCell>{row.skillCategory}</TableCell>
+            <TableCell>{row.skillSet}</TableCell>
+            <TableCell>{row.yearOfExp}</TableCell>
+            <TableCell>{row.rate}</TableCell>
           </TableRow>
         ))}
-        {emptyRows > 0 && (   <TableRow style={{ height: 53 * emptyRows }}> <TableCell colSpan={6} /> </TableRow> )}
+        {emptyRows > 0 && (<TableRow style={{ height: 53 * emptyRows }}><TableCell colSpan={6} /></TableRow> )}
       </TableBody>
       <TableFooter>
         <TableRow>
@@ -110,7 +110,6 @@ const RateCardTable=(props)=>{
       </TableFooter>
     </Table>
   </TableContainer>
-
 }
 
 export default RateCardTable;

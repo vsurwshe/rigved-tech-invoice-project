@@ -42,9 +42,7 @@ const renderNumberField = ({ label, input, meta: { touched, invalid, error }, ..
 
 // this will render the file input
 const renderFileInput = ({ input, lable, type, meta, ...custom }) => {
-  return (
-    <div>{lable} : <input name={input.name} {...custom} type={type} accept="image/*" onChange={event =>handleChange(event, input)} /></div>
-  );
+  return <span>{lable} : <input name={input.name} {...custom} type={type} accept="image/*" onChange={event =>handleChange(event, input)} /></span>
 };
 
 const handleChange = (event, input) => {
@@ -66,9 +64,7 @@ const handleChange = (event, input) => {
 
 // this is render the checkbox 
 const renderCheckbox = ({ input, label }) => (
-  <div>
-    <FormControlLabel control={ <Checkbox checked={input.value ? true : false} onChange={input.onChange} /> } label={label} />
-  </div>
+  <FormControlLabel control={ <Checkbox checked={input.value ? true : false} onChange={input.onChange} /> } label={label} />
 )
 
 // this is render the radio button

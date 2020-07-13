@@ -30,9 +30,7 @@ class ClientManagment extends Component {
         }
     }
 
-    handleCreateClient = (clientData) => {
-        this.setState({ createClient: !this.state.createClient, clientData }) 
-    }
+    handleCreateClient = (clientData) => { this.setState({ createClient: !this.state.createClient, clientData })  }
 
     handleLoadClientList = (loadValue) => { this.setState({ loadClientList: loadValue }) }
 

@@ -29,10 +29,10 @@ const SimpleTabs = (props) => {
    return <div className={classes.root}>
        <AppBar position="static" color="default">
            <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
-               {tabData.map((item, key) => { return <Tab label={item.label} {...a11yProps(key)} /> })}
+               {tabData.map((item, key) => { return <Tab key={key} label={item.label} {...a11yProps(key)} /> })}
            </Tabs>
        </AppBar>
-       {tabData.map((item, key) => { return <TabPanel value={value} index={key}>{item.component}</TabPanel> })}
+       {tabData.map((item, key) => { return <TabPanel value={value} key={key} index={key}>{item.component}</TabPanel> })}
    </div>
 }
 
