@@ -21,7 +21,7 @@ const columns = [
     { id: 'name', label: 'Name', minWidth: 170 },
     { id: 'email', label: 'Email'},
     { id: 'mobileNum', label: 'Mobile Number'},
-    { id: 'jobDesc', label: 'Job Description'},
+    { id: 'role', label: 'Job Designation'},
 ];
   
 function TablePaginationActions(props) {
@@ -52,12 +52,12 @@ function TablePaginationActions(props) {
 }
 
 // this function is used for the create the row data
-function createData(key, name, email, mobileNum, jobDesc) { return { key,name, email, mobileNum, jobDesc }; }
+function createData(key, name, email, mobileNum, role) { return { key,name, email, mobileNum, role }; }
 
 const  ContactTable=(props)=>{
   const {data}= props
   // Creating rows
-  const rows=(data && data.length >0 )&& data.map((item,key)=>{ return  createData((key+1),item.name,item.email,item.mobileNum, item.jobDesc) });  
+  const rows=(data && data.length >0 )&& data.map((item,key)=>{ return  createData((key+1),item.name,item.email,item.mobileNum, item.role) });  
   (rows && rows.length > 0) && rows.sort((a, b) => (a.key < b.key ? -1 : 1));
   const classes = useStyles();
   const [page, setPage] = useState(0);
@@ -86,7 +86,7 @@ const  ContactTable=(props)=>{
               <TableCell>{row.name}</TableCell>
               <TableCell>{row.email}</TableCell>
               <TableCell>{row.mobileNum}</TableCell>
-              <TableCell>{row.jobDesc}</TableCell>
+              <TableCell>{row.role}</TableCell>
             </TableRow>
           ))}
           {emptyRows > 0 && (<TableRow style={{ height: 53 * emptyRows }}><TableCell colSpan={6} /></TableRow>)}
