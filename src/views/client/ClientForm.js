@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import RateCardTable from '../rateCard/RateCardTable';
 import ContactTable from '../contact/ContactTable';
 import { Alert } from '@material-ui/lab';
+import { Required, PhoneNumber, GSTIN, TAN, IFSCCode, BankAccount, Email } from '../utilites/FormValidation';
 
 let ClientForm = (props) => {
     var classes = useStyles();
@@ -65,9 +66,9 @@ const SectionOne = (data) => {
     const { classes } = data
     return <>
         <Field name="id" component={renderTextHiddenField} />
-        <Field name="clientName" component={renderTextField} fullWidth label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." />
-        <Field name="tanNum" component={renderTextField} className={classes.textField} label="TAN No." helperText="Ex. PDES03028F" />
-        <Field name="gstNum" component={renderTextField} className={classes.textField} label="GST No." helperText="Ex. 24AAACC1206D1ZM" />
+        <Field name="clientName" component={renderTextField} fullWidth label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." validate={[Required]} />
+        <Field name="tanNum" component={renderTextField} className={classes.textField} label="TAN No." helperText="Ex. PDES03028F" validate={[Required, TAN]} />
+        <Field name="gstNum" component={renderTextField} className={classes.textField} label="GST No." helperText="Ex. 24AAACC1206D1ZM" validate={[Required, GSTIN]} />
     </>
 }
 
@@ -81,6 +82,7 @@ const SectionTwo = (data) => {
 const AddressTextArea = () => {
     return <Field
         name="addressDtos"
+        validate={[Required]}
         format={address => address ? ("" + address.addressLine + "," + address.area + "," + address.city + ((address.state !== null) ? ("," + address.state + ",") : ",") + address.pincode) : ""}
         parse={value => JSON.parse(value)}
         component={renderTextAreaField}
@@ -91,11 +93,11 @@ const AddressTextArea = () => {
 const AddressDto = (props) => {
     const { classes } = props
     return <>
-        <Field name="addressDtos.addressLine" component={renderTextField} fullWidth label="Address Line" helperText="Ex. Sector 1" />
-        <Field name="addressDtos.city" component={renderTextField} className={classes.textField} label="City" helperText="Ex. Navi Mumbai" />
+        <Field name="addressDtos.addressLine" component={renderTextField} validate={[Required]} fullWidth label="Address Line" helperText="Ex. Sector 1" />
+        <Field name="addressDtos.city" component={renderTextField} validate={[Required]} className={classes.textField} label="City" helperText="Ex. Navi Mumbai" />
         <Field name="addressDtos.area" component={renderTextField} className={classes.textField} label="Area" helperText="Ex. Mahape" />
-        <Field name="addressDtos.state" component={renderTextField} className={classes.textField} label="State" helperText="Ex. Maharashtra" />
-        <Field name="addressDtos.pincode" component={renderTextField} className={classes.textField} label="Pincode" helperText="Ex. 400001" />
+        <Field name="addressDtos.state" component={renderTextField} validate={[Required]} className={classes.textField} label="State" helperText="Ex. Maharashtra" />
+        <Field name="addressDtos.pincode" component={renderTextField} validate={[Required]} className={classes.textField} label="Pincode" helperText="Ex. 400001" />
     </>
 }
 
@@ -118,16 +120,16 @@ const Financials = (props) => {
                 {BankDetailsDto()}
             </Grid>
             <Grid item xs={12} sm={4}>
-                <Field name="tanUrl" component={renderFileInput} style={{ padding: 10 }} type="file" lable="Choose TAN Card Image" />
-                <Field name="gstUrl" component={renderFileInput} style={{ padding: 10 }} type="file" lable="Choose GST Card Image" />
+                <Field name="tanUrl" component={renderFileInput} validate={[Required]} style={{ padding: 10 }} type="file" lable="Choose TAN Card Image" />
+                <Field name="gstUrl" component={renderFileInput} validate={[Required]} style={{ padding: 10 }} type="file" lable="Choose GST Card Image" />
             </Grid>
         </Grid>
     </>
 }
 
 const BankDetailsDto = () => {
-    return <span> <Field name="bankDetailsDtoList.accountNumber" component={renderTextField} label="Account Number" fullWidth helperText="Ex. 3456231234567" />
-        <Field name="bankDetailsDtoList.ifscCode" component={renderTextField} label="IFSC Code" fullWidth helperText="Ex. SBI0000345" />
+    return <span> <Field name="bankDetailsDtoList.accountNumber" component={renderTextField} validate={[Required, BankAccount]} label="Account Number" fullWidth helperText="Ex. 3456231234567" />
+        <Field name="bankDetailsDtoList.ifscCode" component={renderTextField} validate={[Required, IFSCCode]} label="IFSC Code" fullWidth helperText="Ex. SBIN0000123" />
         <Field name="bankDetailsDtoList.bankName" component={renderTextField} label="Bank Name" fullWidth helperText="Ex. State Bank of India" />
         <Field name="bankDetailsDtoList.branchName" component={renderTextField} label="Branch Name" fullWidth helperText="Ex. Mumbai" />
     </span>
@@ -149,9 +151,9 @@ const RenderContact = ({ classes, fields, meta: { error, submitFailed } }) => {
                 <DialogContentText>
                     {fields.map((member, index) => (
                         <tr key={index}>
-                            <td><Field name={`${member}.name`} component={renderTextField} className={classes.textField} label="Name" helperText="Ex. admin" /></td>
-                            <td><Field name={`${member}.email`} component={renderTextField} className={classes.textField1} label="Email" helperText="Ex. admin@rigvedtech.com" /></td>
-                            <td><Field name={`${member}.mobileNum`} component={renderTextField} className={classes.textField1} label="Mobile Number" helperText="Ex. 9130253456" /></td>
+                            <td><Field name={`${member}.name`} component={renderTextField} validate={[Required]} className={classes.textField} label="Name" helperText="Ex. admin" /></td>
+                            <td><Field name={`${member}.email`} component={renderTextField} validate={[Required, Email]} className={classes.textField1} label="Email" helperText="Ex. admin@rigvedtech.com" /></td>
+                            <td><Field name={`${member}.mobileNum`} component={renderTextField} validate={[Required, PhoneNumber]} className={classes.textField1} label="Mobile Number" helperText="Ex. 9130253456" /></td>
                             <td><Field name={`${member}.jobDesc`} component={renderTextField} className={classes.textField1} label="Job Description" helperText="Ex. Developer" /></td>
                             <td><Button type="button" variant="contained" color="secondary" onClick={() => fields.remove(index)}> Remove</Button></td>
                         </tr>
@@ -183,21 +185,21 @@ const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, met
                     {fields.map((member, index) => (
                         <tr key={index} className={classes.selectContainer}>
                             <td>
-                                <Field name={`${member}.domainName`} className={classes.selectTextField} component={renderSelectField} label="Domain" >
+                                <Field name={`${member}.domainName`} className={classes.selectTextField} component={renderSelectField} validate={[Required]} label="Domain" >
                                     {(domains && domains.length > 0) && domains.map((item, key) => <option key={key} value={item.name}>{item.name}</option>)}
                                 </Field>
                             </td>
                             <td>
-                                <Field name={`${member}.skillCategory`} className={classes.selectTextField} component={renderSelectField} label="Category" >
+                                <Field name={`${member}.skillCategory`} className={classes.selectTextField} component={renderSelectField} validate={[Required]} label="Category" >
                                     {(skillCategory && skillCategory.length > 0) && skillCategory.map((item, key) => <option key={key} value={item.name}>{item.name}</option>)}
                                 </Field>
                             </td>
                             <td>
-                                <Field name={`${member}.skillSet`} className={classes.selectTextField} component={renderSelectField} label="Skills" >
+                                <Field name={`${member}.skillSet`} className={classes.selectTextField} component={renderSelectField} validate={[Required]} label="Skills" >
                                     {(skillSet && skillSet.length > 0) && skillSet.map((item, key) => <option key={key} value={item.name}>{item.name}</option>)}
                                 </Field>
                             </td>
-                            <td><Field name={`${member}.yearOfExp`} className={classes.selectTextField} component={renderNumberField} label="Experience" /></td>
+                            <td><Field name={`${member}.yearOfExp`} className={classes.selectTextField} component={renderNumberField} validate={[Required]} label="Experience" /></td>
                             <td><Field name={`${member}.rate`} type="text" className={classes.selectTextField} component={renderTextField} label="Rate" /></td>
                             <td><Button type="button" variant="contained" color="secondary" onClick={() => fields.remove(index)}> Remove</Button></td>
                         </tr>
@@ -216,7 +218,7 @@ const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, met
 const RateCard = (props) => {
     const { rateCardDtos, Domains, SkillCategory, SkillSet, classes } = props
     return <span>
-        <FieldArray name="rateCardDtos" classes={classes} domains={Domains} skillCategory={SkillCategory} skillSet={SkillSet} component={RenderRateCard} />
+        <FieldArray name="rateCardDtos" classes={classes} domains={Domains} skillCategory={SkillCategory} skillSet={SkillSet} component={RenderRateCard} validate={[Required]} />
         <RateCardTable data={rateCardDtos} />
     </span>
 }
@@ -225,7 +227,7 @@ const RateCard = (props) => {
 const ContactAddress = (props) => {
     const { contactPersonDtos, classes } = props
     return <span>
-        <FieldArray name="contactPersonDtos" classes={classes} component={RenderContact} />
+        <FieldArray name="contactPersonDtos" classes={classes} component={RenderContact} validate={[Required]} />
         <ContactTable data={contactPersonDtos} />
     </span>
 }
