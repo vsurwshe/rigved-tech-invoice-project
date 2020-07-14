@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -17,14 +17,14 @@ import { TableHead } from '@material-ui/core';
 import useStyles from "../client/Styles";
 
 const columns = [
-    { id: 'key', label: 'Sr. No.', minWidth: 30 },
-    { id: 'domain', label: 'Domain'},
-    { id: 'category', label: 'Category'},
-    { id: 'skills', label: 'Skills'},
-    { id: 'experience', label: 'Experience'},
-    { id: 'rate', label: 'Rate'},
+  { id: 'key', label: 'Sr. No.', minWidth: 30 },
+  { id: 'domain', label: 'Domain' },
+  { id: 'category', label: 'Category' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'rate', label: 'Rate' },
 ];
-  
+
 function TablePaginationActions(props) {
   const classes = useStyles();
   const theme = useTheme();
@@ -55,42 +55,42 @@ function TablePaginationActions(props) {
 // this function is used for the create the row data
 function createData(key, domainName, skillCategory, skillSet, yearOfExp, rate) { return { key, domainName, skillCategory, skillSet, yearOfExp, rate }; }
 
-const RateCardTable=(props)=>{
-    const {data}=props
-    // Creating rows
-    const rows=(data && data.length >0 )&& data.map((item,key)=>{ return  createData((key+1),item.domainName,item.skillCategory,item.skillSet,item.yearOfExp,item.rate) });  
-    (rows && rows.length > 0) && rows.sort((a, b) => (a.key < b.key ? -1 : 1));
-    const classes = useStyles();
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-    const emptyRows = rows && rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
-    const handleChangePage = (event, newPage) => { setPage(newPage); };
-    
-    const handleChangeRowsPerPage = (event) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
-      setPage(0);
-    };
-    return <TableContainer component={Paper}>
+const RateCardTable = (props) => {
+  const { data } = props
+  // Creating rows
+  const rows = (data && data.length > 0) && data.map((item, key) => { return createData((key + 1), item.domainName, item.skillCategory, item.skillSet, item.fromYearOfExp ? (item.fromYearOfExp + "-" + item.toYearOfExp) : "", item.rate) });
+  (rows && rows.length > 0) && rows.sort((a, b) => (a.key < b.key ? -1 : 1));
+  const classes = useStyles();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const emptyRows = rows && rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+  const handleChangePage = (event, newPage) => { setPage(newPage); };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+  return <TableContainer component={Paper}>
     <Table className={classes.clientTableTable} aria-label="custom pagination table">
       <TableHead>
-          <TableRow>
-            {columns.map((column) => (<TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }}>{column.label}</TableCell>))}
-          </TableRow>
+        <TableRow>
+          {columns.map((column) => (<TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }}>{column.label}</TableCell>))}
+        </TableRow>
       </TableHead>
       <TableBody>
         {/* this condition checking wheter rows is avilable or not */}
-        {(rows && rows.length > 0) && (rowsPerPage > 0 ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage): rows)
-        .map((row,key) => (
-          <TableRow key={key}>
-            <TableCell component="th" scope="row">{row.key}</TableCell>
-            <TableCell>{row.domainName}</TableCell>
-            <TableCell>{row.skillCategory}</TableCell>
-            <TableCell>{row.skillSet}</TableCell>
-            <TableCell>{row.yearOfExp}</TableCell>
-            <TableCell>{row.rate}</TableCell>
-          </TableRow>
-        ))}
-        {emptyRows > 0 && (<TableRow style={{ height: 53 * emptyRows }}><TableCell colSpan={6} /></TableRow> )}
+        {(rows && rows.length > 0) && (rowsPerPage > 0 ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : rows)
+          .map((row, key) => (
+            <TableRow key={key}>
+              <TableCell component="th" scope="row">{row.key}</TableCell>
+              <TableCell>{row.domainName}</TableCell>
+              <TableCell>{row.skillCategory}</TableCell>
+              <TableCell>{row.skillSet}</TableCell>
+              <TableCell>{row.yearOfExp}</TableCell>
+              <TableCell>{row.rate}</TableCell>
+            </TableRow>
+          ))}
+        {emptyRows > 0 && (<TableRow style={{ height: 53 * emptyRows }}><TableCell colSpan={6} /></TableRow>)}
       </TableBody>
       <TableFooter>
         <TableRow>

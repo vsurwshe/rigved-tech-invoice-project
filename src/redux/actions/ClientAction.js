@@ -23,7 +23,7 @@ const GetClientList=(firstIndex, lastIndex,authroizationKey)=>{
     }
 }
 
-const SaveClient=(userData,authroizationKey)=>{
+const SaveClientData=(userData,authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
         .post('/client/create/',userData,{headers: { 
@@ -108,7 +108,7 @@ export function loadMessage(color,message){
 
 export{
     GetClientList,
-    SaveClient,
+    SaveClientData,
     GetClientDetailsById,
     DeleteClient
 }

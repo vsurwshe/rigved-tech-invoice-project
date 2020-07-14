@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import { reset, reduxForm, Field, FieldArray, formValueSelector } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
-import { renderTextField, renderTextHiddenField, renderFileInput, renderSelectField, renderNumberField, renderTextAreaField } from '../utilites/FromUtilites';
+import { renderTextField, renderTextHiddenField, renderFileInput, renderSelectField, renderTextAreaField } from '../utilites/FromUtilites';
 import useStyles from "../client/Styles";
 import { connect } from 'react-redux';
 import RateCardTable from '../rateCard/RateCardTable';
@@ -161,8 +161,8 @@ const RenderContact = ({ classes, fields, meta: { error, submitFailed } }) => {
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose} color="primary" autoFocus> Cancel   </Button>
-                <Button onClick={handleClose} color="primary" autoFocus> Save  </Button>
+                <Button onClick={handleClose} color="primary" autoFocus>Cancel</Button>
+                <Button onClick={handleClose} color="secondary" autoFocus>Save</Button>
             </DialogActions>
         </Dialog>
     </span>
@@ -199,7 +199,16 @@ const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, met
                                     {(skillSet && skillSet.length > 0) && skillSet.map((item, key) => <option key={key} value={item.name}>{item.name}</option>)}
                                 </Field>
                             </td>
-                            <td><Field name={`${member}.yearOfExp`} className={classes.selectTextField} component={renderNumberField} validate={[Required]} label="Experience" /></td>
+                            <td>
+                                <Field name={`${member}.fromYearOfExp`} className={classes.selectTextField} component={renderSelectField} validate={[Required]} label="From" >
+                                    {[...Array(10)].map((item, key) => <option key={key} value={key}>{key}</option>)}
+                                </Field>
+                            </td>
+                            <td>
+                                <Field name={`${member}.toYearOfExp`} className={classes.selectTextField} component={renderSelectField} validate={[Required]} label="To" >
+                                    {[...Array(10)].map((item, key) => <option key={key} value={key}>{key}</option>)}
+                                </Field>
+                            </td>
                             <td><Field name={`${member}.rate`} type="text" className={classes.selectTextField} component={renderTextField} label="Rate" /></td>
                             <td><Button type="button" variant="contained" color="secondary" onClick={() => fields.remove(index)}> Remove</Button></td>
                         </tr>
@@ -207,8 +216,8 @@ const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, met
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose} color="primary" autoFocus> Cancle   </Button>
-                <Button onClick={handleClose} color="primary" autoFocus> Save  </Button>
+                <Button onClick={handleClose} color="primary" autoFocus>Cancel</Button>
+                <Button onClick={handleClose} color="secondary" autoFocus>Save</Button>
             </DialogActions>
         </Dialog>
     </span>
