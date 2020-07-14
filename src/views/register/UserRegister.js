@@ -1,100 +1,33 @@
 import React from 'react';
-import { CircularProgress, Typography, Button, TextField, Fade, } from "@material-ui/core";
+import { Card } from "@material-ui/core";
+import useStyles from "./styles";
+import { Alert } from '@material-ui/lab';
+import RegsiterForm from './RegsiterForm';
+import { connect } from 'react-redux';
+import * as LoginActions from "../../redux/actions/LoginAction";
+import { API_EXE_TIME } from '../../assets/config/Config';
 
 const Register = (props) => {
-    return <> <Typography variant="h1" className={props.classes.greeting}> Welcome!</Typography>
-        <Typography variant="h2" className={props.classes.subGreeting}>Create your account</Typography>
-        <Fade in={props.error}>
-            <Typography color="secondary" className={props.classes.errorMessage}> Something is wrong with your login or password :( </Typography>
-        </Fade>
-        <TextField
-            id="name"
-            InputProps={{
-                classes: {
-                    underline: props.classes.textFieldUnderline,
-                    input: props.classes.textField,
-                },
-            }}
-            value={props.nameValue}
-            onChange={e => props.setNameValue(e.target.value)}
-            margin="normal"
-            placeholder="Full Name"
-            type="text"
-            fullWidth
-        />
-        <TextField
-            id="email"
-            InputProps={{
-                classes: {
-                    underline: props.classes.textFieldUnderline,
-                    input: props.classes.textField,
-                },
-            }}
-            value={props.loginValue}
-            onChange={e => props.setLoginValue(e.target.value)}
-            margin="normal"
-            placeholder="Email Adress"
-            type="email"
-            fullWidth
-        />
-        <TextField
-            id="password"
-            InputProps={{
-                classes: {
-                    underline: props.classes.textFieldUnderline,
-                    input: props.classes.textField,
-                },
-            }}
-            value={props.passwordValue}
-            onChange={e => props.setPasswordValue(e.target.value)}
-            margin="normal"
-            placeholder="Password"
-            type="password"
-            fullWidth
-        />
-        <div className={props.classes.creatingButtonContainer}>
-            {props.isLoading ? (
-                <CircularProgress size={26} />
-            ) : (
-                    <Button
-                        onClick={() =>
-                            RegisterUser(props)
-                        }
-                        disabled={
-                            props.loginValue.length === 0 ||
-                            props.passwordValue.length === 0 ||
-                            props.nameValue.length === 0
-                        }
-                        size="large"
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        className={props.classes.createAccountButton}
-                    >
-                        Create your account
-                    </Button>
-                )}
-        </div>
-        {/* <div className={props.classes.formDividerContainer}>
-            <div className={props.classes.formDivider} />
-            <Typography className={props.classes.formDividerWord}>or</Typography>
-            <div className={props.classes.formDivider} />
-        </div>
-        <Button
-            size="large"
-            className={classnames(
-                props.classes.googleButton,
-                props.classes.googleButtonCreating,
-            )}
-        >
-            {/* <img src={google} alt="google" className={classes.googleIcon} />
-&nbsp;Sign in with Google */}
-        {/* </Button> */}
-    </>
+    var classes = useStyles();
+    return <Card>
+        <center><h1>Register User</h1></center>
+        {props.LoginState.common_message && <Alert severity={props.LoginState.color} >{props.LoginState.common_message}</Alert>}
+        <RegsiterForm classes={classes} RegisterUser={(values) => { RegisterUser(values, props) }} />
+    </Card>
 }
 
-const RegisterUser = (props) => {
-    console.log(props);
+const RegisterUser = async(sendUserValues, props) => {
+    const newUserData={
+        ...sendUserValues,
+        "profilePic": sendUserValues.profilePic.name,
+        "companyName": "RVTech Pvt Ltd"
+    }
+    await props.RegisterUser(newUserData, props.LoginState.authorization)
+    setTimeout(async () => {
+        await props.loadMessage()
+        // await setLoading(loading = !loading);
+    }, API_EXE_TIME)
 }
 
-export default Register;
+const mapStateToProps = state => { return state; };
+export default connect(mapStateToProps, LoginActions)(Register);
