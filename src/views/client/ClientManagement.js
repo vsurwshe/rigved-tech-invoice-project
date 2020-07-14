@@ -79,8 +79,8 @@ class ClientManagment extends Component {
         const {authorization }= this.props.LoginState
         const newUserData={
             ...sendUserValues,
-            "gstUrl":sendUserValues.gstUrl && sendUserValues.gstUrl.name,
-            "tanUrl": sendUserValues.tanUrl && sendUserValues.tanUrl.name,
+            "gstUrl":(sendUserValues.gstUrl && sendUserValues.gstUrl.type) ? sendUserValues.gstUrl.name :sendUserValues.gstUrl,
+            "tanUrl": (sendUserValues.tanUrl && sendUserValues.tanUrl.type) ? sendUserValues.tanUrl.name : sendUserValues.tanUrl,
             "addressDtos":[sendUserValues.addressDtos],
             "active":true,
             "bankDetailsDtoList":[sendUserValues.bankDetailsDtoList]

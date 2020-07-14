@@ -14,7 +14,8 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import { connect } from 'react-redux';
-import { TableHead, Button } from '@material-ui/core';
+import { TableHead } from '@material-ui/core';
+import CreateIcon from '@material-ui/icons/Create';
 import useStyles from "./Styles";
 
 const columns = [
@@ -91,7 +92,7 @@ const  ClientTable=(props)=>{
               <TableCell>{row.clientName}</TableCell>
               <TableCell>{row.gstNum}</TableCell>
               <TableCell>{row.tanNum}</TableCell>
-              <TableCell><Button style={{ float: "Right" }} variant="contained" color="primary" onClick={()=>viewClientDetails(row)}>View</Button></TableCell>
+              <TableCell><CreateIcon variant="contained" color="primary" onClick={()=>viewClientDetails(row)}>Edit</CreateIcon></TableCell>
             </TableRow>
           ))}
           {emptyRows > 0 && ( <TableRow style={{ height: 53 * emptyRows }}> <TableCell colSpan={6} /> </TableRow> )}

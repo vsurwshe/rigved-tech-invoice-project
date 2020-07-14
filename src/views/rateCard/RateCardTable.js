@@ -16,7 +16,6 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import { TableHead } from '@material-ui/core';
 import useStyles from "../client/Styles";
 
-
 const columns = [
     { id: 'key', label: 'Sr. No.', minWidth: 30 },
     { id: 'domain', label: 'Domain'},

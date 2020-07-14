@@ -13,6 +13,19 @@ const renderTextField = ({ label, input, meta: { touched, invalid, error }, ...c
     />
   )
 
+// this is render text filed
+const renderTextHiddenField = ({ label, input, meta: { touched, invalid, error }, ...custom }) => (
+  <TextField
+    label={label}
+    type="hidden"
+    placeholder={label}
+    error={touched && invalid}
+    helperText={touched && error}
+    {...input}
+    {...custom}
+  />
+)
+
 // this is render text area filed
 const renderTextAreaField = ({ maxRows,label, input, meta: { touched, invalid, error }, ...custom }) => (
   <TextField
@@ -109,6 +122,7 @@ const renderDateTimePicker = ({ label, input, meta: { touched, invalid, error },
 
 export{
     renderTextField,
+    renderTextHiddenField,
     renderCheckbox,
     renderSelectField,
     radioButton,

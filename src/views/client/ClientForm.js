@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import { reset, reduxForm, Field, FieldArray, formValueSelector } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
-import { renderTextField, renderFileInput, renderSelectField, renderNumberField, renderTextAreaField } from '../utilites/FromUtilites';
+import { renderTextField, renderTextHiddenField, renderFileInput, renderSelectField, renderNumberField, renderTextAreaField } from '../utilites/FromUtilites';
 import useStyles from "../client/Styles";
 import { connect } from 'react-redux';
 import RateCardTable from '../rateCard/RateCardTable';
@@ -17,10 +17,8 @@ let ClientForm = (props) => {
             {LoadGird(props)}
             <div className={classes.buttonStyle}>
                 <center>
-                    {(initialValues === undefined) && <>
-                        <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;
-                        <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button> &nbsp;&nbsp;
-                    </>}
+                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}>{(initialValues === undefined) ? "SUBMIT" : "EDIT"}</Button> &nbsp;&nbsp;
+                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button>
                 </center>
             </div>
@@ -33,24 +31,24 @@ const LoadGird = (props) => {
     const { rateCardDtos, contactPersonDtos } = props
     const { Domains, SkillCategory, SkillSet } = props.MasterDataSet
     return <><Grid container spacing={5}>
-                <Grid item style={{ paddingLeft: 30 }}>
-                    {HeaderPart({ classes, props })}
-                </Grid>
-             </Grid>
-             <Grid container spacing={5}>
-                 <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
-                     {SectionOne({ classes, props })}
-                 </Grid>
-                 <Grid item xs={12} sm={6}>
-                     {SectionTwo({ classes, props })}
-                 </Grid>
-             </Grid>
-             <Grid container spacing={5} style={{ paddingLeft: 10 }}>
-                 <Grid item xs={12}>
-                     {SectionThree({ classes, rateCardDtos, contactPersonDtos, Domains, SkillCategory, SkillSet })}
-                 </Grid>
-             </Grid>
-            </>
+        <Grid item style={{ paddingLeft: 30 }}>
+            {HeaderPart({ classes, props })}
+        </Grid>
+    </Grid>
+        <Grid container spacing={5}>
+            <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
+                {SectionOne({ classes, props })}
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                {SectionTwo({ classes, props })}
+            </Grid>
+        </Grid>
+        <Grid container spacing={5} style={{ paddingLeft: 10 }}>
+            <Grid item xs={12}>
+                {SectionThree({ classes, rateCardDtos, contactPersonDtos, Domains, SkillCategory, SkillSet })}
+            </Grid>
+        </Grid>
+    </>
 }
 // this method used for the load header part
 const HeaderPart = (props) => {
@@ -66,6 +64,7 @@ const HeaderPart = (props) => {
 const SectionOne = (data) => {
     const { classes } = data
     return <>
+        <Field name="id" component={renderTextHiddenField} />
         <Field name="clientName" component={renderTextField} fullWidth label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." />
         <Field name="tanNum" component={renderTextField} className={classes.textField} label="TAN No." helperText="Ex. PDES03028F" />
         <Field name="gstNum" component={renderTextField} className={classes.textField} label="GST No." helperText="Ex. 24AAACC1206D1ZM" />
@@ -82,7 +81,7 @@ const SectionTwo = (data) => {
 const AddressTextArea = () => {
     return <Field
         name="addressDtos"
-        format={address => address ? ("" + address.addressLine + "," + address.area + "," + address.city + "," + address.state + "," + address.pincode) : ""}
+        format={address => address ? ("" + address.addressLine + "," + address.area + "," + address.city + ((address.state !== null) ? ("," + address.state + ",") : ",") + address.pincode) : ""}
         parse={value => JSON.parse(value)}
         component={renderTextAreaField}
         maxRows={2} label="HQ Address"
@@ -118,7 +117,7 @@ const Financials = (props) => {
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
                 {BankDetailsDto()}
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={4}>
                 <Field name="tanUrl" component={renderFileInput} style={{ padding: 10 }} type="file" lable="Choose TAN Card Image" />
                 <Field name="gstUrl" component={renderFileInput} style={{ padding: 10 }} type="file" lable="Choose GST Card Image" />
             </Grid>
@@ -127,10 +126,11 @@ const Financials = (props) => {
 }
 
 const BankDetailsDto = () => {
-    return <> <Field name="bankDetailsDtoList.accountNumber" component={renderTextField} label="Account Number" fullWidth helperText="Ex. 3456231234567" />
+    return <span> <Field name="bankDetailsDtoList.accountNumber" component={renderTextField} label="Account Number" fullWidth helperText="Ex. 3456231234567" />
         <Field name="bankDetailsDtoList.ifscCode" component={renderTextField} label="IFSC Code" fullWidth helperText="Ex. SBI0000345" />
         <Field name="bankDetailsDtoList.bankName" component={renderTextField} label="Bank Name" fullWidth helperText="Ex. State Bank of India" />
-        <Field name="bankDetailsDtoList.branchName" component={renderTextField} label="Branch Name" fullWidth helperText="Ex. Mumbai" />  </>
+        <Field name="bankDetailsDtoList.branchName" component={renderTextField} label="Branch Name" fullWidth helperText="Ex. Mumbai" />
+    </span>
 }
 
 // this will be render contact
@@ -141,7 +141,7 @@ const RenderContact = ({ classes, fields, meta: { error, submitFailed } }) => {
         fields.push({})
     };
     const handleClose = () => { setOpen(false) };
-    return <>
+    return <span>
         <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>
         <Dialog open={open} onClose={handleClose} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
             <DialogTitle id="responsive-dialog-title">{"Add Contact"}</DialogTitle>
@@ -163,7 +163,7 @@ const RenderContact = ({ classes, fields, meta: { error, submitFailed } }) => {
                 <Button onClick={handleClose} color="primary" autoFocus> Save  </Button>
             </DialogActions>
         </Dialog>
-    </>
+    </span>
 }
 
 // this will be render rate card
@@ -174,7 +174,7 @@ const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, met
         fields.push({})
     };
     const handleClose = () => { setOpen(false) };
-    return <>
+    return <span>
         <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>
         <Dialog open={open} onClose={handleClose} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
             <DialogTitle id="responsive-dialog-title">{"Adding Rate Card"}</DialogTitle>
@@ -209,25 +209,25 @@ const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, met
                 <Button onClick={handleClose} color="primary" autoFocus> Save  </Button>
             </DialogActions>
         </Dialog>
-    </>
+    </span>
 }
 
 // rate card
 const RateCard = (props) => {
     const { rateCardDtos, Domains, SkillCategory, SkillSet, classes } = props
-    return <>
+    return <span>
         <FieldArray name="rateCardDtos" classes={classes} domains={Domains} skillCategory={SkillCategory} skillSet={SkillSet} component={RenderRateCard} />
         <RateCardTable data={rateCardDtos} />
-    </>
+    </span>
 }
 
 // contact address
 const ContactAddress = (props) => {
     const { contactPersonDtos, classes } = props
-    return <>
+    return <span>
         <FieldArray name="contactPersonDtos" classes={classes} component={RenderContact} />
         <ContactTable data={contactPersonDtos} />
-    </>
+    </span>
 }
 
 // make the selector 
