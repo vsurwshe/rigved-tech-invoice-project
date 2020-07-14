@@ -16,6 +16,7 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import { connect } from 'react-redux';
 import { TableHead } from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import useStyles from "./Styles";
 
 const columns = [
@@ -61,7 +62,7 @@ function createData(key,rowData,clientName, gstNum, tanNum) { return { key, rowD
 
 const  ClientTable=(props)=>{
   const {listOfClient}= props.ClientState
-  const {viewClientDetails}= props
+  const {viewClientDetails, deleteClientDetails}= props
   // Creating rows
   const rows=(listOfClient && listOfClient.length >0 )&& listOfClient.map((item,key)=>{ return  createData((key+1),item,item.clientName,item.gstNum,item.tanNum) });  
   (rows && rows.length > 0) && rows.sort((a, b) => (a.key < b.key ? -1 : 1));
@@ -92,7 +93,8 @@ const  ClientTable=(props)=>{
               <TableCell>{row.clientName}</TableCell>
               <TableCell>{row.gstNum}</TableCell>
               <TableCell>{row.tanNum}</TableCell>
-              <TableCell><CreateIcon variant="contained" color="primary" onClick={()=>viewClientDetails(row)}>Edit</CreateIcon></TableCell>
+              <TableCell><CreateIcon variant="contained" color="primary" onClick={()=>viewClientDetails(row)} /></TableCell>
+              <TableCell><DeleteOutlineIcon variant="contained" color="secondary" onClick={()=>deleteClientDetails(row)} /></TableCell>
             </TableRow>
           ))}
           {emptyRows > 0 && ( <TableRow style={{ height: 53 * emptyRows }}> <TableCell colSpan={6} /> </TableRow> )}

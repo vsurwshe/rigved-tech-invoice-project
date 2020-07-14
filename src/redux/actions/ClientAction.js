@@ -54,6 +54,25 @@ const GetClientDetailsById=(clientId, authroizationKey)=>{
     }
 }
 
+const DeleteClient=(clientId, authroizationKey)=>{
+    return(dispatch)=>{
+        return CreateInstance()
+        .get('/client/delete/'+clientId,HeaderConfig(authroizationKey))
+        .then(response => {
+            if(response.status !== STATUS200){
+                dispatch(loadMessage(AlertColor.danger ,response.headers.message));
+            }else{
+                dispatch(DeleteClientDetails(response.data))
+        }})
+        .catch(error => { 
+            if(error.response.status.toString() === CONFLICTSTATUS){
+                dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+            }else{
+                dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+        }})
+    }
+}
+
 //------------------------------------
 
 export function SaveClientList(clientList){
@@ -71,6 +90,12 @@ export function SaveClientDetails(clientDetails){
     }
 }
 
+export function DeleteClientDetails(clientDetails){
+    return{
+        type: "DELETE_CLIENT_DETAILS",
+        clientDetails
+    }
+}
 
 export function loadMessage(color,message){
     return{
@@ -84,6 +109,7 @@ export function loadMessage(color,message){
 export{
     GetClientList,
     SaveClient,
-    GetClientDetailsById
+    GetClientDetailsById,
+    DeleteClient
 }
 

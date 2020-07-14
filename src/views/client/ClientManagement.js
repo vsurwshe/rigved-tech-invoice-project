@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Button, CircularProgress } from '@material-ui/core'
+import { Card, Button, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core'
 import ClientTable from './ClientTable';
 import { connect } from 'react-redux';
 import ClientForm from './ClientForm';
@@ -12,7 +12,8 @@ class ClientManagment extends Component {
     state = {
         createClient: false,
         loadClientList: false,
-        clientData: []
+        clientData: [],
+        deleteModel: false
     }
 
     componentDidMount = async () => {
@@ -30,13 +31,18 @@ class ClientManagment extends Component {
         }
     }
 
+    // this method used for the create client from
     handleCreateClient = (clientData) => { this.setState({ createClient: !this.state.createClient, clientData })  }
 
+    // this method used for the progress bar 
     handleLoadClientList = (loadValue) => { this.setState({ loadClientList: loadValue }) }
+
+    // this method used for the load the delete model
+    handleDeleteModel = (clientData) => { this.setState({deleteModel : !this.state.deleteModel,clientData })};
 
     render() {
         const { createClient , clientData } = this.state
-        return <Card> {createClient  ? this.loadClientForm(clientData) : this.loadClientTable()} </Card>
+        return <Card> {createClient  ? this.loadClientForm(clientData) : this.loadClientTable()}</Card>
     }
 
     // this method used for the loading client form
@@ -51,6 +57,22 @@ class ClientManagment extends Component {
         }
         return <ClientForm initialValues={newClientData} SaveClientMethod={this.SaveClientDetails} cancle={this.handleCreateClient} />
     }
+
+    loadDeleteModel=()=>{
+        const {deleteModel, clientData}= this.state
+        const {id,clientName}= (clientData && clientData.rowData ) ? clientData.rowData: ''
+        return <Dialog open={deleteModel} keepMounted onClose={this.handleDeleteModel} aria-labelledby="alert-dialog-slide-title" aria-describedby="alert-dialog-slide-description"   >
+                <DialogTitle id="alert-dialog-slide-title">{'Delete Client Data'}</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-slide-description">
+                      {"You are deleteing "+clientName+" client record. Are you sure want to delete this record ?"}</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={this.handleDeleteModel} color="primary">Cancel</Button>
+                  <Button onClick={()=>this.DeleteClientDetails(id)} color="secondary">Delete</Button>
+                </DialogActions>
+              </Dialog>
+    }
     
     // this method main framework which calling load client table method
     loadClientTable = () => {
@@ -63,8 +85,9 @@ class ClientManagment extends Component {
 
     // this method used for load the client table
     loadingClientTable=()=><>
+        {this.loadDeleteModel()}
         <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={()=>this.handleCreateClient()} > Create Client</Button>
-        <ClientTable viewClientDetails={this.viewClientDetails} />
+        <ClientTable viewClientDetails={this.viewClientDetails} deleteClientDetails={this.handleDeleteModel} />
     </>
 
     // this method used for the show circular progress bar 
@@ -90,6 +113,19 @@ class ClientManagment extends Component {
             await loadMessage()
             await GetClientList(0, 20, authorization);
             this.handleCreateClient();
+        }, API_EXE_TIME)
+    }
+
+    DeleteClientDetails=async(clientId)=>{
+        const {DeleteClient, loadMessage,GetClientList}=this.props.ClientAction;
+        const {authorization }= this.props.LoginState
+        await this.handleLoadClientList(true);
+        clientId && await DeleteClient(clientId, authorization);
+        setTimeout(async()=>{
+            await loadMessage();
+            await GetClientList(0,20,authorization);
+            await this.handleDeleteModel();
+            await this.handleLoadClientList(false);
         }, API_EXE_TIME)
     }
 }
