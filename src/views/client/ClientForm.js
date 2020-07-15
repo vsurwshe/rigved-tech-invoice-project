@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Card, FormLabel } from '@material-ui/core';
+import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormLabel } from '@material-ui/core';
 import { reset, reduxForm, Field, FieldArray, formValueSelector } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
 import { renderTextField, renderTextHiddenField, renderFileInput, renderSelectField, renderTextAreaField } from '../utilites/FromUtilites';
@@ -8,18 +8,20 @@ import { connect } from 'react-redux';
 import RateCardTable from '../rateCard/RateCardTable';
 import ContactTable from '../contact/ContactTable';
 import { Alert } from '@material-ui/lab';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import { Required, PhoneNumber, GSTIN, TAN, IFSCCode, BankAccount, Email } from '../utilites/FormValidation';
 
 let ClientForm = (props) => {
     var classes = useStyles();
-    const { SaveClientMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues } = props
+    const { SaveClientMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues, operation } = props
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(SaveClientMethod)}>
             {LoadGird(props)}
             <div className={classes.buttonStyle}>
                 <center>
-                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}>{(initialValues === undefined) ? "SUBMIT" : "EDIT"}</Button> &nbsp;&nbsp;
-                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button> &nbsp;&nbsp;
+                    {(operation === "edit" || operation === "create")  && <>
+                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> {(initialValues === undefined) ? "SUBMIT" : "EDIT"}</Button> &nbsp;&nbsp;
+                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button></>}&nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button>
                 </center>
             </div>
@@ -159,7 +161,7 @@ const RenderContact = ({ classes, fields, meta: { error, submitFailed } }) => {
     const handleClose = () => { setOpen(false) };
     return <span>
         <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>
-        <Dialog open={open} onClose={handleClose} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
+        <Dialog open={open} onClose={handleClose} classes={{paper: classes.dialogPaper}} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
             <DialogTitle id="responsive-dialog-title">{"Add Contact"}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
@@ -169,7 +171,7 @@ const RenderContact = ({ classes, fields, meta: { error, submitFailed } }) => {
                             <td><Field name={`${member}.email`} component={renderTextField} validate={[Required, Email]} className={classes.textField1} label="Email" helperText="Ex. admin@rigvedtech.com" /></td>
                             <td><Field name={`${member}.mobileNum`} component={renderTextField} validate={[Required, PhoneNumber]} className={classes.textField1} label="Mobile Number" helperText="Ex. 9130253456" /></td>
                             <td><Field name={`${member}.role`} component={renderTextField} className={classes.textField1} label="Job Designation" helperText="Ex. Developer" /></td>
-                            <td><Button type="button" variant="contained" color="secondary" onClick={() => fields.remove(index)}> Remove</Button></td>
+                            <td><DeleteOutlineIcon variant="contained" color="secondary" onClick={()=>fields.remove(index)} /></td>
                         </tr>
                     ))}
                 </DialogContentText>
@@ -192,9 +194,9 @@ const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, met
     const handleClose = () => { setOpen(false) };
     return <span>
         <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>
-        <Dialog open={open} onClose={handleClose} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
+        <Dialog open={open} onClose={handleClose} classes={{paper: classes.dialogPaper}} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title"  >
             <DialogTitle id="responsive-dialog-title">{"Adding Rate Card"}</DialogTitle>
-            <DialogContent>
+            <DialogContent >
                 <DialogContentText>
                     {fields.map((member, index) => (
                         <tr key={index} className={classes.selectContainer}>
@@ -224,7 +226,7 @@ const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, met
                                 </Field>
                             </td>
                             <td><Field name={`${member}.rate`} type="text" className={classes.selectTextField} component={renderTextField} label="Rate" /></td>
-                            <td><Button type="button" variant="contained" color="secondary" onClick={() => fields.remove(index)}> Remove</Button></td>
+                            <td><DeleteOutlineIcon variant="contained" color="secondary" onClick={()=>fields.remove(index)} /></td>
                         </tr>
                     ))}
                 </DialogContentText>

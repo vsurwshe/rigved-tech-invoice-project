@@ -13,7 +13,8 @@ class ClientManagment extends Component {
         createClient: false,
         loadClientList: false,
         clientData: [],
-        deleteModel: false
+        deleteModel: false,
+        operation:""
     }
 
     componentDidMount = async () => {
@@ -32,7 +33,8 @@ class ClientManagment extends Component {
     }
 
     // this method used for the create client from
-    handleCreateClient = (clientData) => { this.setState({ createClient: !this.state.createClient, clientData }) }
+    handleCreateClient = (clientData,operation) => { console.log("CM- 2- op", operation)
+        this.setState({ createClient: !this.state.createClient, clientData, operation }) }
 
     // this method used for the progress bar 
     handleLoadClientList = (loadValue) => { this.setState({ loadClientList: loadValue }) }
@@ -47,6 +49,7 @@ class ClientManagment extends Component {
 
     // this method used for the loading client form
     loadClientForm = (clientData) => {
+        const {operation}=this.state
         let newClientData = undefined;
         if (clientData) {
             newClientData = {
@@ -55,7 +58,7 @@ class ClientManagment extends Component {
                 "bankDetailsDtoList": clientData.bankDetailsDtoList && clientData.bankDetailsDtoList[0]
             }
         }
-        return <ClientForm initialValues={newClientData} SaveClientMethod={this.SaveClientDetails} cancle={this.handleCreateClient} />
+        return <ClientForm operation={operation} initialValues={newClientData} SaveClientMethod={this.SaveClientDetails} cancle={this.handleCreateClient} />
     }
 
     loadDeleteModel = () => {
@@ -82,16 +85,18 @@ class ClientManagment extends Component {
 
     // this method used for load the client table
     loadingClientTable = () => {
+        const {operation}=this.state
+        console.log("Cm- 3- op ",operation)
         return <>
         {this.loadDeleteModel()}
-        <ClientTable  createClient={this.handleCreateClient} viewClientDetails={this.viewClientDetails}  deleteClientDetails={this.handleDeleteModel}  />
+        <ClientTable  operation={operation} createClient={this.handleCreateClient} viewClientDetails={this.viewClientDetails}  deleteClientDetails={this.handleDeleteModel}  />
     </>
     }
     // this method used for the show circular progress bar 
     loadingCircle = () => <center> <h3>Client Managment</h3> <CircularProgress size={80} /> </center>
 
     // this method called when we click the view button in client table
-    viewClientDetails = (data) => {  this.handleCreateClient(data)  }
+    viewClientDetails = (data,operation) => {  this.handleCreateClient(data,operation)  }
 
     // this method used for the save the client details
     SaveClientDetails = async (sendUserValues) => {

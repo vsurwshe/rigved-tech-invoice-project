@@ -29,4 +29,7 @@ export default makeStyles(theme => ({
         marginRight: theme.spacing(1),
         width: '25ch',
     },
+    dialogPaper: {
+        maxWidth: '300vh'
+    },
 }))
