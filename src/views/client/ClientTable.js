@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Button } from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 import MaterialTable from 'material-table';
 
 const  ClientTable=(props)=>{
@@ -18,7 +19,14 @@ const  ClientTable=(props)=>{
       title: "",
       width:8,
       render: (rowData)=> {
-          return<CreateIcon variant="contained" color="primary" onClick={()=>viewClientDetails(rowData.data)} />
+          return<VisibilityIcon variant="contained" color="primary" onClick={()=>viewClientDetails(rowData.data,"view")} />
+      }
+    },
+    {
+      title: "",
+      width:8,
+      render: (rowData)=> {
+          return<CreateIcon variant="contained" color="primary" onClick={()=>viewClientDetails(rowData.data,"edit")} />
       }
     },
     {
@@ -39,13 +47,13 @@ const  ClientTable=(props)=>{
     <MaterialTable
       title="Client Managment"
       columns={columns}
-      data={data}
+      data={data.length >0 ? data :[]}
       options={{
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' }
       }}
       actions={[
         {icon: () =><Button variant="contained" color="primary">Create Client</Button>,
-          onClick: (event, rowData) => { createClient(); },
+          onClick: (event, rowData) => { createClient(null,"create"); },
           isFreeAction: true,
           tooltip: 'Create Client'}
       ]}
