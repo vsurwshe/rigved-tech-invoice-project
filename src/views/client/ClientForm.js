@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
+import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Card, FormLabel } from '@material-ui/core';
 import { reset, reduxForm, Field, FieldArray, formValueSelector } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
 import { renderTextField, renderTextHiddenField, renderFileInput, renderSelectField, renderTextAreaField } from '../utilites/FromUtilites';
@@ -29,16 +29,16 @@ let ClientForm = (props) => {
 
 const LoadGird = (props) => {
     var classes = useStyles();
-    const { rateCardDtos, contactPersonDtos } = props
+    const { rateCardDtos, contactPersonDtos, initialValues } = props
     const { Domains, SkillCategory, SkillSet } = props.MasterDataSet
     return <><Grid container spacing={5}>
         <Grid item style={{ paddingLeft: 30 }}>
-            {HeaderPart({ classes, props })}
+            {HeaderPart({ classes, initialValues,props })}
         </Grid>
     </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
-                {SectionOne({ classes, props })}
+                {(initialValues === undefined) ? SectionOne({ classes, props }) : EditSectionOne({classes,initialValues})}
             </Grid>
             <Grid item xs={12} sm={6}>
                 {SectionTwo({ classes, props })}
@@ -53,10 +53,10 @@ const LoadGird = (props) => {
 }
 // this method used for the load header part
 const HeaderPart = (props) => {
+    const {initialValues}=props
     const { color, common_message } = props.props.ClientState
     return <Grid item container direction="row" justify="center" alignItems="center" >
-        <div>Company Logo</div> &nbsp; &nbsp;&nbsp;
-        <h3> Rigved Technologies</h3>
+            {(initialValues === undefined) ? <h2>Rigved Technologies</h2> : <h2>{initialValues.clientName}</h2> } 
         <center>{common_message && <Alert color={color} >{common_message}</Alert>}</center>
     </Grid>
 }
@@ -64,13 +64,27 @@ const HeaderPart = (props) => {
 // section one
 const SectionOne = (data) => {
     const { classes } = data
-    return <>
+    return <div>
         <Field name="id" component={renderTextHiddenField} />
         <Field name="clientName" component={renderTextField} fullWidth label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." validate={[Required]} />
         <Field name="tanNum" component={renderTextField} className={classes.textField} label="TAN No." helperText="Ex. PDES03028F" validate={[Required, TAN]} />
         <Field name="gstNum" component={renderTextField} className={classes.textField} label="GST No." helperText="Ex. 24AAACC1206D1ZM" validate={[Required, GSTIN]} />
-    </>
+    </div>
 }
+
+// section one
+const EditSectionOne = (data) => {
+    const { initialValues } = data
+    return <div>
+        <Field name="id" component={renderTextHiddenField} />
+        <Field name="clientName" component={renderTextHiddenField} validate={[Required]} />
+        <Field name="tanNum" component={renderTextHiddenField}  />
+        <Field name="gstNum" component={renderTextHiddenField} />
+        <FormLabel component="legend">GST Number :{initialValues.gstNum}</FormLabel><br/>
+        <FormLabel component="legend">TAN Number :{initialValues.tanNum}</FormLabel>
+    </div>
+}
+
 
 // section two
 const SectionTwo = (data) => {
@@ -87,7 +101,7 @@ const AddressTextArea = () => {
         parse={value => JSON.parse(value)}
         component={renderTextAreaField}
         maxRows={2} label="HQ Address"
-        fullWidth helperText="Ex. Sector 1, Mahape, Navi Mumbai, Maharashtra 400701" />
+        fullWidth />
 }
 // this method used for the show the address inputs 
 const AddressDto = (props) => {

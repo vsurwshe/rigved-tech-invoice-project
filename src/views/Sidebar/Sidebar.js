@@ -27,7 +27,7 @@ import {
 
 const structure = [
   { id: 0, label: "Register", link: "/register", icon: <RegisterIcon /> },
-  { id: 2, label: "Client Managment", link: "/client", icon: <UserIcon /> },
+  { id: 2, label: "Client", link: "/client", icon: <UserIcon /> },
   { id: 3, label: "Rate Card", link: "/ratecard", icon: <NotificationsIcon />},
   { id: 5, type: "divider" },
   { id: 6, type: "title", label: "HELP" },

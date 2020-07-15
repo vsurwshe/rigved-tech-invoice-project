@@ -60,7 +60,7 @@ class ClientManagment extends Component {
 
     loadDeleteModel = () => {
         const { deleteModel, clientData } = this.state
-        const { id, clientName } = (clientData && clientData.rowData) ? clientData.rowData : ''
+        const { id, clientName } = clientData  ? clientData : ''
         return <Dialog open={deleteModel} keepMounted onClose={this.handleDeleteModel} aria-labelledby="alert-dialog-slide-title" aria-describedby="alert-dialog-slide-description"   >
             <DialogTitle id="alert-dialog-slide-title">{'Delete Client Data'}</DialogTitle>
             <DialogContent>
@@ -77,24 +77,21 @@ class ClientManagment extends Component {
     // this method main framework which calling load client table method
     loadClientTable = () => {
         const { loadClientList } = this.state
-        return < div style={{ paddingRight: 10 }}>
-            <h1>Client Management</h1>
-            {loadClientList ? this.loadingCircle() : this.loadingClientTable()}
-        </div>
+        return < div style={{ paddingRight: 10 }}> {loadClientList ? this.loadingCircle() : this.loadingClientTable()} </div>
     }
 
     // this method used for load the client table
-    loadingClientTable = () => <>
+    loadingClientTable = () => {
+        return <>
         {this.loadDeleteModel()}
-        <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={() => this.handleCreateClient()} > Create Client</Button>
-        <ClientTable viewClientDetails={this.viewClientDetails} deleteClientDetails={this.handleDeleteModel} />
+        <ClientTable  createClient={this.handleCreateClient} viewClientDetails={this.viewClientDetails}  deleteClientDetails={this.handleDeleteModel}  />
     </>
-
+    }
     // this method used for the show circular progress bar 
-    loadingCircle = () => <center><CircularProgress size={80} /></center>
+    loadingCircle = () => <center> <h3>Client Managment</h3> <CircularProgress size={80} /> </center>
 
     // this method called when we click the view button in client table
-    viewClientDetails = (props) => { this.handleCreateClient(props.rowData) }
+    viewClientDetails = (data) => {  this.handleCreateClient(data)  }
 
     // this method used for the save the client details
     SaveClientDetails = async (sendUserValues) => {
