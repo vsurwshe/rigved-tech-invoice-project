@@ -6,12 +6,12 @@ import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
 const GetPurchaseOrderList=(firstIndex, lastIndex,authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
-        .get('/client/clientList/'+firstIndex+'/'+lastIndex,HeaderConfig(authroizationKey))
+        .get('/purchaseOrder/poList/'+firstIndex+'/'+lastIndex,HeaderConfig(authroizationKey))
         .then(response => {
             if(response.status !== STATUS200){
                 dispatch(loadMessage(AlertColor.danger ,response.headers.message));
             }else{
-                dispatch(SaveClientList(response.data))
+                dispatch(SavePurchaseOrderList(response.data))
             }
         })
         .catch(error => { 
@@ -34,4 +34,18 @@ export function SavePurchaseOrderList(purchaseOrderList){
         type:"SAVE_PURCHASE_ORDER_LIST",
         purchaseOrderList
     }
+}
+
+
+export function loadMessage(color,message){
+    return{
+        type:"CHANGE_MASSAGE",
+        message,
+        color
+    }
+}
+
+
+export {
+    GetPurchaseOrderList   
 }
