@@ -9,7 +9,7 @@ import { Button } from '@material-ui/core';
 
 const PurchaseOrderTable=(props)=>{
     const { purchaseOrderList}=props.PurchaseOrderState
-    const { createPurchaseOrder, viewPurchaserOrder, deletePuchaseOrderDetails}=props 
+    const { createPurchaseOrder, viewPurchaseOrder, deletePuchaseOrder}=props 
 
       // creating columns
     const columns = [
@@ -21,21 +21,21 @@ const PurchaseOrderTable=(props)=>{
           title: "",
           width:8,
           render: (rowData)=> {
-              return<VisibilityIcon variant="contained" color="primary" onClick={()=>viewPurchaserOrder(rowData.data,"view")} />
+              return<VisibilityIcon variant="contained" color="primary" onClick={()=>viewPurchaseOrder(rowData.data,"view")} />
           }
         },
         {
           title: "",
           width:8,
           render: (rowData)=> {
-              return<CreateIcon variant="contained" color="primary" onClick={()=>viewPurchaserOrder(rowData.data,"edit")} />
+              return<CreateIcon variant="contained" color="primary" onClick={()=>viewPurchaseOrder(rowData.data,"edit")} />
           }
         },
         {
           title: "",
           width:8,
           render: (rowData)=> {
-              return <DeleteOutlineIcon variant="contained" color="secondary" onClick={()=>deletePuchaseOrderDetails(rowData.data)} />
+              return <DeleteOutlineIcon variant="contained" color="secondary" onClick={()=>deletePuchaseOrder(rowData.data)} />
           }
         }  
     ];

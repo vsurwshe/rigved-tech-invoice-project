@@ -54,8 +54,8 @@ class PurchaseOrderManagement extends Component {
     }
 
     loadDeleteModel = () => {
-        const { deleteModel, clientData } = this.state
-        const { id, clientName } = clientData  ? clientData : ''
+        const { deleteModel, puchaseOrderData } = this.state
+        const { id, clientName } = puchaseOrderData  ? puchaseOrderData : ''
         return <Dialog open={deleteModel} keepMounted onClose={this.handleDeleteModel} aria-labelledby="alert-dialog-slide-title" aria-describedby="alert-dialog-slide-description"   >
             <DialogTitle id="alert-dialog-slide-title">{'Delete Client Data'}</DialogTitle>
             <DialogContent>
@@ -80,14 +80,14 @@ class PurchaseOrderManagement extends Component {
         const {operation}=this.state
         return <>
         {this.loadDeleteModel()}
-        <PurchaseOrderTable  operation={operation} createClient={this.handleCreateClient} viewClientDetails={this.viewClientDetails}  deleteClientDetails={this.handleDeleteModel}  />
+        <PurchaseOrderTable  operation={operation} createPurchaseOrder={this.handleCreatePurchaseOrder} viewPurchaseOrder={this.viewPuchaseOrderDetails}  deletePuchaseOrder={this.handleDeleteModel}  />
     </>
     }
     // this method used for the show circular progress bar 
     loadingCircle = () => <center> <h3>Purchase Order Management</h3> <CircularProgress size={80} /> </center>
 
     // this method called when we click the view button in client table
-    viewClientDetails = (data,operation) => {  this.handleCreateClient(data,operation)  }
+    viewPuchaseOrderDetails = (data,operation) => {  this.handleCreatePurchaseOrder(data,operation)  }
 
     // this method used for the save the client details
     SaveClientDetails = async (sendUserValues) => {
@@ -129,6 +129,5 @@ const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({
     PurchaseOrderAction: bindActionCreators(PurchaseOrderAction, dispatch),
 })
-
 
 export default connect(mapStateToProps,mapDispatchToProps)(PurchaseOrderManagement);

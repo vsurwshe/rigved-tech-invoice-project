@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card } from 'material-ui';
 import { formValueSelector, reset, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
+import { Card } from '@material-ui/core';
 
 let PurchaseOrderForm=()=>{
     return <Card>
