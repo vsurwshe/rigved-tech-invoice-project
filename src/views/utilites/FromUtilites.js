@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, FormControlLabel, Checkbox, FormControl, RadioGroup, Radio, FormHelperText, InputLabel, Select, FormLabel } from "@material-ui/core"
+import { TextField, FormControlLabel, Checkbox, FormControl, RadioGroup, Radio, FormHelperText, InputLabel, Select, FormLabel, Button } from "@material-ui/core"
 
 // this is render text filed
 const renderTextField = ({ label, input, meta: { touched, invalid, error }, ...custom }) => (
@@ -54,23 +54,25 @@ const renderNumberField = ({ label, input, meta: { touched, invalid, error }, ..
 )
 
 // this will render the file input
-const renderFileInput = ({ input, lable, type, meta, ...custom }) => {
-  return <span>{lable} : <input name={input.name} {...custom} type={type} accept="image/*" onChange={event =>handleChange(event, input)} /></span>
+const renderFileInput = ({ input, lable, successFunction, type, meta, ...custom }) => {
+  // return <span>{lable} : <input name={input.name} {...custom} type={type} accept="image/*" onChange={event =>handleChange(event, input)} /></span>
+  return <label htmlFor={input.name}>
+          <input style={{ display: 'none' }} id={input.name} name={input.name} type={type} onChange={event =>handleChange(event, input, successFunction)} />
+          <Button color="secondary" variant="contained" component="span" style={{marginTop:10, marginBottom:20}} > Upload {lable}</Button>
+        </label>
 };
 
-const handleChange = (event, input) => {
+const handleChange = async(event, input, successFunction) => {
   event.preventDefault();
   let imageFile = event.target.files[0];
   if (imageFile) {
-    const localImageUrl = URL.createObjectURL(imageFile);
-    const imageObject = new window.Image();
-    imageObject.onload = () => {
-      imageFile.width = imageObject.naturalWidth;
-      imageFile.height = imageObject.naturalHeight;
-      input.onChange(imageFile);
-      URL.revokeObjectURL(imageFile);
+    var reader = new FileReader();
+    reader.onload =async()=>{
+      let byteArray=reader.result.split(",")
+      successFunction && successFunction(byteArray.length >0 && byteArray[1],imageFile.name,imageFile.type)
     };
-    imageObject.src = localImageUrl;
+    reader.onerror = function (error) { console.log('Error: ', error); };
+    await reader.readAsDataURL(imageFile);
   }
 };
 
