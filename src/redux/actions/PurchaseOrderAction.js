@@ -25,6 +25,32 @@ const GetPurchaseOrderList=(firstIndex, lastIndex,authroizationKey)=>{
 }
 
 
+const SavePurchaseOrderDetails=(userData,authroizationKey)=>{
+    return(dispatch)=>{
+        return CreateInstance()
+        .post('/purchaseOrder/create/',userData,{headers: { 
+            'Content-Type': 'application/json',
+            Authorization: authroizationKey 
+        }})
+        .then(response => {
+            if(response.status !== STATUS200){
+                dispatch(loadMessage(AlertColor.danger ,response.headers.message));
+            }else{
+                dispatch(loadMessage(AlertColor.success,response.headers.message))
+                dispatch(SavePurchaseOrderData(userData))
+            }
+        })
+        .catch(error => { 
+            if(error.response && error.response.status.toString() === CONFLICTSTATUS){
+                dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+            }else{
+                dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+            }
+        })
+    }
+}
+
+
 
 
 //-------------------------------------------------------
@@ -36,6 +62,12 @@ export function SavePurchaseOrderList(purchaseOrderList){
     }
 }
 
+export function SavePurchaseOrderData(purchaseOrderData){
+    return{
+        type:"SAVE_PURCHASE_ORDER_DATA",
+        purchaseOrderData
+    }
+}
 
 export function loadMessage(color,message){
     return{
@@ -47,5 +79,6 @@ export function loadMessage(color,message){
 
 
 export {
-    GetPurchaseOrderList   
+    GetPurchaseOrderList,
+    SavePurchaseOrderDetails   
 }

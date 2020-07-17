@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux';
 import {Card, Dialog, DialogTitle, DialogContent, DialogContentText, Button, CircularProgress, DialogActions } from '@material-ui/core';
 import PurchaseOrderTable from './PurchaseOrderTable';
 import PurchaseOrderForm from './PurchaseOrderFrom'
+import { API_EXE_TIME } from '../../assets/config/Config';
 
 class PurchaseOrderManagement extends Component {
     state = { 
@@ -50,7 +51,7 @@ class PurchaseOrderManagement extends Component {
                 "bankDetailsDtoList": clientData.bankDetailsDtoList && clientData.bankDetailsDtoList[0]
             }
         }
-        return <PurchaseOrderForm operation={operation} initialValues={newClientData} SaveClientMethod={this.SaveClientDetails} cancle={this.handleCreateClient} />
+        return <PurchaseOrderForm operation={operation} initialValues={newClientData} SaveClientMethod={this.SaveClientDetails} cancle={this.handleCreatePurchaseOrder} />
     }
 
     loadDeleteModel = () => {
@@ -91,25 +92,27 @@ class PurchaseOrderManagement extends Component {
 
     // this method used for the save the client details
     SaveClientDetails = async (sendUserValues) => {
-        // const { SaveClientData, loadMessage, GetClientList } = this.props.ClientAction;
-        // const { authorization } = this.props.LoginState
-        // const newUserData = {
-        //     ...sendUserValues,
-        //     "gstUrl": (sendUserValues.gstUrl && sendUserValues.gstUrl.type) ? sendUserValues.gstUrl.name : sendUserValues.gstUrl,
-        //     "tanUrl": (sendUserValues.tanUrl && sendUserValues.tanUrl.type) ? sendUserValues.tanUrl.name : sendUserValues.tanUrl,
-        //     "addressDtos": [sendUserValues.addressDtos],
-        //     "active": true,
-        //     "bankDetailsDtoList": [sendUserValues.bankDetailsDtoList]
-        // }
-        // await SaveClientData(newUserData, authorization)
-        // setTimeout(async () => {
-        //     await loadMessage()
-        //     await GetClientList(0, 20, authorization);
-        //     this.handleCreateClient();
-        // }, API_EXE_TIME)
+        console.log("PM- Save Method ",sendUserValues)
+        const { SavePurchaseOrderDetails, loadMessage, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
+        const { authorization } = this.props.LoginState
+        const newUserData = {
+            ...sendUserValues,
+            // "gstUrl": (sendUserValues.gstUrl && sendUserValues.gstUrl.type) ? sendUserValues.gstUrl.name : sendUserValues.gstUrl,
+            // "tanUrl": (sendUserValues.tanUrl && sendUserValues.tanUrl.type) ? sendUserValues.tanUrl.name : sendUserValues.tanUrl,
+            // "addressDtos": [sendUserValues.addressDtos],
+            "active": true,
+            // "bankDetailsDtoList": [sendUserValues.bankDetailsDtoList]
+        }
+        await SavePurchaseOrderDetails(newUserData, authorization)
+        setTimeout(async () => {
+            await loadMessage()
+            await GetPurchaseOrderList(0, 20, authorization);
+            this.handleCreatePurchaseOrder();
+        }, API_EXE_TIME)
     }
 
     DeleteClientDetails = async (clientId) => {
+        console.log("PM- Delete",clientId)
         // const { DeleteClient, loadMessage, GetClientList } = this.props.ClientAction;
         // const { authorization } = this.props.LoginState
         // await this.handleLoadClientList(true);

@@ -115,11 +115,15 @@ const renderDateTimePicker = ({ label, input, meta: { touched, invalid, error },
     <TextField
       label={label}
       type="date"
-      placeholder={label}
+      // placeholder={label}
+      defaultValue=""
       error={touched && invalid}
       helperText={touched && error}
       {...input}
       {...custom}
+      InputLabelProps={{
+        shrink: true
+      }}
     />
 
 export{
