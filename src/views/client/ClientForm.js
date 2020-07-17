@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormLabel } from '@material-ui/core';
+import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormLabel, CircularProgress } from '@material-ui/core';
 import { reset, reduxForm, Field, FieldArray, formValueSelector } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
 import { renderTextField, renderTextHiddenField, renderFileInput, renderSelectField, renderTextAreaField } from '../utilites/FromUtilites';
@@ -13,7 +13,8 @@ import { Required, PhoneNumber, GSTIN, TAN, IFSCCode, BankAccount, Email } from 
 
 let ClientForm = (props) => {
     var classes = useStyles();
-    const { SaveClientMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues, operation } = props
+    const { SaveClientMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues } = props
+    const { operation }=props.stateData
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(SaveClientMethod)}>
             {LoadGird(props)}
@@ -48,7 +49,7 @@ const LoadGird = (props) => {
         </Grid>
         <Grid container spacing={5} style={{ paddingLeft: 10 }}>
             <Grid item xs={12}>
-                {SectionThree({ classes, rateCardDtos, contactPersonDtos, Domains, SkillCategory, SkillSet })}
+                {SectionThree({ classes, rateCardDtos, contactPersonDtos, Domains, SkillCategory, SkillSet, props })}
             </Grid>
         </Grid>
     </>
@@ -118,30 +119,36 @@ const AddressDto = (props) => {
 }
 
 // section three
-const SectionThree = (props) => {
+const SectionThree = (data) => {
     const tabsData = [
-        { label: "Contact Person", component: ContactAddress(props) },
-        { label: "Financials", component: Financials() },
-        { label: "Rate Card", component: RateCard(props) }
+        { label: "Contact Person", component: ContactAddress(data) },
+        { label: "Financials", component: Financials(data.props) },
+        { label: "Rate Card", component: RateCard(data) }
     ]
     return <SimpleTabs tabData={tabsData} />
 }
 
 
 // financials
-const Financials = (props) => {
+const Financials = (data) => {
+    const {gstFileUpload,tanFileUpload}=data
+    const { gstFileUrl, tanFileUrl, gstUpload, tanUpload}=data.stateData
     return <>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
                 {BankDetailsDto()}
             </Grid>
             <Grid item xs={12} sm={4}>
-                <Field name="tanUrl" component={renderFileInput} validate={[Required]} style={{ padding: 10 }} type="file" lable="Choose TAN Card Image" />
-                <Field name="gstUrl" component={renderFileInput} validate={[Required]} style={{ padding: 10 }} type="file" lable="Choose GST Card Image" />
+            {(gstFileUrl === "" || gstFileUrl === undefined) ? (gstUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={gstFileUpload} validate={[Required]} lable="GST Card Image" />)
+                : <>GST Image File :<h6>{gstFileUrl}</h6></>}
+            {(tanFileUrl === "" || tanFileUrl === undefined) ? (tanUpload ? loadingCircle() : <Field name="tanUrl" component={renderFileInput} type="file" successFunction={tanFileUpload} validate={[Required]} lable="TAN Card Image" />)
+                : <>TAN Image File: <h6>{tanFileUrl}</h6></>}
             </Grid>
         </Grid>
     </>
 }
+
+const loadingCircle = () => <center> Uploading <CircularProgress size={40} /> </center>
 
 const BankDetailsDto = () => {
     return <span> <Field name="bankDetailsDtoList.accountNumber" component={renderTextField} validate={[Required, BankAccount]} label="Account Number" fullWidth helperText="Ex. 3456231234567" />
