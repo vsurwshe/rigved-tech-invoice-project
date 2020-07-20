@@ -97,6 +97,10 @@ class ClientManagment extends Component {
         this.setState({tanFileUrl : (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length >0)  && this.props.FileState.fileUrl[0]})
     }
 
+    clearFileUrl=()=>{
+        this.setState({gstFileUrl:"",tanFileUrl:""})
+    }
+
     // this method used for the loading client form
     loadClientForm = (clientData) => {
         const {operation, gstFileUrl, tanFileUrl,gstUpload,tanUpload}=this.state
@@ -115,7 +119,7 @@ class ClientManagment extends Component {
             gstUpload,
             tanUpload
         }
-        return <ClientForm stateData={data} initialValues={newClientData} SaveClientMethod={this.SaveClientDetails} gstFileUpload={this.uploadGSTFile} tanFileUpload={this.uploadTANFile} cancle={this.handleCreateClient} />
+        return <ClientForm stateData={data} initialValues={newClientData} SaveClientMethod={this.SaveClientDetails} gstFileUpload={this.uploadGSTFile} tanFileUpload={this.uploadTANFile} cancle={this.handleCreateClient} clearFile={this.clearFileUrl} />
     }
 
     loadDeleteModel = () => {
