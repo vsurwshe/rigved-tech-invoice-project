@@ -10,6 +10,8 @@ import ContactTable from '../contact/ContactTable';
 import { Alert } from '@material-ui/lab';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import { Required, PhoneNumber, GSTIN, TAN, IFSCCode, BankAccount, Email } from '../utilites/FormValidation';
+// import { CreateInstance } from '../../assets/config/APIConfig';
+import * as FileActions from "../../redux/actions/FileAction";
 
 let ClientForm = (props) => {
     var classes = useStyles();
@@ -131,7 +133,7 @@ const SectionThree = (data) => {
 
 // financials
 const Financials = (data) => {
-    const {gstFileUpload,tanFileUpload}=data
+    const {gstFileUpload,tanFileUpload, initialValues}=data
     const { gstFileUrl, tanFileUrl, gstUpload, tanUpload}=data.stateData
     return <>
         <Grid container spacing={5}>
@@ -139,15 +141,33 @@ const Financials = (data) => {
                 {BankDetailsDto()}
             </Grid>
             <Grid item xs={12} sm={4}>
-            {(gstFileUrl === "" || gstFileUrl === undefined) ? (gstUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={gstFileUpload} validate={[Required]} lable="GST Card Image" />)
-                : <>GST Image File :<h6>{gstFileUrl}</h6></>}
-            {(tanFileUrl === "" || tanFileUrl === undefined) ? (tanUpload ? loadingCircle() : <Field name="tanUrl" component={renderFileInput} type="file" successFunction={tanFileUpload} validate={[Required]} lable="TAN Card Image" />)
-                : <>TAN Image File: <h6>{tanFileUrl}</h6></>}
-            </Grid>
+            {((gstFileUrl === "" || gstFileUrl === undefined)&& initialValues === undefined) ? (gstUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={gstFileUpload} validate={[Required]} lable="GST Card Image" />)
+                : <>{initialValues === undefined ?  LoadFileUrl({"url":gstFileUrl,"cid": 1,"props":data,"componentName":"GST Image"}) 
+                : LoadFileUrl({"url":initialValues.gstUrl,"cid": initialValues.id,"props":data,"componentName":"GST Image"})} </>
+            }
+            {((tanFileUrl === "" || tanFileUrl === undefined)&& initialValues === undefined) ? (tanUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={tanFileUpload} validate={[Required]} lable="TAN Card Image" />)
+                : <>{initialValues === undefined ?  LoadFileUrl({"url":tanFileUrl,"cid": 1,"props":data,"componentName":"TAN Image"}) 
+                : LoadFileUrl({"url":initialValues.tanUrl,"cid": initialValues.id,"props":data,"componentName":"TAN Image"})} </>
+            } 
+            </Grid>  
         </Grid>
     </>
 }
 
+ let LoadFileUrl=(parameter)=>{
+    const { listOfFiles }=parameter.props.FileState
+    const exitsData=(listOfFiles.length > 0) && listOfFiles.filter(x=> (x.cid=== parameter.cid && x.fileName=== parameter.url));
+    if(exitsData === false){
+        GetPhotos(parameter);
+    }
+    return <span>{parameter.componentName}:<img src={exitsData.length > 0 && exitsData[0].fileData} alt={parameter.componentName} style={{height: "50%", width:"70%"}} /></span>;
+}
+
+const GetPhotos=async(parameter)=>{
+    const { FetchPhoto }=parameter.props
+    const { authorization }=parameter.props.LoginState
+    return await FetchPhoto(parameter.url,authorization,parameter.cid);
+}
 const loadingCircle = () => <center> Uploading <CircularProgress size={40} /> </center>
 
 const BankDetailsDto = () => {
@@ -271,7 +291,7 @@ ClientForm = connect(state => {
     const rateCardDtos = selector(state, 'rateCardDtos')
     const contactPersonDtos = selector(state, 'contactPersonDtos')
     return { rateCardDtos, contactPersonDtos, ...state }
-})(ClientForm)
+},FileActions)(ClientForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ClientForm'));
 export default reduxForm({ form: 'ClientForm', onSubmitSuccess: afterSubmit })(ClientForm);
