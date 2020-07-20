@@ -15,7 +15,7 @@ import * as FileActions from "../../redux/actions/FileAction";
 
 let ClientForm = (props) => {
     var classes = useStyles();
-    const { SaveClientMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues } = props
+    const { SaveClientMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues, clearFile } = props
     const { operation }=props.stateData
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(SaveClientMethod)}>
@@ -25,7 +25,7 @@ let ClientForm = (props) => {
                     {(operation === "edit" || operation === "create")  && <>
                     <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> {(initialValues === undefined) ? "SUBMIT" : "EDIT"}</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button></>}&nbsp;&nbsp;
-                    <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button>
+                    <Button type="button" variant="outlined" color="secondary" onClick={async () => { await clearFile(); await reset(); cancle() }}> Cancel</Button>
                 </center>
             </div>
         </form>
@@ -141,14 +141,18 @@ const Financials = (data) => {
                 {BankDetailsDto()}
             </Grid>
             <Grid item xs={12} sm={4}>
-            {((gstFileUrl === "" || gstFileUrl === undefined)&& initialValues === undefined) ? (gstUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={gstFileUpload} validate={[Required]} lable="GST Card Image" />)
-                : <>{initialValues === undefined ?  LoadFileUrl({"url":gstFileUrl,"cid": 1,"props":data,"componentName":"GST Image"}) 
-                : LoadFileUrl({"url":initialValues.gstUrl,"cid": initialValues.id,"props":data,"componentName":"GST Image"})} </>
-            }
-            {((tanFileUrl === "" || tanFileUrl === undefined)&& initialValues === undefined) ? (tanUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={tanFileUpload} validate={[Required]} lable="TAN Card Image" />)
-                : <>{initialValues === undefined ?  LoadFileUrl({"url":tanFileUrl,"cid": 1,"props":data,"componentName":"TAN Image"}) 
-                : LoadFileUrl({"url":initialValues.tanUrl,"cid": initialValues.id,"props":data,"componentName":"TAN Image"})} </>
-            } 
+                <Grid item xs={12}>
+                    {((gstFileUrl === "" || gstFileUrl === undefined)&& initialValues === undefined) ? (gstUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={gstFileUpload} validate={[Required]} lable="GST Card Image" />)
+                        : <>{initialValues === undefined ?  LoadFileUrl({"url":gstFileUrl,"cid": 1,"props":data,"componentName":"GST Image"}) 
+                        : LoadFileUrl({"url":initialValues.gstUrl,"cid": initialValues.id,"props":data,"componentName":"GST Image"})} </>
+                    }
+                </Grid>
+                <Grid item xs={12}>
+                    {((tanFileUrl === "" || tanFileUrl === undefined)&& initialValues === undefined) ? (tanUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={tanFileUpload} validate={[Required]} lable="TAN Card Image" />)
+                        : <>{initialValues === undefined ?  LoadFileUrl({"url":tanFileUrl,"cid": 1,"props":data,"componentName":"TAN Image"}) 
+                        : LoadFileUrl({"url":initialValues.tanUrl,"cid": initialValues.id,"props":data,"componentName":"TAN Image"})} </>
+                    }
+                </Grid>
             </Grid>  
         </Grid>
     </>
@@ -157,10 +161,8 @@ const Financials = (data) => {
  let LoadFileUrl=(parameter)=>{
     const { listOfFiles }=parameter.props.FileState
     const exitsData=(listOfFiles.length > 0) && listOfFiles.filter(x=> (x.cid=== parameter.cid && x.fileName=== parameter.url));
-    if(exitsData === false){
-        GetPhotos(parameter);
-    }
-    return <span>{parameter.componentName}:<img src={exitsData.length > 0 && exitsData[0].fileData} alt={parameter.componentName} style={{height: "50%", width:"70%"}} /></span>;
+    if(exitsData === false || exitsData.length <=0){ GetPhotos(parameter) }
+    return <>{parameter.componentName}:<img src={exitsData.length > 0 && exitsData[0].fileData} alt={parameter.componentName} style={{height: "50%", width:"70%"}} /></>;
 }
 
 const GetPhotos=async(parameter)=>{

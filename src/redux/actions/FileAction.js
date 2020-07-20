@@ -20,7 +20,7 @@ const SaveFileDetails = (fileData, authroizationKey) => {
                 }
             })
             .catch(error => {
-                if (error.response.status.toString() === CONFLICTSTATUS) {
+                if (error && error.response && error.response.status.toString() === CONFLICTSTATUS) {
                     dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
                 } else {
                     dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
