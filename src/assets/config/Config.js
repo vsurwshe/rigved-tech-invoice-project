@@ -9,8 +9,16 @@ const AlertColor={
     warning: "warning"
 }
 
+const FromActions={
+    "CR":"CREATE",
+    "VI": "VIEW",
+    "ED":"EDIT",
+    "DE":"DELETE"
+}
+
 export{
     API_URL,
     AlertColor,
-    API_EXE_TIME
+    API_EXE_TIME,
+    FromActions
 }
