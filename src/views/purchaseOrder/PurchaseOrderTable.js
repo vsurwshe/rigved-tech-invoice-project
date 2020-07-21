@@ -44,7 +44,7 @@ const PurchaseOrderTable=(props)=>{
     const data=(purchaseOrderList && purchaseOrderList.length >0 )&& purchaseOrderList.map((item,key)=>{ 
       return { "key":(key+1), "data":item, "poAmount":item.poAmount, "poNum":item.poNum, "clientName":item.clientName }
     });
-    console.log("pt ",data)
+    
     return <div style={{ maxWidth: "100%" }}>
     <MaterialTable
       title="Purchase Order Managment"

@@ -50,8 +50,24 @@ const SavePurchaseOrderDetails=(userData,authroizationKey)=>{
     }
 }
 
-
-
+const DeletePurchaseOrder=(clientId, authroizationKey)=>{
+    return(dispatch)=>{
+        return CreateInstance()
+        .get('/purchaseOrder/delete/'+clientId,HeaderConfig(authroizationKey))
+        .then(response => {
+            if(response.status !== STATUS200){
+                dispatch(loadMessage(AlertColor.danger ,response.headers.message));
+            }else{
+                dispatch(DeletePurchaseOrderDetails(response.data))
+        }})
+        .catch(error => { 
+            if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
+                dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+            }else{
+                dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+        }})
+    }
+}
 
 //-------------------------------------------------------
 
@@ -69,6 +85,13 @@ export function SavePurchaseOrderData(purchaseOrderData){
     }
 }
 
+export function DeletePurchaseOrderDetails(purchaseOrderDetails){
+    return{
+        type: "DELETE_PURCHASE_ORDER_DETAILS",
+        purchaseOrderDetails
+    }
+}
+
 export function loadMessage(color,message){
     return{
         type:"CHANGE_MASSAGE",
@@ -80,5 +103,6 @@ export function loadMessage(color,message){
 
 export {
     GetPurchaseOrderList,
-    SavePurchaseOrderDetails   
+    SavePurchaseOrderDetails,
+    DeletePurchaseOrder   
 }

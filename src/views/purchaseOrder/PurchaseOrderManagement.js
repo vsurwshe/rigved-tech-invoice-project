@@ -6,6 +6,7 @@ import {Card, Dialog, DialogTitle, DialogContent, DialogContentText, Button, Cir
 import PurchaseOrderTable from './PurchaseOrderTable';
 import PurchaseOrderForm from './PurchaseOrderFrom'
 import { API_EXE_TIME } from '../../assets/config/Config';
+import moment from 'moment';
 
 class PurchaseOrderManagement extends Component {
     state = { 
@@ -13,14 +14,15 @@ class PurchaseOrderManagement extends Component {
         loadPuchaseOrderList: false,
         puchaseOrderData: [],
         deleteModel: false,
-        operation:""
+        operation:"",
+        purchaseOrderFileUrl:"",
+        purchaseOrderFileUpload:false
     }
 
     componentDidMount=async()=>{
         const { purchaseOrderList }= this.props.PurchaseOrderState
         const { authorization }= this.props.LoginState
         const { GetPurchaseOrderList }= this.props.PurchaseOrderAction
-        console.log("PM ", purchaseOrderList)
         if (purchaseOrderList && purchaseOrderList.length === 0) {
             await GetPurchaseOrderList(0,20,authorization);
         }
@@ -35,23 +37,37 @@ class PurchaseOrderManagement extends Component {
     // this method used for the load the delete model
     handleDeleteModel = (puchaseOrderData) => { this.setState({ deleteModel: !this.state.deleteModel, puchaseOrderData }) };
 
+    // this method used for the handling the puchase order file
+    handlePurchaseOrderUplaod=()=>{ this.setState({purchaseOrderFileUpload : !this.state.purchaseOrderFileUpload})}
+
+
     render() { 
         const {createPuchaseOrder, puchaseOrderData}=this.state
         return <Card> {createPuchaseOrder ? this.loadPurchaseOrderForm(puchaseOrderData) :this.loadPurchaseOrder()}</Card>
     }
 
+    uploadPurchaseFile=(fileData,name,type)=>{
+        console.log("PM -3",fileData)
+    }
+
     // this method used for the loading PurchaseOrder form
-    loadPurchaseOrderForm = (clientData) => {
-        const {operation}=this.state
-        let newClientData = undefined;
-        if (clientData) {
-            newClientData = {
-                ...clientData,
-                "addressDtos": clientData.addressDtos && clientData.addressDtos[0],
-                "bankDetailsDtoList": clientData.bankDetailsDtoList && clientData.bankDetailsDtoList[0]
+    loadPurchaseOrderForm = (purchaseOrderData) => {
+        const {operation,purchaseOrderFileUrl, purchaseOrderFileUpload}=this.state
+        let newPurchaseOrderData = undefined;
+        if (purchaseOrderData) {
+            newPurchaseOrderData = {
+                ...purchaseOrderData,
+                "validFrom":moment(purchaseOrderData.validFrom).format('YYYY-MM-DD') ,
+                "validTo":moment(purchaseOrderData.validTo).format('YYYY-MM-DD') ,
             }
         }
-        return <PurchaseOrderForm operation={operation} initialValues={newClientData} SaveClientMethod={this.SaveClientDetails} cancle={this.handleCreatePurchaseOrder} />
+        const data={ operation,purchaseOrderFileUrl,purchaseOrderFileUpload }
+        return <PurchaseOrderForm 
+                stateData={data} 
+                initialValues={newPurchaseOrderData} 
+                SaveMethod={this.SavePODetails} 
+                cancle={this.handleCreatePurchaseOrder} 
+            />
     }
 
     loadDeleteModel = () => {
@@ -72,8 +88,8 @@ class PurchaseOrderManagement extends Component {
 
     // this method main framework which calling load PurchaseOrder table method
     loadPurchaseOrder = () => {
-        const { loadClientList } = this.state
-        return < div style={{ paddingRight: 10 }}>  {loadClientList ? this.loadingCircle() :this.loadingPurchaseOrderTable()} </div>
+        const { loadPuchaseOrderList } = this.state
+        return < div style={{ paddingRight: 10 }}>  {loadPuchaseOrderList ? this.loadingCircle() :this.loadingPurchaseOrderTable()} </div>
     }
 
     // this method used for load the client table
@@ -91,15 +107,14 @@ class PurchaseOrderManagement extends Component {
     viewPuchaseOrderDetails = (data,operation) => {  this.handleCreatePurchaseOrder(data,operation)  }
 
     // this method used for the save the client details
-    SaveClientDetails = async (sendUserValues) => {
-        console.log("PM- Save Method ",sendUserValues)
+    SavePODetails = async (sendUserValues) => {
         const { SavePurchaseOrderDetails, loadMessage, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
         const { authorization } = this.props.LoginState
         const newUserData = {
             ...sendUserValues,
             // "gstUrl": (sendUserValues.gstUrl && sendUserValues.gstUrl.type) ? sendUserValues.gstUrl.name : sendUserValues.gstUrl,
-            // "tanUrl": (sendUserValues.tanUrl && sendUserValues.tanUrl.type) ? sendUserValues.tanUrl.name : sendUserValues.tanUrl,
-            // "addressDtos": [sendUserValues.addressDtos],
+            // "validFrom": DatePassToAPI(sendUserValues.validFrom) ,
+            // "validTo": DatePassToAPI(sendUserValues.validTo),
             "active": true,
             // "bankDetailsDtoList": [sendUserValues.bankDetailsDtoList]
         }
@@ -111,18 +126,17 @@ class PurchaseOrderManagement extends Component {
         }, API_EXE_TIME)
     }
 
-    DeleteClientDetails = async (clientId) => {
-        console.log("PM- Delete",clientId)
-        // const { DeleteClient, loadMessage, GetClientList } = this.props.ClientAction;
-        // const { authorization } = this.props.LoginState
-        // await this.handleLoadClientList(true);
-        // clientId && await DeleteClient(clientId, authorization);
-        // setTimeout(async () => {
-        //     await loadMessage();
-        //     await GetClientList(0, 20, authorization);
-        //     await this.handleDeleteModel();
-        //     await this.handleLoadClientList(false);
-        // }, API_EXE_TIME)
+    DeleteClientDetails = async (purchaseOrderId) => {
+        const { DeletePurchaseOrder, loadMessage, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
+        const { authorization } = this.props.LoginState
+        await this.handleLoadPurchaseOrdertList();
+        purchaseOrderId && await DeletePurchaseOrder(purchaseOrderId, authorization);
+        setTimeout(async () => {
+            await loadMessage();
+            await GetPurchaseOrderList(0, 20, authorization);
+            await this.handleDeleteModel();
+            await this.handleLoadPurchaseOrdertList();
+        }, API_EXE_TIME)
     }
 
 
