@@ -84,8 +84,14 @@ class PurchaseOrderManagement extends Component {
                 SaveMethod={this.SavePODetails} 
                 cancle={this.handleCreatePurchaseOrder} 
                 uploadFile={this.uploadPurchaseFile}
+                clearFile={this.clearFileUrl}
             />
     }
+    // this method used for the clear the state variable
+    clearFileUrl=()=>{
+        this.setState({purchaseOrderFileUrl:""})
+    }
+
 
     loadDeleteModel = () => {
         const { deleteModel, puchaseOrderData } = this.state
