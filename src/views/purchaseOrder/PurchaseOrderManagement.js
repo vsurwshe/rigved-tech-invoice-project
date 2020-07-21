@@ -1,6 +1,8 @@
 import React,{Component} from 'react';
 import { connect } from 'react-redux';
 import * as PurchaseOrderAction from '../../redux/actions/PurchaseOrderAction'
+import * as FileAction from '../../redux/actions/FileAction'
+import { loadMessage } from '../../redux/actions/ClientAction'
 import { bindActionCreators } from 'redux';
 import {Card, Dialog, DialogTitle, DialogContent, DialogContentText, Button, CircularProgress, DialogActions } from '@material-ui/core';
 import PurchaseOrderTable from './PurchaseOrderTable';
@@ -40,14 +42,28 @@ class PurchaseOrderManagement extends Component {
     // this method used for the handling the puchase order file
     handlePurchaseOrderUplaod=()=>{ this.setState({purchaseOrderFileUpload : !this.state.purchaseOrderFileUpload})}
 
-
     render() { 
         const {createPuchaseOrder, puchaseOrderData}=this.state
         return <Card> {createPuchaseOrder ? this.loadPurchaseOrderForm(puchaseOrderData) :this.loadPurchaseOrder()}</Card>
     }
 
-    uploadPurchaseFile=(fileData,name,type)=>{
-        console.log("PM -3",fileData)
+    uploadPurchaseFile=async(fileData,name,type)=>{
+        const {SaveFileDetails, SaveFileData}= this.props.FileAction
+        const { authorization } = this.props.LoginState
+        let newFileData=[{
+            "fileName":name,
+	        "description":"PoDetail",
+	        "contentType":type,
+	        "content":`${fileData}`
+        }]
+        await this.handlePurchaseOrderUplaod();
+        await SaveFileDetails(newFileData, authorization)
+        setTimeout(async () => {
+            await loadMessage()
+            await SaveFileData();
+            await this.handlePurchaseOrderUplaod();
+        }, API_EXE_TIME)
+        this.setState({purchaseOrderFileUrl : (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length >0)  && this.props.FileState.fileUrl[0]})
     }
 
     // this method used for the loading PurchaseOrder form
@@ -67,6 +83,7 @@ class PurchaseOrderManagement extends Component {
                 initialValues={newPurchaseOrderData} 
                 SaveMethod={this.SavePODetails} 
                 cancle={this.handleCreatePurchaseOrder} 
+                uploadFile={this.uploadPurchaseFile}
             />
     }
 
@@ -108,15 +125,13 @@ class PurchaseOrderManagement extends Component {
 
     // this method used for the save the client details
     SavePODetails = async (sendUserValues) => {
+        const { purchaseOrderFileUrl }=this.state
         const { SavePurchaseOrderDetails, loadMessage, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
         const { authorization } = this.props.LoginState
         const newUserData = {
             ...sendUserValues,
-            // "gstUrl": (sendUserValues.gstUrl && sendUserValues.gstUrl.type) ? sendUserValues.gstUrl.name : sendUserValues.gstUrl,
-            // "validFrom": DatePassToAPI(sendUserValues.validFrom) ,
-            // "validTo": DatePassToAPI(sendUserValues.validTo),
+            "poCntrUrl":(purchaseOrderFileUrl === "" || purchaseOrderFileUrl === undefined) ? sendUserValues.poCntrUrl  : purchaseOrderFileUrl,
             "active": true,
-            // "bankDetailsDtoList": [sendUserValues.bankDetailsDtoList]
         }
         await SavePurchaseOrderDetails(newUserData, authorization)
         setTimeout(async () => {
@@ -145,6 +160,7 @@ class PurchaseOrderManagement extends Component {
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({
     PurchaseOrderAction: bindActionCreators(PurchaseOrderAction, dispatch),
+    FileAction: bindActionCreators(FileAction,dispatch)
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(PurchaseOrderManagement);

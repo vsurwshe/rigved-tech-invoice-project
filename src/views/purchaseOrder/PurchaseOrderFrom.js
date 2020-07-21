@@ -1,12 +1,12 @@
 import React from 'react';
 import { reset, reduxForm, Field } from 'redux-form';
 import { connect } from 'react-redux';
-import { Button, Grid } from '@material-ui/core';
+import { Button, Grid, CircularProgress } from '@material-ui/core';
 import useStyles from "../client/Styles";
 import { renderTextField, renderDateTimePicker, renderFileInput } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
 import { FromActions } from '../../assets/config/Config';
-
+import * as FileAction from "../../redux/actions/FileAction";
 
 let PurchaseOrderForm = (props) => {
     var classes = useStyles();
@@ -42,7 +42,7 @@ const LoadGird = (props) => {
         </Grid>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop:20 }}>
             <Grid item xs={12}>
-                {(initialValues !== undefined) && SectionThree({ classes })} 
+                {(initialValues !== undefined) && SectionThree({ classes, initialValues, props })} 
             </Grid>
         </Grid>
     </>
@@ -51,13 +51,35 @@ const LoadGird = (props) => {
 
 const SectionOne = (data) => {
     const { classes, initialValues } = data
-    const { operation }= data.props.stateData
+    const { uploadFile }=data.props
+    const { operation, purchaseOrderFileUrl, purchaseOrderFileUpload }= data.props.stateData
     return <>
         { operation === FromActions.CR ? LoadFields({classes}) : LoadHeader({classes, initialValues}) }
         <Field name="validFrom" component={renderDateTimePicker} className={classes.textField} label="Valid From" helperText="Ex. 01/01/2000" validate={[Required]} />
-        {operation === FromActions.CR && <Field name="poUrl" component={renderFileInput} fullWidth helperText="" type="file" lable="Purchase Order Image" />}
+        {operation === FromActions.CR && 
+            <>{ (purchaseOrderFileUpload) ? loadingCircle() 
+                :  (purchaseOrderFileUrl ? LoadFileUrl({"url":purchaseOrderFileUrl,"cid": 1,"props":data,"componentName":"Purchase Order Image","style" :{height: "50%", width:"70%"}}) 
+                                : <Field name="poCntrUrl" component={renderFileInput} fullWidth type="file" successFunction={uploadFile} lable="Purchase Order File" />)
+              }</>
+        }
     </>
 }
+
+
+let LoadFileUrl=(parameter)=>{
+    const { listOfFiles }=parameter.props.props.FileState
+    const exitsData=(listOfFiles.length > 0) && listOfFiles.filter(x=> (x.cid=== parameter.cid && x.fileName=== parameter.url));
+    if(exitsData === false || exitsData.length <=0){  GetPhotos(parameter)  }
+    return <img src={exitsData.length > 0 && exitsData[0].fileData} alt={parameter.componentName} style={parameter.style} />
+}
+
+const GetPhotos=async(parameter)=>{
+    const { FetchPhoto }=parameter.props.props
+    const { authorization }=parameter.props.props.LoginState
+    return await FetchPhoto(parameter.url,authorization,parameter.cid);
+}
+
+const loadingCircle = () => <center> Uploading <CircularProgress size={40} /> </center>
 
 const LoadFields=(parameter)=>{
     const { classes }=parameter
@@ -69,9 +91,7 @@ const LoadFields=(parameter)=>{
 
 const LoadHeader=(parameter)=>{
     const { classes, initialValues }=parameter
-    return <>
-        <h2 className={classes.textField}>{initialValues.clientName}</h2>
-    </>
+    return <> <h2 className={classes.textField}>{initialValues.clientName}</h2></>
 }
 
 const SectionTwo = (data) => {
@@ -80,22 +100,26 @@ const SectionTwo = (data) => {
     return <>
         <Field name="poAmount" component={renderTextField} className={classes.textField} label="Puchase Order Amount" helperText="Ex. 10000" validate={[Required]} />
         <Field name="validTo" component={renderDateTimePicker} className={classes.textField} label="Valid to" helperText="Ex. 01/01/2000" validate={[Required]} />
-        {operation === "view" &&<> <Field name="invoicedAmount" component={renderTextField} className={classes.textField} label="Invoiced Amount" helperText="Ex. 10000" />
-        <Field name="balance" component={renderTextField} className={classes.textField} label="Balance" helperText="Ex.67345"  /></>}
+        {operation === FromActions.VI &&
+        <> <Field name="invAmnt" component={renderTextField} className={classes.textField} label="Invoiced Amount" helperText="Ex. 10000" />
+        <Field name="balPoAmt" component={renderTextField} className={classes.textField} label="Balance" helperText="Ex.67345"  /></>}
     </>
 }
 
-const SectionThree = (props) => {
-    // const { classes } = props
-    return <>
-        <h1>PDF Viewer</h1>
-    </>
-
+const SectionThree = (data) => {
+    const { initialValues } = data
+    return LoadFileUrl({
+        "url":initialValues.poCntrUrl,
+        "cid": initialValues.id,
+        "props":data,
+        "componentName":"Purchase Order Image",
+        "style":{width:"100%", height:"100%"}
+    })
 }
 
 // make the selector 
 // const selector = formValueSelector('PurchaseOrderForm')
-PurchaseOrderForm = connect(state => { return { ...state } })(PurchaseOrderForm)
+PurchaseOrderForm = connect(state => { return { ...state } }, FileAction)(PurchaseOrderForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('PurchaseOrderForm'));
 export default reduxForm({ form: 'PurchaseOrderForm', onSubmitSuccess: afterSubmit })(PurchaseOrderForm);
