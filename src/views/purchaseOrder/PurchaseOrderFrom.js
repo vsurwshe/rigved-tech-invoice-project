@@ -43,7 +43,7 @@ const LoadGird = (props) => {
                 {SectionTwo({ classes, props, initialValues })}
             </Grid>
         </Grid>
-        <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
+        <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20, paddingRight:10 , paddingBottom:20}}>
             <Grid item xs={12}>
                 {(initialValues !== undefined) && SectionThree({ classes, initialValues, props })}
             </Grid>
@@ -73,14 +73,14 @@ let LoadFileUrl = (parameter) => {
     const { listOfFiles } = parameter.props.props.FileState
     const exitsData = (listOfFiles.length > 0) && listOfFiles.filter(x => (x.cid === parameter.cid && x.fileName === parameter.url));
     if (exitsData === false || exitsData.length <= 0) { GetPhotos(parameter) }
-    return <img src={exitsData.length > 0 && exitsData[0].fileData} alt={parameter.componentName} style={parameter.style} />
+    return <iframe title="POFileUrl" type="application/pdf" src={exitsData.length > 0 && exitsData[0].fileData}  style={{ width: "100%", height: "100%" }} />
 }
 
 // this method used for the load the image form api
 const GetPhotos = async (parameter) => {
     const { FetchPhoto } = parameter.props.props
     const { authorization } = parameter.props.props.LoginState
-    return await FetchPhoto(parameter.url, authorization, parameter.cid);
+    return await FetchPhoto(parameter.url, authorization, parameter.cid,"application/pdf");
 }
 
 // this method will used for the loading circule progress bar
@@ -90,15 +90,18 @@ const loadingCircle = () => <center> Uploading <CircularProgress size={40} /> </
 const LoadFields = (parameter) => {
     const { classes } = parameter
     return <>
-        <Field name="clientName" component={renderTextField} fullWidth label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." validate={[Required]} />
-        <Field name="poNum" component={renderTextField} className={classes.textField} label="Purchase Order Number" helperText="Ex. po121-20/21" validate={[Required]} />
+        <Field name="poNum" component={renderTextField} fullWidth label="Purchase Order Number" helperText="Ex. po121-20/21" validate={[Required]} />
+        <Field name="clientName" component={renderTextField} className={classes.textField}  label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." validate={[Required]} />
     </>
 }
 
 // this method will load the header part
 const LoadHeader = (parameter) => {
     const { classes, initialValues } = parameter
-    return <><h2 className={classes.textField}>{initialValues.clientName}</h2></>
+    return <>
+        <h2 className={classes.textField}>{initialValues.clientName}</h2>
+        <h4>Purchase Order Number:&nbsp;&nbsp;{initialValues.poNum}</h4>
+    </>
 }
 
 // this method will load the sections second 

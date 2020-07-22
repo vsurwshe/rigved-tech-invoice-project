@@ -53,7 +53,7 @@ class PurchaseOrderManagement extends Component {
         let newFileData=[{
             "fileName":name,
 	        "description":"PoDetail",
-	        "contentType":type,
+	        "contentType":"pdf",
 	        "content":`${fileData}`
         }]
         await this.handlePurchaseOrderUplaod();
