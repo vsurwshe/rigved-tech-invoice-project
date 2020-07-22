@@ -30,7 +30,7 @@ const GetProjectList = (firstIndex, lastIndex, authroizationKey) => {
 
 export function SaveProjectList(projectList) {
     return {
-        type: "SAVE_PRoJECT_LIST",
+        type: "SAVE_PROJECT_LIST",
         projectList
     }
 }

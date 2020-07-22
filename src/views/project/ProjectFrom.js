@@ -3,7 +3,7 @@ import { reset, reduxForm, Field } from 'redux-form';
 import { connect } from 'react-redux';
 import { Button, Grid } from '@material-ui/core';
 import useStyles from "../client/Styles";
-import { renderTextField, renderDateTimePicker, renderFileInput } from '../utilites/FromUtilites';
+import { renderTextField, renderDateTimePicker, renderFileInput, renderAutocomplete } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
 import { FromActions } from '../../assets/config/Config';
 
@@ -52,18 +52,30 @@ const LoadGird = (props) => {
 const SectionOne = (data) => {
     const { classes, initialValues } = data
     const { operation }= data.props.stateData
-    return <>
-        { operation === FromActions.CR ? LoadFields({classes}) : LoadHeader({classes, initialValues}) }
-        <Field name="validFrom" component={renderDateTimePicker} className={classes.textField} label="Valid From" helperText="Ex. 01/01/2000" validate={[Required]} />
-        {operation === FromActions.CR && <Field name="poUrl" component={renderFileInput} fullWidth helperText="" type="file" lable="Purchase Order Image" />}
-    </>
+    return <> {operation === FromActions.CR ? LoadFields({classes, "mainProps":data.props}) : LoadHeader({classes, initialValues}) }</>
 }
 
 const LoadFields=(parameter)=>{
     const { classes }=parameter
+    const { listOfClient }=parameter.mainProps.ClientState
+    const { ManagerList }=parameter.mainProps.MasterDataSet
+    const { purchaseOrderList }=parameter.mainProps.PurchaseOrderState
+    let projectManagerOptions= ManagerList.length >0 && ManagerList.map((item,key)=>{
+        return {title:item.firstName+" "+item.lastName,id:item.accountId}
+    }) 
+    let clientOptions= listOfClient.length >0 && listOfClient.map((item,key)=>{
+        return {title:item.clientName,id:item.id}
+    })
+    let purchaseOrderOptions= purchaseOrderList.length >0 && purchaseOrderList.map((item,key)=>{
+        return {title:item.poNum,id:item.id}
+    })
+    console.log("Data PF ",parameter, projectManagerOptions, clientOptions, purchaseOrderOptions)
     return <> 
-        <Field name="clientName" component={renderTextField} fullWidth label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." validate={[Required]} />
-        <Field name="poNum" component={renderTextField} className={classes.textField} label="Purchase Order Number" helperText="Ex. po121-20/21" validate={[Required]} /> 
+        <Field name="projectName" component={renderTextField} fullWidth label="Project Name" helperText="Ex. PRMS" validate={[Required]} />
+        <Field name="clientName" component={renderAutocomplete} optionData={clientOptions}  label="Client Name" validate={[Required]} /> 
+        <Field name="projectManager" component={renderAutocomplete} optionData={projectManagerOptions} label="Project Manager Name" validate={[Required]} /> 
+        <Field name="purchaseOrder" component={renderAutocomplete} optionData={purchaseOrderOptions} label="Purchase Order Number (Current)" />
+        <Button color="secondary" variant="contained">View PO</Button>
     </>
 }
 
@@ -76,12 +88,11 @@ const LoadHeader=(parameter)=>{
 
 const SectionTwo = (data) => {
     const { classes } = data
-    const { operation }= data.props.stateData
+    // const { operation }= data.props.stateData
     return <>
-        <Field name="poAmount" component={renderTextField} className={classes.textField} label="Puchase Order Amount" helperText="Ex. 10000" validate={[Required]} />
-        <Field name="validTo" component={renderDateTimePicker} className={classes.textField} label="Valid to" helperText="Ex. 01/01/2000" validate={[Required]} />
-        {operation === "view" &&<> <Field name="invoicedAmount" component={renderTextField} className={classes.textField} label="Invoiced Amount" helperText="Ex. 10000" />
-        <Field name="balance" component={renderTextField} className={classes.textField} label="Balance" helperText="Ex.67345"  /></>}
+        <Field name="projectStartDate" component={renderDateTimePicker} className={classes.textField} label="Start Date" helperText="Ex. 01/01/2000" validate={[Required]} />
+        <Field name="projectEndDate" component={renderDateTimePicker} className={classes.textField} label="End Date" helperText="Ex. 01/01/2000" validate={[Required]} />
+        <Field name="contractAttachmentUrl" component={renderFileInput} fullWidth helperText="" type="file" lable="Project File" />
     </>
 }
 

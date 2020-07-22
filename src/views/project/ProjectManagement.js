@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import ProjectTable from "./ProjectTable";
+import ProjectForm from "./ProjectFrom";
+import {Card, CircularProgress } from '@material-ui/core';
 import * as ProjectAction from "../../redux/actions/ProjectAction"
 import * as MasterDataAction from "../../redux/actions/MasterDataAction"
 import * as ClientAction from "../../redux/actions/ClientAction"
@@ -8,6 +10,7 @@ import { loadMessage } from "../../redux/actions/ClientAction"
 import { bindActionCreators } from 'redux';
 import { API_EXE_TIME } from '../../assets/config/Config';
 import { connect } from 'react-redux';
+import moment from 'moment';
 
 class ProjectManagement extends Component {
     state = { 
@@ -16,20 +19,27 @@ class ProjectManagement extends Component {
         projectData: [],
         deleteModel: false,
         operation:"",
-        projectContractFileUplaod:false,
+        projectContractFileUpload:false,
         projectContractFileUrl:""
      }
     
     componentDidMount=async()=>{
-        console.log(this.props)
+        const { listOfClient } = this.props.ClientState;
         const { projectList }= this.props.ProjectState
         const { authorization }= this.props.LoginState
-        const { GetProjectList }= this.props.ProjectAction
+        const { purchaseOrderList }= this.props.PurchaseOrderState
         const { Domains, ManagerList } = this.props.MasterDataSet;
         const { GetDomains, GetManagerList } = this.props.MasterDataAction;
-        (projectList && projectList.length === 0) && await GetProjectList(0,20,authorization);
+        const { GetProjectList }= this.props.ProjectAction
+        const { GetClientList } = this.props.ClientAction;
+        const { GetPurchaseOrderList }= this.props.PurchaseOrderAction
+        await this.handleLoadProjectList();
+        (listOfClient && listOfClient.length === 0) && await GetClientList(0,20,authorization);
+        (purchaseOrderList && purchaseOrderList.length === 0) && await GetPurchaseOrderList(0,20,authorization);
         (Domains && Domains.length === 0) && await GetDomains(0, 10, authorization);
         (ManagerList && ManagerList.length === 0) && await GetManagerList(0,10,authorization);
+        (projectList && projectList.length === 0) && await GetProjectList(0,20,authorization);
+        await this.handleLoadProjectList();
     }
 
     // this method used for the create project from
@@ -42,11 +52,12 @@ class ProjectManagement extends Component {
     handleDeleteModel = (projectData) => { this.setState({ deleteModel: !this.state.deleteModel, projectData }) };
 
     // this method used for the handling the puchase order file
-    handleProjectContractFileUplaod=()=>{ this.setState({projectContractFileUplaod : !this.state.projectContractFileUplaod})}
+    handleProjectContractFileUplaod=()=>{ this.setState({projectContractFileUpload : !this.state.projectContractFileUpload})}
 
 
     render() { 
-        return <ProjectTable />;
+        const {createProject, projectData}=this.state
+        return <Card> {createProject ? this.loadProjectForm(projectData) :this.loadProjectTable()}</Card>
     }
 
     uploadContractFile=async(fileData,name,type)=>{
@@ -66,6 +77,71 @@ class ProjectManagement extends Component {
             await this.handleProjectContractFileUplaod();
         }, API_EXE_TIME)
         this.setState({projectContractFileUrl : (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length >0)  && this.props.FileState.fileUrl[0]})
+    }
+
+    // this method used for the loading Project form
+    loadProjectForm = (projectData) => {
+        const {operation,projectContractFileUrl, projectContractFileUpload}=this.state
+        let newProjectData = undefined;
+        if (projectData) {
+            newProjectData = {
+                ...projectData,
+                "validFrom":moment(projectData.validFrom).format('YYYY-MM-DD') ,
+                "validTo":moment(projectData.validTo).format('YYYY-MM-DD') ,
+            }
+        }
+        const data={ operation,projectContractFileUrl, projectContractFileUpload }
+        return <ProjectForm 
+                stateData={data} 
+                initialValues={newProjectData} 
+                SaveMethod={this.SaveProject} 
+                cancle={this.handleCreateProject} 
+                uploadFile={this.uploadContractFile}
+                clearFile={this.clearFileUrl}
+            />
+    }
+    // this method used for the clear the state variable
+    clearFileUrl=()=>{
+        this.setState({projectContractFileUrl:""})
+    }
+
+    // this method main framework which calling load PurchaseOrder table method
+    loadProjectTable = () => {
+        const { loadProjectList } = this.state
+        return < div style={{ paddingRight: 10 }}>  {loadProjectList ? this.loadingCircle() :this.loadingProjectTable()} </div>
+    }
+
+    // this method used for load the client table
+    loadingProjectTable = () => {
+        const {operation}=this.state
+        return <>
+        {/* {this.loadDeleteModel()} */}
+            <ProjectTable  
+                operation={operation} 
+                createProject={this.handleCreateProject} 
+            />
+    </>
+    }
+    // this method used for the show circular progress bar 
+    loadingCircle = () => <center> <h3>Project Management</h3> <CircularProgress size={80} /> </center>
+
+    // this method used for the call the save project api
+    SaveProject=async(sendUserValues)=>{
+        console.log("Calling Save Project ",sendUserValues)
+        // const { purchaseOrderFileUrl }=this.state
+        // const { SavePurchaseOrderDetails, loadMessage, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
+        // const { authorization } = this.props.LoginState
+        // const newUserData = {
+        //     ...sendUserValues,
+        //     "poCntrUrl":(purchaseOrderFileUrl === "" || purchaseOrderFileUrl === undefined) ? sendUserValues.poCntrUrl  : purchaseOrderFileUrl,
+        //     "active": true,
+        // }
+        // await SavePurchaseOrderDetails(newUserData, authorization)
+        // setTimeout(async () => {
+        //     await loadMessage()
+        //     await GetPurchaseOrderList(0, 20, authorization);
+        //     this.handleCreatePurchaseOrder();
+        // }, API_EXE_TIME)
     }
 }
 

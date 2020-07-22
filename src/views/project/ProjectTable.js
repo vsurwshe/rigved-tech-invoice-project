@@ -42,8 +42,9 @@ const ProjectTable = (props) => {
 
   // this will load the autocompelete actions drop down
   const loadActions = [
-    { title: 'Actions 1', year: 1994 },
-    { title: 'Actions 2', year: 1972 }
+    { title: 'View', year: 1994 },
+    { title: 'Edit', year: 1972 },
+    { title: 'Delete', year: 1972 }
   ]
   // Creating rows
   const data = (projectList && projectList.length > 0) && projectList.map((item, key) => {

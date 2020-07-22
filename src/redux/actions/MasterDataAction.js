@@ -75,7 +75,7 @@ const GetManagerList=(firstIndex, lastIndex,authroizationKey)=>{
                 if(response.status !== STATUS200){
                     dispatch(loadMessage(AlertColor.danger ,response.headers.message));
                 }else{
-                    dispatch(saveDomain(response.data))
+                    dispatch(saveManagerList(response.data))
                 }
             })
             .catch(error => { 

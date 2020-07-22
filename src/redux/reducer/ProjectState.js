@@ -5,7 +5,7 @@ const initialState = {
 
 const ProjectState = (state = initialState, action) => {
     switch (action.type) {
-        case "SAVE_PRoJECT_LIST":
+        case "SAVE_PROJECT_LIST":
             return { ...state, projectList: action.projectList }
         default:
             return state;
