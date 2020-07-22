@@ -67,6 +67,26 @@ const GetDomains=(firstIndex, lastIndex,authroizationKey)=>{
     }
 }
 
+const GetManagerList=(firstIndex, lastIndex,authroizationKey)=>{
+    return(dispatch)=>{
+        return CreateInstance()
+            .get('/masterdata/searchProjectMang/'+firstIndex+'/'+lastIndex,HeaderConfig(authroizationKey))
+            .then(response => {
+                if(response.status !== STATUS200){
+                    dispatch(loadMessage(AlertColor.danger ,response.headers.message));
+                }else{
+                    dispatch(saveDomain(response.data))
+                }
+            })
+            .catch(error => { 
+                if(error.response.status.toString() === CONFLICTSTATUS){
+                    dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+                }else{
+                    dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+                }
+            })
+    }
+}
 
 
 //----------------------------------
@@ -92,6 +112,13 @@ export function saveDomain(Domains){
     }
 }
 
+export function saveManagerList(ManagerList){
+    return {
+        type:"SAVE_MANAGER_LIST",
+        ManagerList
+    }
+}
+
 export function loadMessage(color, message){
     return{
         type:"SET_NO_DATA",
@@ -104,5 +131,6 @@ export function loadMessage(color, message){
 export {
     GetSkillSet,
     GetSkillCategory,
-    GetDomains
+    GetDomains,
+    GetManagerList
 }

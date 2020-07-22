@@ -1,11 +1,11 @@
 const initialState = {
     SkillSet: [],
     SkillCategory: [],
-    Domains: []
+    Domains: [],
+    ManagerList: []
 }
 
-
-
+// this is master data state 
 const MasterDataState = (state = initialState, action) => {
     switch (action.type) {
         case "SAVE_SKILL_SET":
@@ -14,6 +14,8 @@ const MasterDataState = (state = initialState, action) => {
             return { ...state, SkillCategory: action.SkillCategory }
         case "SAVE_DOMAIN_SET":
             return { ...state, Domains: action.Domains }
+        case "SAVE_MANAGER_LIST":
+            return { ...state, ManagerList: action.ManagerList }
         default:
             return state
     }
