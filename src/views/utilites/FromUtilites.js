@@ -131,7 +131,9 @@ const renderAutocomplete=({label,optionData,className, input, meta: { touched, i
   <Autocomplete
     id="auto-highlight"
     autoHighlight
-    options={(optionData && optionData.length >0) ? optionData.map((option) => option.title): []}
+    options={(optionData && optionData.length >0) ? optionData: []}
+    getOptionLabel={optionData => optionData.title}
+    onChange={(event, value) => value && input.onChange(value.id)}
     renderInput={(params) => ( <TextField {...params} label={label} margin="normal"  /> )}
     {...custom}
   />

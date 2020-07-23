@@ -14,7 +14,7 @@ import moment from 'moment';
 
 class ProjectManagement extends Component {
     state = { 
-        createProject: false,
+        fromAction:false,
         loadProjectList: false,
         projectData: [],
         deleteModel: false,
@@ -42,11 +42,11 @@ class ProjectManagement extends Component {
         await this.handleLoadProjectList();
     }
 
-    // this method used for the create project from
-    handleCreateProject = (projectData,operation) => { this.setState({ createProject: !this.state.createProject, projectData, operation }) }
-
     // this method used for the progress bar 
     handleLoadProjectList = () => { this.setState({ loadProjectList: !this.state.loadProjectList }) }
+
+    // this method used for the from actions in project 
+    handleProjectFromActions = (projectData,operation) => { this.setState({ fromAction: !this.state.fromAction, projectData, operation }) }
 
     // this method used for the load the delete model
     handleDeleteModel = (projectData) => { this.setState({ deleteModel: !this.state.deleteModel, projectData }) };
@@ -56,8 +56,8 @@ class ProjectManagement extends Component {
 
 
     render() { 
-        const {createProject, projectData}=this.state
-        return <Card> {createProject ? this.loadProjectForm(projectData) :this.loadProjectTable()}</Card>
+        const {fromAction, projectData}=this.state
+        return <Card> {fromAction ? this.loadProjectForm(projectData) :this.loadProjectTable()}</Card>
     }
 
     uploadContractFile=async(fileData,name,type)=>{
@@ -86,8 +86,8 @@ class ProjectManagement extends Component {
         if (projectData) {
             newProjectData = {
                 ...projectData,
-                "validFrom":moment(projectData.validFrom).format('YYYY-MM-DD') ,
-                "validTo":moment(projectData.validTo).format('YYYY-MM-DD') ,
+                "projectStartDate":moment(projectData.projectStartDate).format('YYYY-MM-DD') ,
+                "projectEndDate":moment(projectData.projectEndDate).format('YYYY-MM-DD') ,
             }
         }
         const data={ operation,projectContractFileUrl, projectContractFileUpload }
@@ -95,7 +95,7 @@ class ProjectManagement extends Component {
                 stateData={data} 
                 initialValues={newProjectData} 
                 SaveMethod={this.SaveProject} 
-                cancle={this.handleCreateProject} 
+                cancle={this.handleProjectFromActions} 
                 uploadFile={this.uploadContractFile}
                 clearFile={this.clearFileUrl}
             />
@@ -119,6 +119,9 @@ class ProjectManagement extends Component {
             <ProjectTable  
                 operation={operation} 
                 createProject={this.handleCreateProject} 
+                viewProject={this.handleViewProject}
+                editProject={this.handleEditProject}
+                fromAction={this.handleProjectFromActions}
             />
     </>
     }

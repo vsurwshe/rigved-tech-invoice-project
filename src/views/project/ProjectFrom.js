@@ -1,5 +1,5 @@
 import React from 'react';
-import { reset, reduxForm, Field } from 'redux-form';
+import { reset, reduxForm, Field, formValueSelector } from 'redux-form';
 import { connect } from 'react-redux';
 import { Button, Grid } from '@material-ui/core';
 import useStyles from "../client/Styles";
@@ -57,6 +57,7 @@ const SectionOne = (data) => {
 
 const LoadFields=(parameter)=>{
     const { classes }=parameter
+    const { purchaseOrder }=parameter.mainProps
     const { listOfClient }=parameter.mainProps.ClientState
     const { ManagerList }=parameter.mainProps.MasterDataSet
     const { purchaseOrderList }=parameter.mainProps.PurchaseOrderState
@@ -69,13 +70,13 @@ const LoadFields=(parameter)=>{
     let purchaseOrderOptions= purchaseOrderList.length >0 && purchaseOrderList.map((item,key)=>{
         return {title:item.poNum,id:item.id}
     })
-    console.log("Data PF ",parameter, projectManagerOptions, clientOptions, purchaseOrderOptions)
+    console.log("Data PF ",parameter, parameter.mainProps)
     return <> 
         <Field name="projectName" component={renderTextField} fullWidth label="Project Name" helperText="Ex. PRMS" validate={[Required]} />
         <Field name="clientName" component={renderAutocomplete} optionData={clientOptions}  label="Client Name" validate={[Required]} /> 
         <Field name="projectManager" component={renderAutocomplete} optionData={projectManagerOptions} label="Project Manager Name" validate={[Required]} /> 
         <Field name="purchaseOrder" component={renderAutocomplete} optionData={purchaseOrderOptions} label="Purchase Order Number (Current)" />
-        <Button color="secondary" variant="contained">View PO</Button>
+        {purchaseOrder && <Button color="secondary" variant="contained">View PO</Button>}
     </>
 }
 
@@ -105,8 +106,12 @@ const SectionThree = (props) => {
 }
 
 // make the selector 
-// const selector = formValueSelector('PurchaseOrderForm')
-ProjectForm = connect(state => { return { ...state } })(ProjectForm)
+const selector = formValueSelector('ProjectForm')
+ProjectForm = connect(state => { 
+    // can select values individually
+    const purchaseOrder = selector(state, 'purchaseOrder')
+    return { ...state, purchaseOrder } 
+})(ProjectForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ProjectForm'));
 export default reduxForm({ form: 'ProjectForm', 

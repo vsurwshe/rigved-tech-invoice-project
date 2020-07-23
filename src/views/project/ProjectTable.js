@@ -9,7 +9,7 @@ import { FromActions } from '../../assets/config/Config';
 
 const ProjectTable = (props) => {
   const { projectList } = props.ProjectState
-  const { createProject } = props
+  const { fromAction } = props
 
   // creating columns
   const columns = [
@@ -33,6 +33,7 @@ const ProjectTable = (props) => {
           id="combo-box-actions"
           options={loadActions}
           getOptionLabel={(option) => option.title}
+          onChange={(event, value) => loadActinos(value.action,rowData)}
           style={{ width: 150 }}
           renderInput={(params) => <TextField {...params} label="Actions" />}
         />
@@ -40,11 +41,24 @@ const ProjectTable = (props) => {
     }
   ];
 
+  const loadActinos=(action,rowData)=>{
+    switch (action) {
+      case FromActions.ED:
+        fromAction(rowData.data,FromActions.ED);
+        break;
+      case FromActions.VI:
+        fromAction(rowData.data,FromActions.VI);
+        break;
+      default:
+        break;
+    }
+  }
+
   // this will load the autocompelete actions drop down
   const loadActions = [
-    { title: 'View', year: 1994 },
-    { title: 'Edit', year: 1972 },
-    { title: 'Delete', year: 1972 }
+    { title: 'View', action: FromActions.VI },
+    { title: 'Edit', action: FromActions.ED },
+    { title: 'Delete', action: FromActions.DE }
   ]
   // Creating rows
   const data = (projectList && projectList.length > 0) && projectList.map((item, key) => {
@@ -62,7 +76,7 @@ const ProjectTable = (props) => {
       actions={[
         {
           icon: () => <Button variant="contained" color="primary">Create Project</Button>,
-          onClick: (event, rowData) => { createProject(null, FromActions.CR); },
+          onClick: (event, rowData) => { fromAction(null, FromActions.CR); },
           isFreeAction: true,
           tooltip: 'Create Project'
         }
