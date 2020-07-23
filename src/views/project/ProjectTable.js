@@ -9,7 +9,7 @@ import { FromActions } from '../../assets/config/Config';
 
 const ProjectTable = (props) => {
   const { projectList } = props.ProjectState
-  const { fromAction } = props
+  const { fromAction, deleteMethod } = props
 
   // creating columns
   const columns = [
@@ -44,10 +44,13 @@ const ProjectTable = (props) => {
   const loadActinos=(action,rowData)=>{
     switch (action) {
       case FromActions.ED:
-        fromAction(rowData.data,FromActions.ED);
+        fromAction(rowData.data,FromActions.ED,true);
         break;
       case FromActions.VI:
-        fromAction(rowData.data,FromActions.VI);
+        fromAction(rowData.data,FromActions.VI,true);
+        break;
+      case FromActions.DE:
+        deleteMethod(rowData.data);
         break;
       default:
         break;

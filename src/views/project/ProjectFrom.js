@@ -44,7 +44,7 @@ const LoadGird = (props) => {
         </Grid>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop:20 }}>
             <Grid item xs={12}>
-                {(initialValues !== undefined) && SectionThree({ classes })} 
+                {SectionThree({ classes, "mainProps":props })} 
             </Grid>
         </Grid>
     </>
@@ -75,7 +75,6 @@ const LoadFields=(parameter)=>{
     let projectTypeOptions= Domains.length >0 && Domains.map((item,key)=>{
         return {title:item.name ? item.name: "",id:item.id}
     })
-    console.log("Data PF ",parameter, parameter.mainProps)
     return <> 
         <Field name="projectName" component={renderTextField} fullWidth label="Project Name" helperText="Ex. PRMS" validate={[Required]} />
         <Field name="projectType" component={renderAutocomplete} optionData={projectTypeOptions} label="Project Type" validate={[Required]} />
@@ -105,7 +104,7 @@ const SectionTwo = (data) => {
         <Field name="projectStartDate" component={renderDateTimePicker} className={classes.textField} label="Start Date" helperText="Ex. 01/01/2000" validate={[Required]} />
         <Field name="projectEndDate" component={renderDateTimePicker} className={classes.textField} label="End Date" helperText="Ex. 01/01/2000" validate={[Required]} />
         <Field name="projectCost" component={renderNumberField} className={classes.textField} label="Project Cost" helperText="Ex. 20000" validate={[Required]} />
-        <Field name="projectDesc" component={renderTextAreaField} maxRows={2} label="Project Description" fullWidth />
+        <Field name="projectDesc" component={renderTextAreaField} className={classes.textField} maxRows={2} label="Project Description"  />
         {operation === FromActions.CR &&
             <>{(projectContractFileUpload) ? loadingCircle()
                 : (projectContractFileUrl ? LoadFileUrl({ "url": projectContractFileUrl, "cid": 1, "props": data, "componentName": "Purchase Order Image", "style": { height: "60%", width: "100%" } })
@@ -134,12 +133,13 @@ const GetPhotos = async (parameter) => {
 const loadingCircle = () => <center> Uploading <CircularProgress size={40} /> </center>
 
 
-const SectionThree = (props) => {
+const SectionThree = (data) => {
+    const {showTabs }= data.mainProps.stateData
     const tabsData = [
-        { label: "Contact Person", component: Resources(props) },
-        { label: "Financials", component: Expenses(props) },
+        { label: "Contact Person", component: Resources(data) },
+        { label: "Financials", component: Expenses(data) },
     ]
-    return <SimpleTabs tabData={tabsData} />
+    return showTabs && <SimpleTabs tabData={tabsData} />
 
 }
 

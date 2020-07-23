@@ -50,7 +50,24 @@ const SaveProjectRecord=(userData,authroizationKey)=>{
     }
 }
 
-
+const DeleteProjectRecord=(projectId, authroizationKey)=>{
+    return(dispatch)=>{
+        return CreateInstance()
+        .get('/project/delete/'+projectId,HeaderConfig(authroizationKey))
+        .then(response => {
+            if(response.status !== STATUS200){
+                dispatch(loadMessage(AlertColor.danger ,response.headers.message));
+            }else{
+                dispatch(DeleteProject(response.data))
+        }})
+        .catch(error => { 
+            if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
+                dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+            }else{
+                dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+        }})
+    }
+}
 
 //-------------------------------
 
@@ -68,9 +85,15 @@ export function SaveProject(projectData) {
     }
 }
 
-
+export function DeleteProject(projectData){
+    return {
+        type: "DELETE_PROJECT_DATA",
+        projectData
+    }
+}
 
 export {
     GetProjectList,
-    SaveProjectRecord
+    SaveProjectRecord,
+    DeleteProjectRecord
 }
