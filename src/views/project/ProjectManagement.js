@@ -6,6 +6,7 @@ import * as ProjectAction from "../../redux/actions/ProjectAction"
 import * as MasterDataAction from "../../redux/actions/MasterDataAction"
 import * as ClientAction from "../../redux/actions/ClientAction"
 import * as PurchaseOrderAction from "../../redux/actions/PurchaseOrderAction"
+import * as FileAction from "../../redux/actions/FileAction"
 import { loadMessage } from "../../redux/actions/ClientAction"
 import { bindActionCreators } from 'redux';
 import { API_EXE_TIME } from '../../assets/config/Config';
@@ -65,7 +66,7 @@ class ProjectManagement extends Component {
         const { authorization } = this.props.LoginState
         let newFileData=[{
             "fileName":name,
-	        "description":"PoDetail",
+	        "description":"ProjectDetail",
 	        "contentType":"pdf",
 	        "content":`${fileData}`
         }]
@@ -130,21 +131,20 @@ class ProjectManagement extends Component {
 
     // this method used for the call the save project api
     SaveProject=async(sendUserValues)=>{
-        console.log("Calling Save Project ",sendUserValues)
-        // const { purchaseOrderFileUrl }=this.state
-        // const { SavePurchaseOrderDetails, loadMessage, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
-        // const { authorization } = this.props.LoginState
-        // const newUserData = {
-        //     ...sendUserValues,
-        //     "poCntrUrl":(purchaseOrderFileUrl === "" || purchaseOrderFileUrl === undefined) ? sendUserValues.poCntrUrl  : purchaseOrderFileUrl,
-        //     "active": true,
-        // }
-        // await SavePurchaseOrderDetails(newUserData, authorization)
-        // setTimeout(async () => {
-        //     await loadMessage()
-        //     await GetPurchaseOrderList(0, 20, authorization);
-        //     this.handleCreatePurchaseOrder();
-        // }, API_EXE_TIME)
+        const { projectContractFileUrl }=this.state
+        const { SaveProjectRecord, GetProjectList } = this.props.ProjectAction;
+        const { authorization } = this.props.LoginState
+        const newProjectData = {
+            ...sendUserValues,
+            "contractAttachmentUrl":(projectContractFileUrl === "" || projectContractFileUrl === undefined) ? sendUserValues.contractAttachmentUrl  : projectContractFileUrl,
+            "active": true,
+        }
+        await SaveProjectRecord(newProjectData, authorization)
+        setTimeout(async () => {
+            await loadMessage()
+            await GetProjectList(0, 20, authorization);
+            this.handleProjectFromActions();
+        }, API_EXE_TIME)
     }
 }
 
@@ -153,7 +153,8 @@ const mapDispatchToProps = (dispatch) => ({
     ProjectAction: bindActionCreators(ProjectAction, dispatch),
     MasterDataAction: bindActionCreators(MasterDataAction, dispatch),
     ClientAction: bindActionCreators(ClientAction, dispatch),
-    PurchaseOrderAction: bindActionCreators(PurchaseOrderAction, dispatch)
+    PurchaseOrderAction: bindActionCreators(PurchaseOrderAction, dispatch),
+    FileAction : bindActionCreators(FileAction,dispatch)
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(ProjectManagement);

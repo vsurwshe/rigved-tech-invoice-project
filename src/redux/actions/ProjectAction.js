@@ -25,6 +25,32 @@ const GetProjectList = (firstIndex, lastIndex, authroizationKey) => {
     }
 }
 
+const SaveProjectRecord=(userData,authroizationKey)=>{
+    return(dispatch)=>{
+        return CreateInstance()
+        .post('/project/createProj/',userData,{headers: { 
+            'Content-Type': 'application/json',
+            Authorization: authroizationKey 
+        }})
+        .then(response => {
+            if(response.status !== STATUS200){
+                dispatch(loadMessage(AlertColor.danger ,response.headers.message));
+            }else{
+                dispatch(loadMessage(AlertColor.success,response.headers.message))
+                dispatch(SaveProject(userData))
+            }
+        })
+        .catch(error => { 
+            if(error.response && error.response.status.toString() === CONFLICTSTATUS){
+                dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+            }else{
+                dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+            }
+        })
+    }
+}
+
+
 
 //-------------------------------
 
@@ -35,8 +61,16 @@ export function SaveProjectList(projectList) {
     }
 }
 
+export function SaveProject(projectData) {
+    return {
+        type: "SAVE_PROJECT_DATA",
+        projectData
+    }
+}
+
 
 
 export {
-    GetProjectList
+    GetProjectList,
+    SaveProjectRecord
 }
