@@ -88,7 +88,26 @@ const GetManagerList=(firstIndex, lastIndex,authroizationKey)=>{
     }
 }
 
-
+const GetExpenseTypeList=(firstIndex, lastIndex,authroizationKey)=>{
+    return(dispatch)=>{
+        return CreateInstance()
+            .get('/masterdata/Expense Type/'+firstIndex+'/'+lastIndex,HeaderConfig(authroizationKey))
+            .then(response => {
+                if(response.status !== STATUS200){
+                    dispatch(loadMessage(AlertColor.danger ,response.headers.message));
+                }else{
+                    dispatch(saveExpenseSet(response.data))
+                }
+            })
+            .catch(error => { 
+                if(error.response.status.toString() === CONFLICTSTATUS){
+                    dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+                }else{
+                    dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+                }
+            })
+    }
+}
 //----------------------------------
 
 export function saveSkillSet(SkillSet){
@@ -119,6 +138,13 @@ export function saveManagerList(ManagerList){
     }
 }
 
+export function saveExpenseSet(ExpenseTypeList){
+    return {
+        type:"SAVE_EXPENSE_TYPE_LIST",
+        ExpenseTypeList
+    }
+}
+
 export function loadMessage(color, message){
     return{
         type:"SET_NO_DATA",
@@ -132,5 +158,6 @@ export {
     GetSkillSet,
     GetSkillCategory,
     GetDomains,
-    GetManagerList
+    GetManagerList,
+    GetExpenseTypeList
 }

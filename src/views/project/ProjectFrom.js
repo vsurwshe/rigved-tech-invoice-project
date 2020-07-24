@@ -8,6 +8,7 @@ import { Required } from '../utilites/FormValidation';
 import { FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
 import * as FileAction from '../../redux/actions/FileAction'
+import ExpensesTable from '../Expenses/ExpensesTable';
 
 
 let ProjectForm = (props) => {
@@ -97,14 +98,14 @@ const LoadHeader=(parameter)=>{
 }
 
 const SectionTwo = (data) => {
-    const { classes } = data
+    const { classes, initialValues } = data
     const { uploadFile } = data.props
     const { operation, projectContractFileUrl, projectContractFileUpload }= data.props.stateData
     return <>
-        <Field name="projectStartDate" component={renderDateTimePicker} className={classes.textField} label="Start Date" helperText="Ex. 01/01/2000" validate={[Required]} />
-        <Field name="projectEndDate" component={renderDateTimePicker} className={classes.textField} label="End Date" helperText="Ex. 01/01/2000" validate={[Required]} />
-        <Field name="projectCost" component={renderNumberField} className={classes.textField} label="Project Cost" helperText="Ex. 20000" validate={[Required]} />
-        <Field name="projectDesc" component={renderTextAreaField} className={classes.textField} maxRows={2} label="Project Description"  />
+        <Field name="projectStartDate" component={renderDateTimePicker} className={classes.textField} label="Start Date" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} validate={[Required]} />
+        <Field name="projectEndDate" component={renderDateTimePicker} className={classes.textField} label="End Date" helperText={(initialValues === undefined) &&"Ex. 01/01/2000"} validate={[Required]} />
+        <Field name="projectCost" component={renderNumberField} className={classes.textField} label="Project Cost" helperText={(initialValues === undefined) &&"Ex. 20000"} validate={[Required]} />
+        <Field name="projectDesc" component={renderTextAreaField} fullWidth maxRows={2} label="Project Description"  />
         {operation === FromActions.CR &&
             <>{(projectContractFileUpload) ? loadingCircle()
                 : (projectContractFileUrl ? LoadFileUrl({ "url": projectContractFileUrl, "cid": 1, "props": data, "componentName": "Purchase Order Image", "style": { height: "60%", width: "100%" } })
@@ -136,8 +137,8 @@ const loadingCircle = () => <center> Uploading <CircularProgress size={40} /> </
 const SectionThree = (data) => {
     const {showTabs }= data.mainProps.stateData
     const tabsData = [
-        { label: "Contact Person", component: Resources(data) },
-        { label: "Financials", component: Expenses(data) },
+        { label: "Resources", component: Resources(data) },
+        { label: "Expenses", component: Expenses(data) },
     ]
     return showTabs && <SimpleTabs tabData={tabsData} />
 
@@ -148,7 +149,7 @@ const Resources=(data)=>{
 }
 
 const Expenses=(data)=>{
-    return <h1> Expenses</h1>
+    return <ExpensesTable />
 }
 
 // make the selector 
