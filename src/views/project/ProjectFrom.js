@@ -140,7 +140,7 @@ const SectionThree = (data) => {
         { label: "Resources", component: Resources(data) },
         { label: "Expenses", component: Expenses(data) },
     ]
-    return showTabs && <SimpleTabs tabData={tabsData} />
+    return showTabs && <SimpleTabs  tabData={tabsData} />
 
 }
 
@@ -149,7 +149,8 @@ const Resources=(data)=>{
 }
 
 const Expenses=(data)=>{
-    return <ExpensesTable />
+    const {initialValues}=data.mainProps
+    return <ExpensesTable projectData={initialValues} />
 }
 
 // make the selector 

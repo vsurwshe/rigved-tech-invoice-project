@@ -15,7 +15,28 @@ const GetExpensesList = (firstIndex, lastIndex, authroizationKey) => {
                 }
             })
             .catch(error => {
-                if (error.response.status.toString() === CONFLICTSTATUS) {
+                if (error && error.response && error.response.status.toString() === CONFLICTSTATUS) {
+                    dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+                } else {
+                    dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+                }
+            })
+    }
+}
+
+const GetExpensesListByProjectId = (firstIndex, lastIndex,projectId, authroizationKey) => {
+    return (dispatch) => {
+        return CreateInstance()
+        .get('/project/expenseList/' + firstIndex + '/' + lastIndex+ '/' +projectId, HeaderConfig(authroizationKey))
+            .then(response => {
+                if (response.status !== STATUS200) {
+                    dispatch(loadMessage(AlertColor.danger, response.headers.message));
+                } else {
+                    dispatch(saveExpenseListByProjectId(response.data,projectId))
+                }
+            })
+            .catch(error => {
+                if (error && error.response && error.response.status.toString() === CONFLICTSTATUS) {
                     dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
                 } else {
                     dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
@@ -40,7 +61,7 @@ const SaveExpenseRecord=(userData,authroizationKey)=>{
             }
         })
         .catch(error => { 
-            if(error.response && error.response.status.toString() === CONFLICTSTATUS){
+            if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
                 dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
             }else{
                 dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
@@ -65,8 +86,16 @@ export function saveExpenseRecord(expenseRecord){
     }
 }
 
+export function saveExpenseListByProjectId(expenseList,projectId){
+    return {
+        type:"SAVE_EXPENSES_LIST_BY_PROJECT_ID",
+        expenseList,
+        projectId
+    }
+}
 
 export{
     GetExpensesList,
-    SaveExpenseRecord
+    SaveExpenseRecord,
+    GetExpensesListByProjectId
 }
