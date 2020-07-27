@@ -9,6 +9,7 @@ import { FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
 import * as FileAction from '../../redux/actions/FileAction'
 import ExpensesTable from '../Expenses/ExpensesTable';
+import ResourcesTable from '../resources/ResourcesTable';
 
 
 let ProjectForm = (props) => {
@@ -145,7 +146,8 @@ const SectionThree = (data) => {
 }
 
 const Resources=(data)=>{
-    return <h1> Resources</h1>
+    const {initialValues}=data.mainProps
+    return <ResourcesTable projectData={initialValues} />
 }
 
 const Expenses=(data)=>{

@@ -63,6 +63,7 @@ const ProjectTable = (props) => {
     { title: 'Edit', action: FromActions.ED },
     { title: 'Delete', action: FromActions.DE }
   ]
+  
   // Creating rows
   const data = (projectList && projectList.length > 0) && projectList.map((item, key) => {
     return { "key": (key + 1), "data": item, "projectName": item.projectName, "clientName": item.clientName }
