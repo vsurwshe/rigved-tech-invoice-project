@@ -146,12 +146,12 @@ const SectionThree = (data) => {
 
 const Resources=(data)=>{
     const {initialValues}=data.mainProps
-    return <ResourcesTable projectData={initialValues} />
+    return <ResourcesTable projectData={initialValues} stateData={data.mainProps.stateData} />
 }
 
 const Expenses=(data)=>{
     const {initialValues}=data.mainProps
-    return <ExpensesTable projectData={initialValues} />
+    return <ExpensesTable projectData={initialValues} stateData={data.mainProps.stateData} />
 }
 
 // make the selector 

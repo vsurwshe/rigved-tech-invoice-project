@@ -4,7 +4,7 @@ import MaterialTable from "material-table";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Button } from '@material-ui/core';
-import { API_EXE_TIME } from '../../assets/config/Config';
+import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
 import * as ExpenseAction from "../../redux/actions/ExpensesAction";
 import * as FileAction from "../../redux/actions/FileAction";
 import moment from 'moment';
@@ -12,6 +12,7 @@ import { bindActionCreators } from 'redux';
 
 const ExpensesTable = (props) => {
   const { projectData }=props 
+  const { operation }=props.stateData
   const [countCall,setCountCall]=useState(0)
   const { expensesListByProjectId}=props.ExpenseState
   const { SaveExpenseRecord, GetExpensesListByProjectId } = props.ExpenseAction
@@ -167,7 +168,7 @@ const ExpensesTable = (props) => {
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
         search: false
       }}
-      icons={{Add: () => <Button variant="contained" color="primary">Add Expense</Button>}}
+      icons={{Add: () => {return (operation && (operation === FromActions.ED || operation === FromActions.CR)) ? <Button variant="contained" color="primary">Add Expense</Button> : ""}}}
       editable={{
         isEditable: rowData => false, 
         isEditHidden: rowData => true,

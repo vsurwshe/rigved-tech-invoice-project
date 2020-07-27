@@ -1,5 +1,5 @@
 import React,{useState } from 'react';
-import { Dialog, Button, Slide, DialogTitle, DialogActions, makeStyles, DialogContentText, DialogContent } from '@material-ui/core';
+import { Dialog, Button, Slide, DialogTitle, DialogActions, makeStyles, DialogContentText, DialogContent, Grid } from '@material-ui/core';
 import { connect } from 'react-redux';
 import MaterialTable from 'material-table';
 import AppBar from '@material-ui/core/AppBar';
@@ -9,6 +9,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import * as EmployeeAction from "../../redux/actions/EmployeeAction";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
+import { FromActions } from '../../assets/config/Config';
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -32,6 +33,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 let ResourcesTable=(props)=>{
     const { GetEmployeeListByProjectId, projectData }=props
     const { employeeListByPojectId }=props.EmpolyeeState
+    const { operation }=props.stateData
     const { authorization}=props.LoginState
     const [open, setOpen] = useState(false);
     const [countCall,setCountCall]=useState(0)
@@ -83,7 +85,7 @@ return <>
                 search: false
               }}
               actions={[
-                { icon: () => <Button variant="contained" color="primary">Assign Resource</Button>,
+                { icon: () => {return (operation && (operation === FromActions.ED || operation === FromActions.CR)) ?  <Button variant="contained" color="primary">Assign Resource</Button> : ""},
                   onClick: (event, rowData) => { handleClickOpen() },
                   isFreeAction: true,
                   tooltip: 'Assign Resource'
@@ -105,9 +107,15 @@ const LoadAddResourceModel=(data)=>{
       </Toolbar>
     </AppBar>
     <DialogContent>
-        <DialogContentText id="alert-dialog-slide-description">
+       <Grid container spacing={5}>
+            <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop:20 }}>
+                {LoadRateCardList(data.mainProps)}
+            </Grid>
+            <Grid item xs={12} sm={6} style={{paddingTop:50}}>
                 {LoadEmployeeList(data.mainProps)}
-        </DialogContentText>
+            </Grid>
+        </Grid>
+                
     </DialogContent>
     <DialogActions>
         <Button onClick={() => console.log("Called the Saving Resources")} color="secondary">Delete</Button>
@@ -116,8 +124,8 @@ const LoadAddResourceModel=(data)=>{
 }
 
 const LoadEmployeeList=(props)=>{
-  const  {employeeListByPojectId}=props.EmpolyeeState
-  let options=employeeListByPojectId.length >0 && employeeListByPojectId.map((item,key)=>{return{title:item.firstName+" "+item.lastName,id:item.accountId}});
+  const  {EmployeeList}=props.MasterDataSet
+  let options=EmployeeList.length >0 && EmployeeList.map((item,key)=>{return{title:item.firstName+" "+item.lastName,id:item.accountId}});
   return <Autocomplete
       multiple
       id="tags-outlined"
@@ -125,11 +133,15 @@ const LoadEmployeeList=(props)=>{
       options={options}
       getOptionLabel={(option) => option.title}
       onChange={(event, value) => value && value.type}
-      style={{ width: "50%" }}
-      renderInput={(params) => <TextField {...params} fullWidth label="By Name" />}
+      style={{ width: "100%" }}
+      renderInput={(params) => <TextField {...params} fullWidth label="Member Name" />}
   />
 }
 
+
+const LoadRateCardList=(propsData)=>{
+  return <h2> Rate Card Details </h2>
+}
 
 
 const mapStateToProps = state => { return state; };

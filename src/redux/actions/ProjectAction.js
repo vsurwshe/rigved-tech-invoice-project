@@ -37,7 +37,7 @@ const SaveProjectRecord=(userData,authroizationKey)=>{
                 dispatch(loadMessage(AlertColor.danger ,response.headers.message));
             }else{
                 dispatch(loadMessage(AlertColor.success,response.headers.message))
-                dispatch(SaveProject(userData))
+                dispatch(SaveProject(response.data))
             }
         })
         .catch(error => { 
