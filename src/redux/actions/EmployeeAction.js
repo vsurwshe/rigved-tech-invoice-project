@@ -12,7 +12,7 @@ const GetEmployeeListByProjectId = (firstIndex, lastIndex,projectId, authroizati
                 if (response.status !== STATUS200) {
                     dispatch(loadMessage(AlertColor.danger, response.headers.message));
                 } else {
-                    dispatch(SaveEmployeeListByProjectId(response.data))
+                    dispatch(SaveEmployeeListByProjectId(response.data,projectId))
                 }
             })
             .catch(error => {
@@ -26,11 +26,13 @@ const GetEmployeeListByProjectId = (firstIndex, lastIndex,projectId, authroizati
 }
 
 
+
 //------------------------------
-export function SaveEmployeeListByProjectId(employeeList){
+export function SaveEmployeeListByProjectId(employeeList,projectId){
     return {
         type:"SAVE_EMPOLYEE_BY_PROJECT_ID",
-        employeeList
+        employeeList,
+        projectId
     }
 }
 

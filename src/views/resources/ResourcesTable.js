@@ -7,6 +7,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import * as EmployeeAction from "../../redux/actions/EmployeeAction";
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import TextField from '@material-ui/core/TextField';
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -25,10 +27,10 @@ const useStyles = makeStyles((theme) => ({
   
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
-  });
+});
 
 let ResourcesTable=(props)=>{
-    const { ResourceList, GetEmployeeListByProjectId, projectData }=props
+    const { GetEmployeeListByProjectId, projectData }=props
     const { employeeListByPojectId }=props.EmpolyeeState
     const { authorization}=props.LoginState
     const [open, setOpen] = useState(false);
@@ -36,11 +38,19 @@ let ResourcesTable=(props)=>{
     const handleClickOpen = () => { setOpen(true) };
     const handleClose = () => { setOpen(false) };
 
+    let exitsEmployeeListByPojectId=(employeeListByPojectId && employeeListByPojectId.length > 0)&& employeeListByPojectId.filter(item=> item.projectId ===projectData.id);
+    
+    if((exitsEmployeeListByPojectId === false || exitsEmployeeListByPojectId.length <=0) && countCall===0){
+      setCountCall(countCall + 1)
+      GetEmployeeListByProjectId(0,2,projectData.id,authorization);
+      exitsEmployeeListByPojectId=(employeeListByPojectId && employeeListByPojectId.length > 0)&& employeeListByPojectId.filter(item=> item.projectId ===projectData.id);
+    }
+
     // creating columns
     const columns = [
-      { title: 'Emp\u00a0Id', field: 'empId', width: 20 },
+      { title: 'Emp\u00a0Id', field: 'employeeNumber', width: 20 },
       { title: 'Name', field: 'name' },
-      { title: 'Domain', field: 'domain' },
+      { title: 'Domain', field: 'designation' },
       { title: 'Category', field: 'category' },
       { title: 'Experience', field: 'experience' },
       { title: 'Skill', field: 'skill' },
@@ -49,31 +59,31 @@ let ResourcesTable=(props)=>{
     ];
 
   // Creating rows
-  const data = (ResourceList && ResourceList.length > 0) && ResourceList.map((item, key) => {
-    return { "key": (key + 1), "data": item, "projectName": item.projectName, "clientName": item.clientName }
+  let data =(exitsEmployeeListByPojectId && exitsEmployeeListByPojectId.length > 0 ) && exitsEmployeeListByPojectId.map((item, key) => {
+    let tempData=(item && item.List.length>0) && item.List.map((subitem,key)=>{
+      return  { 
+        "data": subitem, 
+        "employeeNumber":subitem.employeeNumber,
+        "name":subitem.firstName+" "+subitem.lastName,
+        // "expDate":moment(subitem.expDate).format('YYYY-MM-DD'),
+      }
+    }) 
+    return (tempData && tempData.length >0 )? tempData : [];
   });
-
-  const LoadEmployee=()=>{
-    if(employeeListByPojectId && employeeListByPojectId.length === 0 && projectData!== undefined && countCall===0){
-      setCountCall(countCall + 1)
-      GetEmployeeListByProjectId(0,20,projectData.id,authorization);
-    }
-  }
     
 return <>
-        {LoadAddResourceModel({open,handleClose})}
-        {LoadEmployee()}
+        {LoadAddResourceModel({open,handleClose, "mainProps":props})}
         <div style={{ maxWidth: "100%" }}>
             <MaterialTable
-              title="Resources Managment"
+              title=""
               columns={columns}
-              data={(data && data.length > 0) ? data : []}
+              data={(data && data.length > 0) ? data[0] : []}
               options={{
-                headerStyle: { backgroundColor: '#01579b', color: '#FFF' }
+                headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
+                search: false
               }}
               actions={[
-                {
-                  icon: () => <Button variant="contained" color="primary">Assign Resource</Button>,
+                { icon: () => <Button variant="contained" color="primary">Assign Resource</Button>,
                   onClick: (event, rowData) => { handleClickOpen() },
                   isFreeAction: true,
                   tooltip: 'Assign Resource'
@@ -96,13 +106,28 @@ const LoadAddResourceModel=(data)=>{
     </AppBar>
     <DialogContent>
         <DialogContentText id="alert-dialog-slide-description">
-                <h1>Dialog Content</h1>
+                {LoadEmployeeList(data.mainProps)}
         </DialogContentText>
     </DialogContent>
     <DialogActions>
         <Button onClick={() => console.log("Called the Saving Resources")} color="secondary">Delete</Button>
     </DialogActions>
   </Dialog>
+}
+
+const LoadEmployeeList=(props)=>{
+  const  {employeeListByPojectId}=props.EmpolyeeState
+  let options=employeeListByPojectId.length >0 && employeeListByPojectId.map((item,key)=>{return{title:item.firstName+" "+item.lastName,id:item.accountId}});
+  return <Autocomplete
+      multiple
+      id="tags-outlined"
+      filterSelectedOptions
+      options={options}
+      getOptionLabel={(option) => option.title}
+      onChange={(event, value) => value && value.type}
+      style={{ width: "50%" }}
+      renderInput={(params) => <TextField {...params} fullWidth label="By Name" />}
+  />
 }
 
 

@@ -155,14 +155,14 @@ const ExpensesTable = (props) => {
         "attachmentUrl":  subitem.attachmentUrl
       }
     }) 
-    return tempData;
+    return (tempData && tempData.length >0 )? tempData : [];
   });
 
   return <div style={{ maxWidth: "100%" }}>
     <MaterialTable
       title=""
       columns={columns}
-      data={data.length > 0 ? data[0] : []}
+      data={(data && data.length > 0) ? data[0] : []}
       options={{
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
         search: false

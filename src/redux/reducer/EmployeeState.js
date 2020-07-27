@@ -7,7 +7,8 @@ const initialState = {
 const EmployeeState=(state=initialState,action)=>{
     switch (action.type) {
         case "SAVE_EMPOLYEE_BY_PROJECT_ID":
-            return {...state, employeeListByPojectId: action.employeeList}
+            let newEmployeeListByProjectId =state.employeeListByPojectId.filter(item=> item.projectId !== action.projectId); 
+            return {...state, employeeListByPojectId: [...newEmployeeListByProjectId,{"List":action.employeeList,"projectId": action.projectId}]}
         case "SAVE_EMPOLYEE_BY_RATECARD_ID":
             return {...state, employeeListByRateCardId: action.employeeList}
     
