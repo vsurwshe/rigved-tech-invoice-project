@@ -60,7 +60,6 @@ const SectionOne = (data) => {
 }
 
 const LoadFields=(parameter)=>{
-    const { classes }=parameter
     const { purchaseOrder }=parameter.mainProps
     const { listOfClient }=parameter.mainProps.ClientState
     const { ManagerList,Domains }=parameter.mainProps.MasterDataSet
@@ -164,7 +163,5 @@ ProjectForm = connect(state => {
 },FileAction)(ProjectForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ProjectForm'));
-export default reduxForm({ form: 'ProjectForm', 
-// onSubmitSuccess: afterSubmit 
-})(ProjectForm);
+export default reduxForm({ form: 'ProjectForm', onSubmitSuccess: afterSubmit})(ProjectForm);
 

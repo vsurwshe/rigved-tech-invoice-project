@@ -1,13 +1,12 @@
-import React,{useState} from 'react';
-import { Dialog, Button, Slide, DialogTitle, DialogActions, List, ListItem, Typography, makeStyles, DialogContentText, DialogContent } from '@material-ui/core';
+import React,{useState } from 'react';
+import { Dialog, Button, Slide, DialogTitle, DialogActions, makeStyles, DialogContentText, DialogContent } from '@material-ui/core';
 import { connect } from 'react-redux';
 import MaterialTable from 'material-table';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
-import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
+import * as EmployeeAction from "../../redux/actions/EmployeeAction";
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -29,31 +28,41 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   });
 
 let ResourcesTable=(props)=>{
-    const { ResourceList }=props
-    
+    const { ResourceList, GetEmployeeListByProjectId, projectData }=props
+    const { employeeListByPojectId }=props.EmpolyeeState
+    const { authorization}=props.LoginState
     const [open, setOpen] = useState(false);
+    const [countCall,setCountCall]=useState(0)
     const handleClickOpen = () => { setOpen(true) };
     const handleClose = () => { setOpen(false) };
 
-      // creating columns
-  const columns = [
-    { title: 'Emp\u00a0Id', field: 'empId', width: 20 },
-    { title: 'Name', field: 'name' },
-    { title: 'Domain', field: 'domain' },
-    { title: 'Category', field: 'category' },
-    { title: 'Experience', field: 'experience' },
-    { title: 'Skill', field: 'skill' },
-    { title: 'Onboarding\u00a0Date', field: 'name' },
-    { title: 'Exit\u00a0Date', field: 'clientName' },
-  ];
+    // creating columns
+    const columns = [
+      { title: 'Emp\u00a0Id', field: 'empId', width: 20 },
+      { title: 'Name', field: 'name' },
+      { title: 'Domain', field: 'domain' },
+      { title: 'Category', field: 'category' },
+      { title: 'Experience', field: 'experience' },
+      { title: 'Skill', field: 'skill' },
+      { title: 'Onboarding\u00a0Date', field: 'name' },
+      { title: 'Exit\u00a0Date', field: 'clientName' },
+    ];
 
   // Creating rows
   const data = (ResourceList && ResourceList.length > 0) && ResourceList.map((item, key) => {
     return { "key": (key + 1), "data": item, "projectName": item.projectName, "clientName": item.clientName }
   });
+
+  const LoadEmployee=()=>{
+    if(employeeListByPojectId && employeeListByPojectId.length === 0 && projectData!== undefined && countCall===0){
+      setCountCall(countCall + 1)
+      GetEmployeeListByProjectId(0,20,projectData.id,authorization);
+    }
+  }
     
 return <>
         {LoadAddResourceModel({open,handleClose})}
+        {LoadEmployee()}
         <div style={{ maxWidth: "100%" }}>
             <MaterialTable
               title="Resources Managment"
@@ -99,4 +108,4 @@ const LoadAddResourceModel=(data)=>{
 
 
 const mapStateToProps = state => { return state; };
-export default connect(mapStateToProps)(ResourcesTable);
+export default connect(mapStateToProps,EmployeeAction)(ResourcesTable);

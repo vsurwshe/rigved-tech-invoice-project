@@ -4,10 +4,7 @@ import MaterialTable from "material-table";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Button } from '@material-ui/core';
-import { FromActions, API_EXE_TIME } from '../../assets/config/Config';
-import { Field } from 'redux-form';
-import { renderAutocomplete, renderDateTimePicker } from '../utilites/FromUtilites';
-import { Required } from '../utilites/FormValidation';
+import { API_EXE_TIME } from '../../assets/config/Config';
 import * as ExpenseAction from "../../redux/actions/ExpensesAction";
 import * as FileAction from "../../redux/actions/FileAction";
 import moment from 'moment';
@@ -15,17 +12,18 @@ import { bindActionCreators } from 'redux';
 
 const ExpensesTable = (props) => {
   const { projectData }=props 
+  const [countCall,setCountCall]=useState(0)
   const { expensesListByProjectId}=props.ExpenseState
   const { SaveExpenseRecord, GetExpensesListByProjectId } = props.ExpenseAction
   const { ExpenseTypeList }=props.MasterDataSet
   const { authorization }=props.LoginState
-  const [expenseFilePath, setFilePath] = useState(undefined);
   
   let expenseTypeListOptions= ExpenseTypeList.length >0 && ExpenseTypeList.map((item,key)=>{return{title:item.name,id:item.id}})
   let projectId= projectData && projectData.id;
   let exitsExpensesListByProjectId=(expensesListByProjectId && expensesListByProjectId.length > 0)&& expensesListByProjectId.filter(item=> item.projectId ===projectId);
 
-  if(exitsExpensesListByProjectId === false || exitsExpensesListByProjectId.length <=0){
+  if((exitsExpensesListByProjectId === false || exitsExpensesListByProjectId.length <=0) && countCall===0){
+    setCountCall(countCall + 1)
     GetExpensesListByProjectId(0,20,projectId,authorization);
     exitsExpensesListByProjectId=(expensesListByProjectId && expensesListByProjectId.length > 0)&& expensesListByProjectId.filter(item=> item.projectId ===projectId);
   }
