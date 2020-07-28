@@ -25,6 +25,29 @@ const GetEmployeeListByProjectId = (firstIndex, lastIndex,projectId, authroizati
     }
 }
 
+const SaveEmployeeRecord=(userData,authroizationKey)=>{
+    return(dispatch)=>{
+        return CreateInstance()
+        .post('/project/addEmployee/',userData,{headers: { 
+            'Content-Type': 'application/json',
+            Authorization: authroizationKey 
+        }})
+        .then(response => {
+            if(response.status !== STATUS200){
+                dispatch(loadMessage(AlertColor.danger ,response.headers.message));
+            }else{
+                dispatch(SaveEmployeeDetails(response.data))
+            }
+        })
+        .catch(error => { 
+            if(error.response && error.response.status.toString() === CONFLICTSTATUS){
+                dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+            }else{
+                dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+            }
+        })
+    }
+}
 
 
 //------------------------------
@@ -36,8 +59,14 @@ export function SaveEmployeeListByProjectId(employeeList,projectId){
     }
 }
 
-
+export function SaveEmployeeDetails(employeeDetails){
+    return {
+        type:"SAVE_EMPLOYEE_DETAILS",
+        employeeDetails
+    }
+}
 
 export{
-    GetEmployeeListByProjectId   
+    GetEmployeeListByProjectId,
+    SaveEmployeeRecord   
 }

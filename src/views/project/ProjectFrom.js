@@ -175,8 +175,5 @@ ProjectForm = connect(state => {
     return { ...state, purchaseOrder } 
 },mapDispatchToProps)(ProjectForm)
 
-const afterSubmit = (result, dispatch) => dispatch(reset('ProjectForm'));
-export default reduxForm({ form: 'ProjectForm', 
-// onSubmitSuccess: afterSubmit
-})(ProjectForm);
+export default reduxForm({ form: 'ProjectForm'})(ProjectForm);
 

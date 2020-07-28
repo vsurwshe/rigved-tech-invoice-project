@@ -1,5 +1,5 @@
-import React,{useState } from 'react';
-import { Dialog, Button, Slide, DialogTitle, DialogActions, makeStyles, DialogContentText, DialogContent, Grid } from '@material-ui/core';
+import React,{useState, forwardRef } from 'react';
+import { Dialog, Button, Slide, DialogTitle, DialogActions, makeStyles, DialogContent, Grid, CircularProgress } from '@material-ui/core';
 import { connect } from 'react-redux';
 import MaterialTable from 'material-table';
 import AppBar from '@material-ui/core/AppBar';
@@ -7,9 +7,12 @@ import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import * as EmployeeAction from "../../redux/actions/EmployeeAction";
+import * as ClientAction from "../../redux/actions/ClientAction"
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { FromActions } from '../../assets/config/Config';
+import { bindActionCreators } from 'redux';
+import ResourceRateCardTable from "./ResourceRateCardTable";
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -23,29 +26,37 @@ const useStyles = makeStyles((theme) => ({
         marginRight: theme.spacing(2),
         color: theme.palette.text.hint,
     }
-  }));
+}));
   
-  
-const Transition = React.forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-});
+const Transition = forwardRef(function Transition(props, ref) { return <Slide direction="up" ref={ref} {...props} />; });
 
 let ResourcesTable=(props)=>{
-    const { GetEmployeeListByProjectId, projectId }=props
+    const { projectId }=props
+    const { clientId }=(props.form && props.form.ProjectForm &&props.form.ProjectForm.values) && props.form.ProjectForm.values
+    const { GetEmployeeListByProjectId,}=props.EmployeeAction
+    const { GetClientDetailsById }=props.ClientAction
     const { employeeListByPojectId }=props.EmpolyeeState
     const { operation }=props.stateData
     const { authorization}=props.LoginState
     const [open, setOpen] = useState(false);
     const [countCall,setCountCall]=useState(0)
+    const [countCallRateCard,setCountRateCardCall]=useState(0)
     const handleClickOpen = () => { setOpen(true) };
     const handleClose = () => { setOpen(false) };
 
     let exitsEmployeeListByPojectId=(employeeListByPojectId && employeeListByPojectId.length > 0)&& employeeListByPojectId.filter(item=> item.projectId ===projectId);
     
+    // this codition will check the passed project id realted employee is there or not
     if((exitsEmployeeListByPojectId === false || exitsEmployeeListByPojectId.length <=0) && countCall===0){
       setCountCall(countCall + 1)
       GetEmployeeListByProjectId(0,20,projectId,authorization);
       exitsEmployeeListByPojectId=(employeeListByPojectId && employeeListByPojectId.length > 0)&& employeeListByPojectId.filter(item=> item.projectId ===projectId);
+    }
+
+    // this codition get the client details by client id
+    if(countCallRateCard === 0 && clientId){
+      setCountRateCardCall(countCallRateCard+1);
+      GetClientDetailsById(clientId,authorization)
     }
 
     // creating columns
@@ -98,9 +109,10 @@ return <>
 
 const LoadAddResourceModel=(data)=>{
     const classes = useStyles();
-    const {open, handleClose}=data
-    const [listOfEmployeeAccount,setEmployeeAccount]=useState([])
-
+    const { open, handleClose}=data
+    const [listOfEmployeeAccount,setEmployeeAccount]=useState([]);
+    const [selectedRateCard,setSelectedRateCard]=useState([]);
+    const [load,setLoad]=useState(false);
     return <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
     <AppBar className={classes.appBar} style={{float: "right"}}>
       <Toolbar >
@@ -109,21 +121,53 @@ const LoadAddResourceModel=(data)=>{
       </Toolbar>
     </AppBar>
     <DialogContent>
-       <Grid container spacing={5}>
+      { load ? loadingCircle() :<><Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop:20 }}>
-                {LoadRateCardList(data.mainProps)}
+                {LoadRateCardList({"mainProps":data.mainProps,selectedRateCard,setSelectedRateCard})}
             </Grid>
             <Grid item xs={12} sm={6} style={{paddingTop:50}}>
                 {LoadEmployeeList({"mainProps":data.mainProps,listOfEmployeeAccount,setEmployeeAccount})}
             </Grid>
-        </Grid>
-                
+        </Grid></>
+      }
     </DialogContent>
     <DialogActions>
-        <Button onClick={() => console.log("Called the Saving Resources")} color="secondary">Delete</Button>
+        <Button onClick={handleClose} color="primary">Cancle</Button>
+        <Button onClick={() =>loadAssignResource({listOfEmployeeAccount, selectedRateCard,"mainProps":data.mainProps,load,setLoad,handleClose})} color="secondary">Assign Resource</Button>
     </DialogActions>
   </Dialog>
 }
+
+const loadAssignResource=(data)=>{
+  const { listOfEmployeeAccount, selectedRateCard,setLoad,load,handleClose}=data
+  const { projectId }=data.mainProps
+  const { authorization}=data.mainProps.LoginState
+  const { SaveEmployeeRecord,GetEmployeeListByProjectId }=data.mainProps.EmployeeAction
+  let accountList=(listOfEmployeeAccount && listOfEmployeeAccount.length >0) && listOfEmployeeAccount.map((item,key)=>item.id)
+  let newResourceData={
+    "accountIdList":accountList,
+    "projectId":projectId,
+    "rateCardId":selectedRateCard.rateCardId,
+    "active": 1
+  }
+  console.log("Save Assign Resource",data,newResourceData)
+  setLoad(true);
+  saveAssignResource({newResourceData,load,setLoad, SaveEmployeeRecord,GetEmployeeListByProjectId,authorization,handleClose});
+}
+
+const saveAssignResource=async(propsData)=>{
+  const {newResourceData,setLoad,SaveEmployeeRecord,GetEmployeeListByProjectId,authorization,handleClose }=propsData
+  if(newResourceData){
+    await SaveEmployeeRecord(newResourceData,authorization);
+    await GetEmployeeListByProjectId(0,20,newResourceData.projectId,authorization);
+    await setLoad(false);
+    await handleClose();
+  }
+}
+
+// this method will used for the loading circule progress bar
+const loadingCircle = () => <center> Saveing.... <CircularProgress size={40} /> </center>
+
 
 const LoadEmployeeList=(props)=>{
   const { EmployeeList}=props.mainProps.MasterDataSet
@@ -147,9 +191,18 @@ const LoadEmployeeList=(props)=>{
 
 
 const LoadRateCardList=(propsData)=>{
-  return <h2> Rate Card Details </h2>
+  const { rateCardDtos}= (propsData && propsData.mainProps.ClientState && propsData.mainProps.ClientState.clientDataById) && propsData.mainProps.ClientState.clientDataById
+  const { selectedRateCard,setSelectedRateCard }=propsData
+  return <><h2>Select Rate Card</h2>
+      {rateCardDtos ? <ResourceRateCardTable tableData={rateCardDtos} selectedRateCard={selectedRateCard} setSelectedRateCard={setSelectedRateCard} /> : <h4>There is no rate card assign for this client</h4>}
+    </>
 }
 
 
 const mapStateToProps = state => { return state; };
-export default connect(mapStateToProps,EmployeeAction)(ResourcesTable);
+const mapDispatchToProps = (dispatch) => ({
+  EmployeeAction : bindActionCreators(EmployeeAction,dispatch),
+  ClientAction: bindActionCreators(ClientAction,dispatch)
+})
+
+export default connect(mapStateToProps,mapDispatchToProps)(ResourcesTable);
