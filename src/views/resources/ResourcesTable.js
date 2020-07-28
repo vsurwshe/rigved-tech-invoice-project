@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
   
+// this method will used for the transition for model 
 const Transition = forwardRef(function Transition(props, ref) { return <Slide direction="up" ref={ref} {...props} />; });
 
 let ResourcesTable=(props)=>{
@@ -74,39 +75,34 @@ let ResourcesTable=(props)=>{
   // Creating rows
   let data =(exitsEmployeeListByPojectId && exitsEmployeeListByPojectId.length > 0 ) && exitsEmployeeListByPojectId.map((item, key) => {
     let tempData=(item && item.List.length>0) && item.List.map((subitem,key)=>{
-      return  { 
-        "data": subitem, 
-        "employeeNumber":subitem.employeeNumber,
-        "name":subitem.firstName+" "+subitem.lastName,
-        // "expDate":moment(subitem.expDate).format('YYYY-MM-DD'),
-      }
+      return  { "data": subitem, "employeeNumber":subitem.employeeNumber, "name":subitem.firstName+" "+subitem.lastName, }
     }) 
     return (tempData && tempData.length >0 )? tempData : [];
   });
     
-return <>
-        {LoadAddResourceModel({open,handleClose, "mainProps":props})}
-        <div style={{ maxWidth: "100%" }}>
-            <MaterialTable
-              title=""
-              columns={columns}
-              data={(data && data.length > 0) ? data[0] : []}
-              options={{
-                headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
-                search: false
-              }}
-              actions={[
-                { icon: () => {return (operation && (operation === FromActions.ED || operation === FromActions.CR)) ?  <Button variant="contained" color="primary">Assign Resource</Button> : ""},
-                  onClick: (event, rowData) => { handleClickOpen() },
-                  isFreeAction: true,
-                  tooltip: 'Assign Resource'
-                }
-              ]}
-            />
-        </div>
+return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
+  <div style={{ maxWidth: "100%" }}>
+      <MaterialTable
+        title=""
+        columns={columns}
+        data={(data && data.length > 0) ? data[0] : []}
+        options={{
+          headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
+          search: false
+        }}
+        actions={[
+          { icon: () => {return (operation && (operation === FromActions.ED || operation === FromActions.CR)) ?  <div><Button variant="contained" color="primary">Assign Resource</Button></div> : ""},
+            onClick: (event, rowData) => { handleClickOpen() },
+            isFreeAction: true,
+            tooltip: 'Assign Resource'
+          }
+        ]}
+      />
+  </div>
 </>
 }
 
+// this method will used for the loading add resource model
 const LoadAddResourceModel=(data)=>{
     const classes = useStyles();
     const { open, handleClose}=data
@@ -138,6 +134,7 @@ const LoadAddResourceModel=(data)=>{
   </Dialog>
 }
 
+// this method will used for the loading assign resource
 const loadAssignResource=(data)=>{
   const { listOfEmployeeAccount, selectedRateCard,setLoad,load,handleClose}=data
   const { projectId }=data.mainProps
@@ -150,11 +147,11 @@ const loadAssignResource=(data)=>{
     "rateCardId":selectedRateCard.rateCardId,
     "active": 1
   }
-  console.log("Save Assign Resource",data,newResourceData)
   setLoad(true);
   saveAssignResource({newResourceData,load,setLoad, SaveEmployeeRecord,GetEmployeeListByProjectId,authorization,handleClose});
 }
 
+// this method will used for calling the save employee record
 const saveAssignResource=async(propsData)=>{
   const {newResourceData,setLoad,SaveEmployeeRecord,GetEmployeeListByProjectId,authorization,handleClose }=propsData
   if(newResourceData){
@@ -166,9 +163,9 @@ const saveAssignResource=async(propsData)=>{
 }
 
 // this method will used for the loading circule progress bar
-const loadingCircle = () => <center> Saveing.... <CircularProgress size={40} /> </center>
+const loadingCircle = () => <center> Saving.... <CircularProgress size={40} /> </center>
 
-
+// this method will used for the loading employee list
 const LoadEmployeeList=(props)=>{
   const { EmployeeList}=props.mainProps.MasterDataSet
   const { listOfEmployeeAccount, setEmployeeAccount}=props
@@ -186,23 +183,22 @@ const LoadEmployeeList=(props)=>{
         style={{ width: "100%" }}
         renderInput={(params) => <TextField {...params} fullWidth label="Member Name" />}
       />
-    </>
+  </>
 }
 
-
+// this method will used for the rate card list into material table
 const LoadRateCardList=(propsData)=>{
   const { rateCardDtos}= (propsData && propsData.mainProps.ClientState && propsData.mainProps.ClientState.clientDataById) && propsData.mainProps.ClientState.clientDataById
   const { selectedRateCard,setSelectedRateCard }=propsData
   return <><h2>Select Rate Card</h2>
-      {rateCardDtos ? <ResourceRateCardTable tableData={rateCardDtos} selectedRateCard={selectedRateCard} setSelectedRateCard={setSelectedRateCard} /> : <h4>There is no rate card assign for this client</h4>}
+      {rateCardDtos ? <ResourceRateCardTable tableData={rateCardDtos} selectedRateCard={selectedRateCard} setSelectedRateCard={setSelectedRateCard} /> 
+      : <h4>There is no rate card assign for this client</h4>}
     </>
 }
-
 
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({
   EmployeeAction : bindActionCreators(EmployeeAction,dispatch),
   ClientAction: bindActionCreators(ClientAction,dispatch)
 })
-
 export default connect(mapStateToProps,mapDispatchToProps)(ResourcesTable);

@@ -20,7 +20,6 @@ const ExpensesTable = (props) => {
   const { authorization }=props.LoginState
   
   let expenseTypeListOptions= ExpenseTypeList.length >0 && ExpenseTypeList.map((item,key)=>{return{title:item.name,id:item.id}})
-  // let projectId= projectData && projectData.id;
   let exitsExpensesListByProjectId=(expensesListByProjectId && expensesListByProjectId.length > 0)&& expensesListByProjectId.filter(item=> item.projectId ===projectId);
 
   if((exitsExpensesListByProjectId === false || exitsExpensesListByProjectId.length <=0) && countCall===0){
@@ -34,12 +33,11 @@ const ExpensesTable = (props) => {
     { title: "Attatchment",
       field:'attachmentUrl',
       editComponent: dataProps=>{
-      return (props.FileState && props.FileState.fileUrl && props.FileState.fileUrl.length > 0 ) ?<h6>{props.FileState.fileUrl[0]}</h6> :<TextField 
+      return (props.FileState && props.FileState.fileUrl && props.FileState.fileUrl.length > 0 ) ?<h6>{props.FileState.fileUrl[0]}</h6> 
+            :<TextField 
                 type="file"
                 onChange={event => ExpenseFileUpload(event,dataProps)}
-                InputLabelProps={{
-                  shrink: true
-                }}
+                InputLabelProps={{ shrink: true }}
             /> 
       }
     },
@@ -47,7 +45,7 @@ const ExpensesTable = (props) => {
       field: 'expType', 
       editComponent: props => {
         return <Autocomplete
-        id="auto-highlight"
+        id="exp-type"
         autoHighlight
         options={(expenseTypeListOptions && expenseTypeListOptions.length >0) ? expenseTypeListOptions: []}
         getOptionLabel={expenseTypeListOptions => (expenseTypeListOptions && expenseTypeListOptions.title) && expenseTypeListOptions.title}
@@ -61,7 +59,7 @@ const ExpensesTable = (props) => {
       field: 'mobileNumber',
       editComponent: props=>{
         return <TextField
-                  id="datetime-local"
+                  id="mobile-number"
                   label="Mobile Number"
                   type="text"
                   onChange={e => props.onChange(e.target.value)}
@@ -75,15 +73,13 @@ const ExpensesTable = (props) => {
       field: 'description',
       editComponent: props=>{
         return <TextField
-                  id="description"
-                  multiline
-                  label="Description"
-                  type="text"
-                  rows={1}
-                  onChange={e => props.onChange(e.target.value)}
-                  InputLabelProps={{
-                    shrink: true
-                  }}
+              id="description"
+              multiline
+              label="Description"
+              type="text"
+              rows={1}
+              onChange={e => props.onChange(e.target.value)}
+              InputLabelProps={{ shrink: true }}
           />
       } 
     },
@@ -91,13 +87,11 @@ const ExpensesTable = (props) => {
       field: 'amount',
       editComponent: props=>{
         return <TextField
-                  id="datetime-local"
-                  label="Amount"
-                  type="number"
-                  onChange={e => props.onChange(e.target.value)}
-                  InputLabelProps={{
-                    shrink: true
-                  }}
+              id="amount"
+              label="Amount"
+              type="number"
+              onChange={e => props.onChange(e.target.value)}
+              InputLabelProps={{ shrink: true }}
           />
       }
     },
@@ -105,13 +99,11 @@ const ExpensesTable = (props) => {
       field: 'expDate',
       editComponent: props=>{
         return <TextField
-                  id="datetime-local"
-                  label="Expense Date"
-                  type="date"
-                  onChange={e => props.onChange(e.target.value)}
-                  InputLabelProps={{
-                    shrink: true
-                  }}
+              id="expDate"
+              label="Expense Date"
+              type="date"
+              onChange={e => props.onChange(e.target.value)}
+              InputLabelProps={{ shrink: true }}
           />
       }
     }

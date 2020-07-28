@@ -94,13 +94,12 @@ const LoadFields=(parameter)=>{
 }
 
 const LoadHeader=(parameter)=>{
-    const { classes, initialValues }=parameter
+    const { initialValues }=parameter
     return <>
-        <h2 className={classes.textField}>{initialValues.projectName}</h2>
-        <h4 className={classes.textField}>Client Name :{initialValues.clientName}</h4>
-        <h4 className={classes.textField}>Project Manager :{initialValues.projectManager}</h4>
-        <h4 className={classes.textField}>Purchase Order :{initialValues.purchaseOrder}</h4>
-
+        <h2>{initialValues.projectName}</h2>
+        <h4>Client Name: {initialValues.clientName}</h4>
+        <h4>Project Manager: {initialValues.projectManager}</h4>
+        <h4>Purchase Order: {initialValues.purchaseOrder}</h4>
     </>
 }
 

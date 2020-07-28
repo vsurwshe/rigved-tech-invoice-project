@@ -3,8 +3,9 @@ import { TextField, FormControlLabel, Checkbox, FormControl, RadioGroup, Radio, 
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 // this is render text filed
-const renderTextField = ({ label, input, meta: { touched, invalid, error }, ...custom }) => (
+const renderTextField = ({ label, name, input, meta: { touched, invalid, error }, ...custom }) => (
     <TextField
+      id={name}
       label={label}
       placeholder={label}
       error={touched && invalid}
@@ -15,8 +16,9 @@ const renderTextField = ({ label, input, meta: { touched, invalid, error }, ...c
   )
 
 // this is render text filed
-const renderTextHiddenField = ({ label, input, meta: { touched, invalid, error }, ...custom }) => (
+const renderTextHiddenField = ({ label, name, input, meta: { touched, invalid, error }, ...custom }) => (
   <TextField
+    id={name}
     label={label}
     type="hidden"
     placeholder={label}
@@ -28,8 +30,9 @@ const renderTextHiddenField = ({ label, input, meta: { touched, invalid, error }
 )
 
 // this is render text area filed
-const renderTextAreaField = ({ maxRows,label, input, meta: { touched, invalid, error }, ...custom }) => (
+const renderTextAreaField = ({ maxRows,name,label, input, meta: { touched, invalid, error }, ...custom }) => (
   <TextField
+    id={name}
     label={label}
     placeholder={label}
     multiline
@@ -42,8 +45,9 @@ const renderTextAreaField = ({ maxRows,label, input, meta: { touched, invalid, e
 )
 
 // this is render text filed
-const renderNumberField = ({ label, input, meta: { touched, invalid, error }, ...custom }) => (
+const renderNumberField = ({ label, name,input, meta: { touched, invalid, error }, ...custom }) => (
   <TextField
+    id={name}
     type="number"
     label={label}
     placeholder={label}
@@ -111,25 +115,23 @@ const renderSelectField = ({ input, label, meta: { touched, error }, children, .
 )
 
 // this render date time picker filed
-const renderDateTimePicker = ({ label, input, meta: { touched, invalid, error }, ...custom }) => 
-<TextField
-      id="datetime-local"
-      label={label}
-      type="date"
-      defaultValue=""
-      error={touched && invalid}
-      helperText={touched && error}
-      {...input}
-      {...custom}
-      InputLabelProps={{
-        shrink: true
-      }}
-/>
+const renderDateTimePicker = ({ label,name, input, meta: { touched, invalid, error }, ...custom }) => 
+  <TextField
+    id={name}
+    label={label}
+    type="date"
+    defaultValue=""
+    error={touched && invalid}
+    helperText={touched && error}
+    {...input}
+    {...custom}
+    InputLabelProps={{ shrink: true }}
+  />
 
 // this render autocompelete 
-const renderAutocomplete=({label,optionData,className, input, meta: { touched, invalid, error }, ...custom})=>
+const renderAutocomplete=({label,name,optionData,className, input, meta: { touched, invalid, error }, ...custom})=>
   <Autocomplete
-    id="auto-highlight"
+    id={name}
     autoHighlight
     options={(optionData && optionData.length >0) ? optionData: []}
     getOptionLabel={optionData => (optionData && optionData.title) && optionData.title}
@@ -139,9 +141,9 @@ const renderAutocomplete=({label,optionData,className, input, meta: { touched, i
   />
 
 // this render autocompelete 
-const renderAutocompleteWithProps=({label,optionData,className, input, meta: { touched, invalid, error }, ...custom})=>
+const renderAutocompleteWithProps=({label,name,optionData,className, input, meta: { touched, invalid, error }, ...custom})=>
   <Autocomplete
-    id="auto-highlight"
+    id={name}
     autoHighlight
     options={(optionData && optionData.length >0) ? optionData: []}
     getOptionLabel={optionData => (optionData && optionData.title) && optionData.title}

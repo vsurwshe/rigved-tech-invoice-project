@@ -6,6 +6,10 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import Checkbox from '@material-ui/core/Checkbox';
 import { Button } from '@material-ui/core';
 import { FromActions } from '../../assets/config/Config';
+import CreateIcon from '@material-ui/icons/Create';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+
 
 const ProjectTable = (props) => {
   const { projectList } = props.ProjectState
@@ -30,9 +34,9 @@ const ProjectTable = (props) => {
       width: 8,
       render: (rowData) => {
         return <Autocomplete
-          id="combo-box-actions"
           options={loadActions}
-          getOptionLabel={(option) => option.title}
+          getOptionLabel={(option) => option.action}
+          renderOption={(option) => (<center>{option.title}</center>)} 
           onChange={(event, value) => loadActinos(value.action,rowData)}
           style={{ width: 150 }}
           renderInput={(params) => <TextField {...params} label="Actions" />}
@@ -59,9 +63,9 @@ const ProjectTable = (props) => {
 
   // this will load the autocompelete actions drop down
   const loadActions = [
-    { title: 'View', action: FromActions.VI },
-    { title: 'Edit', action: FromActions.ED },
-    { title: 'Delete', action: FromActions.DE }
+    { title: <VisibilityIcon variant="contained" color="primary" />, action: FromActions.VI },
+    { title: <CreateIcon variant="contained" color="primary" />, action: FromActions.ED },
+    { title: <DeleteOutlineIcon variant="contained" color="secondary" />, action: FromActions.DE }
   ]
   
   // Creating rows
@@ -79,7 +83,7 @@ const ProjectTable = (props) => {
       }}
       actions={[
         {
-          icon: () => <Button variant="contained" color="primary">Create Project</Button>,
+          icon: () => <div><Button variant="contained" color="primary">Create Project</Button></div>,
           onClick: (event, rowData) => { fromAction(null, FromActions.CR); },
           isFreeAction: true,
           tooltip: 'Create Project'
