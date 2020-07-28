@@ -154,6 +154,7 @@ class ProjectManagement extends Component {
         const { authorization } = this.props.LoginState
         const newProjectData = {
             ...sendUserValues,
+            "clientName":sendUserValues.clientName && sendUserValues.clientName.title,
             "contractAttachmentUrl":(projectContractFileUrl === "" || projectContractFileUrl === undefined) ? sendUserValues.contractAttachmentUrl  : projectContractFileUrl,
             "active": true,
         }

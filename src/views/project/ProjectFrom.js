@@ -1,15 +1,16 @@
 import React from 'react';
-import { reset, reduxForm, Field, formValueSelector } from 'redux-form';
+import { reset, reduxForm, Field, formValueSelector,change } from 'redux-form';
 import { connect } from 'react-redux';
 import { Button, Grid, CircularProgress } from '@material-ui/core';
 import useStyles from "../client/Styles";
-import { renderTextField, renderDateTimePicker, renderFileInput, renderAutocomplete, renderNumberField, renderTextAreaField } from '../utilites/FromUtilites';
+import { renderTextField, renderDateTimePicker, renderAutocompleteWithProps, renderFileInput, renderAutocomplete, renderNumberField, renderTextAreaField, renderTextHiddenField } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
 import { FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
 import * as FileAction from '../../redux/actions/FileAction'
 import ExpensesTable from '../Expenses/ExpensesTable';
 import ResourcesTable from '../resources/ResourcesTable';
+import { bindActionCreators } from 'redux';
 
 
 let ProjectForm = (props) => {
@@ -60,7 +61,7 @@ const SectionOne = (data) => {
 }
 
 const LoadFields=(parameter)=>{
-    const { purchaseOrder }=parameter.mainProps
+    const { purchaseOrder,change }=parameter.mainProps
     const { listOfClient }=parameter.mainProps.ClientState
     const { ManagerList,Domains }=parameter.mainProps.MasterDataSet
     const { purchaseOrderList }=parameter.mainProps.PurchaseOrderState
@@ -79,7 +80,13 @@ const LoadFields=(parameter)=>{
     return <> 
         <Field name="projectName" component={renderTextField} fullWidth label="Project Name" helperText="Ex. PRMS" validate={[Required]} />
         <Field name="projectType" component={renderAutocomplete} optionData={projectTypeOptions} label="Project Type" validate={[Required]} />
-        <Field name="clientName" component={renderAutocomplete} optionData={clientOptions}  label="Client Name" validate={[Required]} /> 
+        <Field name="clientName" component={renderAutocompleteWithProps} 
+        onChange={(value)=>{
+            change('ProjectForm', 'clientName', value.title);
+            change('ProjectForm', 'clientId', value.id);
+        }} 
+        optionData={clientOptions}  label="Client Name" validate={[Required]} /> 
+        <Field name="clientId" component={renderTextHiddenField} /> 
         <Field name="projectManager" component={renderAutocomplete} optionData={projectManagerOptions} label="Project Manager Name" validate={[Required]} /> 
         <Field name="purchaseOrder" component={renderAutocomplete} optionData={purchaseOrderOptions} label="Purchase Order Number (Current)" />
         {purchaseOrder && <Button color="secondary" variant="contained">View PO</Button>}
@@ -108,7 +115,7 @@ const SectionTwo = (data) => {
         <Field name="projectDesc" component={renderTextAreaField} fullWidth maxRows={2} label="Project Description"  />
         {operation === FromActions.CR &&
             <>{(projectContractFileUpload) ? loadingCircle()
-                : (projectContractFileUrl ? LoadFileUrl({ "url": projectContractFileUrl, "cid": 1, "props": data, "componentName": "Purchase Order Image", "style": { height: "60%", width: "100%" } })
+                : (projectContractFileUrl ? LoadFileUrl({ "url": projectContractFileUrl, "cid": 1, "mainProps": data, "componentName": "Purchase Order Image", "style": { height: "60%", width: "100%" } })
                     : <Field name="contractAttachmentUrl" component={renderFileInput} fullWidth type="file" successFunction={uploadFile} lable="Project File" />)
             }</>
         }
@@ -117,7 +124,7 @@ const SectionTwo = (data) => {
 
 // this method used for the showing image
 let LoadFileUrl = (parameter) => {
-    const { listOfFiles } = parameter.props.props.FileState
+    const { listOfFiles } = parameter.mainProps.props.FileState
     const exitsData = (listOfFiles.length > 0) && listOfFiles.filter(x => (x.cid === parameter.cid && x.fileName === parameter.url));
     if (exitsData === false || exitsData.length <= 0) { GetPhotos(parameter) }
     return <iframe title="ProjectContractFileUrl" type="application/pdf" src={exitsData.length > 0 && exitsData[0].fileData}  style={parameter.style} />
@@ -125,8 +132,8 @@ let LoadFileUrl = (parameter) => {
 
 // this method used for the load the image form api
 const GetPhotos = async (parameter) => {
-    const { FetchPhoto } = parameter.props.props
-    const { authorization } = parameter.props.props.LoginState
+    const { FetchPhoto } = parameter.mainProps.props.FileAction
+    const { authorization } = parameter.mainProps.props.LoginState
     return await FetchPhoto(parameter.url, authorization, parameter.cid,"application/pdf");
 }
 
@@ -146,22 +153,30 @@ const SectionThree = (data) => {
 
 const Resources=(data)=>{
     const {initialValues}=data.mainProps
-    return <ResourcesTable projectData={initialValues} stateData={data.mainProps.stateData} />
+    let projectId=initialValues ? initialValues.id : (data.mainProps.ProjectState.projectDetails && data.mainProps.ProjectState.projectDetails.Id)
+    return <ResourcesTable projectId={projectId} stateData={data.mainProps.stateData} />
 }
 
 const Expenses=(data)=>{
     const {initialValues}=data.mainProps
-    return <ExpensesTable projectData={initialValues} stateData={data.mainProps.stateData} />
+    let projectId=initialValues ? initialValues.id : (data.mainProps.ProjectState.projectDetails && data.mainProps.ProjectState.projectDetails.Id)
+    return <ExpensesTable projectId={projectId} stateData={data.mainProps.stateData} />
 }
 
 // make the selector 
 const selector = formValueSelector('ProjectForm')
+const mapDispatchToProps = (dispatch) => ({
+    FileAction : bindActionCreators(FileAction,dispatch),
+    change: bindActionCreators(change,dispatch)
+})
 ProjectForm = connect(state => { 
     // can select values individually
     const purchaseOrder = selector(state, 'purchaseOrder')
     return { ...state, purchaseOrder } 
-},FileAction)(ProjectForm)
+},mapDispatchToProps)(ProjectForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ProjectForm'));
-export default reduxForm({ form: 'ProjectForm', onSubmitSuccess: afterSubmit})(ProjectForm);
+export default reduxForm({ form: 'ProjectForm', 
+// onSubmitSuccess: afterSubmit
+})(ProjectForm);
 

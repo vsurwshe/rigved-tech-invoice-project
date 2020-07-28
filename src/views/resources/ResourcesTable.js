@@ -31,7 +31,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 let ResourcesTable=(props)=>{
-    const { GetEmployeeListByProjectId, projectData }=props
+    const { GetEmployeeListByProjectId, projectId }=props
     const { employeeListByPojectId }=props.EmpolyeeState
     const { operation }=props.stateData
     const { authorization}=props.LoginState
@@ -40,12 +40,12 @@ let ResourcesTable=(props)=>{
     const handleClickOpen = () => { setOpen(true) };
     const handleClose = () => { setOpen(false) };
 
-    let exitsEmployeeListByPojectId=(employeeListByPojectId && employeeListByPojectId.length > 0)&& employeeListByPojectId.filter(item=> item.projectId ===projectData.id);
+    let exitsEmployeeListByPojectId=(employeeListByPojectId && employeeListByPojectId.length > 0)&& employeeListByPojectId.filter(item=> item.projectId ===projectId);
     
     if((exitsEmployeeListByPojectId === false || exitsEmployeeListByPojectId.length <=0) && countCall===0){
       setCountCall(countCall + 1)
-      GetEmployeeListByProjectId(0,2,projectData.id,authorization);
-      exitsEmployeeListByPojectId=(employeeListByPojectId && employeeListByPojectId.length > 0)&& employeeListByPojectId.filter(item=> item.projectId ===projectData.id);
+      GetEmployeeListByProjectId(0,20,projectId,authorization);
+      exitsEmployeeListByPojectId=(employeeListByPojectId && employeeListByPojectId.length > 0)&& employeeListByPojectId.filter(item=> item.projectId ===projectId);
     }
 
     // creating columns
@@ -99,6 +99,8 @@ return <>
 const LoadAddResourceModel=(data)=>{
     const classes = useStyles();
     const {open, handleClose}=data
+    const [listOfEmployeeAccount,setEmployeeAccount]=useState([])
+
     return <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
     <AppBar className={classes.appBar} style={{float: "right"}}>
       <Toolbar >
@@ -112,7 +114,7 @@ const LoadAddResourceModel=(data)=>{
                 {LoadRateCardList(data.mainProps)}
             </Grid>
             <Grid item xs={12} sm={6} style={{paddingTop:50}}>
-                {LoadEmployeeList(data.mainProps)}
+                {LoadEmployeeList({"mainProps":data.mainProps,listOfEmployeeAccount,setEmployeeAccount})}
             </Grid>
         </Grid>
                 
@@ -124,18 +126,23 @@ const LoadAddResourceModel=(data)=>{
 }
 
 const LoadEmployeeList=(props)=>{
-  const  {EmployeeList}=props.MasterDataSet
+  const { EmployeeList}=props.mainProps.MasterDataSet
+  const { listOfEmployeeAccount, setEmployeeAccount}=props
   let options=EmployeeList.length >0 && EmployeeList.map((item,key)=>{return{title:item.firstName+" "+item.lastName,id:item.accountId}});
-  return <Autocomplete
-      multiple
-      id="tags-outlined"
-      filterSelectedOptions
-      options={options}
-      getOptionLabel={(option) => option.title}
-      onChange={(event, value) => value && value.type}
-      style={{ width: "100%" }}
-      renderInput={(params) => <TextField {...params} fullWidth label="Member Name" />}
-  />
+  return <> <h2>Select the member</h2>
+      <Autocomplete
+        multiple
+        id="tags-outlined"
+        filterSelectedOptions
+        options={[...listOfEmployeeAccount,...options]}
+        value={listOfEmployeeAccount}
+        getOptionLabel={(options) => options.title}
+        getOptionSelected={(option, value) => option.id === value.id}
+        onChange={(event, value) =>value && setEmployeeAccount(value)}
+        style={{ width: "100%" }}
+        renderInput={(params) => <TextField {...params} fullWidth label="Member Name" />}
+      />
+    </>
 }
 
 

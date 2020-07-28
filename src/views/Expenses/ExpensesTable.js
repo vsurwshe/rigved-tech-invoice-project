@@ -11,7 +11,7 @@ import moment from 'moment';
 import { bindActionCreators } from 'redux';
 
 const ExpensesTable = (props) => {
-  const { projectData }=props 
+  const { projectId }=props 
   const { operation }=props.stateData
   const [countCall,setCountCall]=useState(0)
   const { expensesListByProjectId}=props.ExpenseState
@@ -20,7 +20,7 @@ const ExpensesTable = (props) => {
   const { authorization }=props.LoginState
   
   let expenseTypeListOptions= ExpenseTypeList.length >0 && ExpenseTypeList.map((item,key)=>{return{title:item.name,id:item.id}})
-  let projectId= projectData && projectData.id;
+  // let projectId= projectData && projectData.id;
   let exitsExpensesListByProjectId=(expensesListByProjectId && expensesListByProjectId.length > 0)&& expensesListByProjectId.filter(item=> item.projectId ===projectId);
 
   if((exitsExpensesListByProjectId === false || exitsExpensesListByProjectId.length <=0) && countCall===0){
@@ -34,7 +34,7 @@ const ExpensesTable = (props) => {
     { title: "Attatchment",
       field:'attachmentUrl',
       editComponent: dataProps=>{
-      return (props.FileState && props.FileState.fileUrl && props.FileState.fileUrl.length > 0 ) ?<h3>{props.FileState.fileUrl[0]}</h3> :<TextField 
+      return (props.FileState && props.FileState.fileUrl && props.FileState.fileUrl.length > 0 ) ?<h6>{props.FileState.fileUrl[0]}</h6> :<TextField 
                 type="file"
                 onChange={event => ExpenseFileUpload(event,dataProps)}
                 InputLabelProps={{
@@ -186,7 +186,7 @@ const ExpensesTable = (props) => {
             }
             await SaveExpenseRecord([newExpenseData],authorization);
             setTimeout(async()=>{
-              await GetExpensesListByProjectId(0,20,projectData && projectData.id, authorization)
+              await GetExpensesListByProjectId(0,20,projectId, authorization)
               await SaveFileData();
               resolve();
             },API_EXE_TIME)

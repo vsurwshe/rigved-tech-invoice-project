@@ -138,6 +138,18 @@ const renderAutocomplete=({label,optionData,className, input, meta: { touched, i
     {...custom}
   />
 
+// this render autocompelete 
+const renderAutocompleteWithProps=({label,optionData,className, input, meta: { touched, invalid, error }, ...custom})=>
+  <Autocomplete
+    id="auto-highlight"
+    autoHighlight
+    options={(optionData && optionData.length >0) ? optionData: []}
+    getOptionLabel={optionData => (optionData && optionData.title) && optionData.title}
+    onChange={(event, value) => value && input.onChange(value)}
+    renderInput={(params) => ( <TextField {...params} label={label} margin="normal"  /> )}
+    {...custom}
+  />
+
 export{
     renderTextField,
     renderTextHiddenField,
@@ -148,5 +160,6 @@ export{
     renderNumberField,
     renderTextAreaField,
     renderFileInput,
-    renderAutocomplete
+    renderAutocomplete,
+    renderAutocompleteWithProps
 }
