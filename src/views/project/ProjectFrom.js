@@ -57,7 +57,7 @@ const LoadGird = (props) => {
 const SectionOne = (data) => {
     const { classes, initialValues } = data
     const { operation }= data.props.stateData
-    return <> {operation === FromActions.CR ? LoadFields({classes, "mainProps":data.props}) : LoadHeader({classes, initialValues}) }</>
+    return <> {operation === FromActions.CR ? LoadFields({classes, "mainProps":data.props}) : LoadHeader({classes, initialValues,"mainProps":data.props}) }</>
 }
 
 const LoadFields=(parameter)=>{
@@ -89,18 +89,25 @@ const LoadFields=(parameter)=>{
         <Field name="clientId" component={renderTextHiddenField} /> 
         <Field name="projectManager" component={renderAutocomplete} optionData={projectManagerOptions} label="Project Manager Name" validate={[Required]} /> 
         <Field name="purchaseOrder" component={renderAutocomplete} optionData={purchaseOrderOptions} label="Purchase Order Number (Current)" />
-        {purchaseOrder && <Button color="secondary" variant="contained">View PO</Button>}
     </>
 }
 
 const LoadHeader=(parameter)=>{
     const { initialValues }=parameter
+    const { purchaseOrderList }=parameter.mainProps.PurchaseOrderState
+    let purchaseOrderDetails= (purchaseOrderList && purchaseOrderList.length >0) && purchaseOrderList.filter(item=>item.poNum === initialValues.purchaseOrder) 
+
     return <>
         <h2>{initialValues.projectName}</h2>
         <h4>Client Name: {initialValues.clientName}</h4>
         <h4>Project Manager: {initialValues.projectManager}</h4>
-        <h4>Purchase Order: {initialValues.purchaseOrder}</h4>
+        <h4>Purchase Order: {initialValues.purchaseOrder}&nbsp;&nbsp;&nbsp;<Button color="secondary" variant="contained" onClick={()=> ViewPurchaseOrder(purchaseOrderDetails)}>View PO</Button></h4>
     </>
+}
+
+const ViewPurchaseOrder=(purchaseOrderDetails)=>{
+    console.log("LH ",purchaseOrderDetails)
+
 }
 
 const SectionTwo = (data) => {

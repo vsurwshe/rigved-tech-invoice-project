@@ -64,18 +64,18 @@ let ResourcesTable=(props)=>{
     const columns = [
       { title: 'Emp\u00a0Id', field: 'employeeNumber', width: 20 },
       { title: 'Name', field: 'name' },
-      { title: 'Domain', field: 'designation' },
+      { title: 'Domain', field: 'domain' },
       { title: 'Category', field: 'category' },
       { title: 'Experience', field: 'experience' },
       { title: 'Skill', field: 'skill' },
-      { title: 'Onboarding\u00a0Date', field: 'name' },
-      { title: 'Exit\u00a0Date', field: 'clientName' },
+      { title: 'Onboarding\u00a0Date', field: 'onboardingDate' },
+      { title: 'Exit\u00a0Date', field: 'exitDate' },
     ];
 
   // Creating rows
   let data =(exitsEmployeeListByPojectId && exitsEmployeeListByPojectId.length > 0 ) && exitsEmployeeListByPojectId.map((item, key) => {
     let tempData=(item && item.List.length>0) && item.List.map((subitem,key)=>{
-      return  { "data": subitem, "employeeNumber":subitem.employeeNumber, "name":subitem.firstName+" "+subitem.lastName, }
+      return  { "data": subitem,"domain":subitem.domain, "employeeNumber":subitem.employeeNumber, "name":subitem.firstName+" "+subitem.lastName, }
     }) 
     return (tempData && tempData.length >0 )? tempData : [];
   });
