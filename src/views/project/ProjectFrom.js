@@ -1,5 +1,5 @@
 import React from 'react';
-import { reset, reduxForm, Field, formValueSelector,change } from 'redux-form';
+import {  reduxForm, Field, formValueSelector,change } from 'redux-form';
 import { connect } from 'react-redux';
 import { Button, Grid, CircularProgress } from '@material-ui/core';
 import useStyles from "../client/Styles";
@@ -61,7 +61,7 @@ const SectionOne = (data) => {
 }
 
 const LoadFields=(parameter)=>{
-    const { purchaseOrder,change }=parameter.mainProps
+    const { change }=parameter.mainProps
     const { listOfClient }=parameter.mainProps.ClientState
     const { ManagerList,Domains }=parameter.mainProps.MasterDataSet
     const { purchaseOrderList }=parameter.mainProps.PurchaseOrderState

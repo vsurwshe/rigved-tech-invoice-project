@@ -54,21 +54,6 @@ const ExpensesTable = (props) => {
       /> 
       }
     },
-    // { 
-    //   title: 'Mobile\u00a0Number', 
-    //   field: 'mobileNumber',
-    //   editComponent: props=>{
-    //     return <TextField
-    //               id="mobile-number"
-    //               label="Mobile Number"
-    //               type="text"
-    //               onChange={e => props.onChange(e.target.value)}
-    //               InputLabelProps={{
-    //                 shrink: true
-    //               }}
-    //         />
-    //   } 
-    // },
     { title: 'Description',
       field: 'description',
       editComponent: props=>{

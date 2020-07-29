@@ -1,8 +1,6 @@
 import React from 'react';
 import { connect } from "react-redux";
 import MaterialTable from "material-table";
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import Checkbox from '@material-ui/core/Checkbox';
 import { Button } from '@material-ui/core';
 import { FromActions } from '../../assets/config/Config';
@@ -30,44 +28,28 @@ const ProjectTable = (props) => {
     },
     { title: 'Status', field: 'status', width: 60 },
     {
-      title: "Actions",
-      width: 8,
-      render: (rowData) => {
-        return <Autocomplete
-          options={loadActions}
-          getOptionLabel={(option) => option.action}
-          renderOption={(option) => (<center>{option.title}</center>)} 
-          onChange={(event, value) => loadActinos(value.action,rowData)}
-          style={{ width: 150 }}
-          renderInput={(params) => <TextField {...params} label="Actions" />}
-        />
+      title: "",
+      width:8,
+      render: (rowData)=> {
+          return<VisibilityIcon variant="contained" color="primary" onClick={()=>fromAction(rowData.data,FromActions.VI,true)} />
       }
-    }
+    },
+    {
+      title: "",
+      width:8,
+      render: (rowData)=> {
+          return<CreateIcon variant="contained" color="primary" onClick={()=>fromAction(rowData.data,FromActions.ED,true)} />
+      }
+    },
+    {
+      title: "",
+      width:8,
+      render: (rowData)=> {
+          return <DeleteOutlineIcon variant="contained" color="secondary" onClick={()=>deleteMethod(rowData.data)} />
+      }
+    }  
   ];
 
-  const loadActinos=(action,rowData)=>{
-    switch (action) {
-      case FromActions.ED:
-        fromAction(rowData.data,FromActions.ED,true);
-        break;
-      case FromActions.VI:
-        fromAction(rowData.data,FromActions.VI,true);
-        break;
-      case FromActions.DE:
-        deleteMethod(rowData.data);
-        break;
-      default:
-        break;
-    }
-  }
-
-  // this will load the autocompelete actions drop down
-  const loadActions = [
-    { title: <VisibilityIcon variant="contained" color="primary" />, action: FromActions.VI },
-    { title: <CreateIcon variant="contained" color="primary" />, action: FromActions.ED },
-    { title: <DeleteOutlineIcon variant="contained" color="secondary" />, action: FromActions.DE }
-  ]
-  
   // Creating rows
   const data = (projectList && projectList.length > 0) && projectList.map((item, key) => {
     return { "key": (key + 1), "data": item, "projectName": item.projectName, "clientName": item.clientName }
@@ -82,8 +64,7 @@ const ProjectTable = (props) => {
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' }
       }}
       actions={[
-        {
-          icon: () => <div><Button variant="contained" color="primary">Create Project</Button></div>,
+        { icon: () => <div><Button variant="contained" color="primary">Create Project</Button></div>,
           onClick: (event, rowData) => { fromAction(null, FromActions.CR); },
           isFreeAction: true,
           tooltip: 'Create Project'

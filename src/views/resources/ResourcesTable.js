@@ -10,7 +10,7 @@ import * as EmployeeAction from "../../redux/actions/EmployeeAction";
 import * as ClientAction from "../../redux/actions/ClientAction"
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-import { FromActions } from '../../assets/config/Config';
+import { FromActions, API_EXE_TIME } from '../../assets/config/Config';
 import { bindActionCreators } from 'redux';
 import ResourceRateCardTable from "./ResourceRateCardTable";
 
@@ -108,6 +108,7 @@ const LoadAddResourceModel=(data)=>{
     const { open, handleClose}=data
     const [listOfEmployeeAccount,setEmployeeAccount]=useState([]);
     const [selectedRateCard,setSelectedRateCard]=useState([]);
+    const[tableData,setTableData]=useState([]);
     const [load,setLoad]=useState(false);
     return <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
     <AppBar className={classes.appBar} style={{float: "right"}}>
@@ -118,37 +119,35 @@ const LoadAddResourceModel=(data)=>{
     </AppBar>
     <DialogContent>
       { load ? loadingCircle() :<><Grid container spacing={3}>
-            <Grid item  xs={8} style={{ paddingLeft: 30, paddingTop:20 }}>
+            <Grid item  xs={7}>
                 {LoadRateCardList({"mainProps":data.mainProps,selectedRateCard,setSelectedRateCard})}
             </Grid>
-            <Grid item  xs={4} style={{paddingTop:50}}>
-                {LoadEmployeeList({"mainProps":data.mainProps,listOfEmployeeAccount,setEmployeeAccount})}
+            <Grid item  xs={5}>
+                {LoadEmployeeList({"mainProps":data.mainProps,listOfEmployeeAccount,setEmployeeAccount,tableData,setTableData, selectedRateCard})}
             </Grid>
         </Grid></>
       }
     </DialogContent>
     <DialogActions>
         <Button onClick={handleClose} color="primary">Cancle</Button>
-        <Button onClick={() =>loadAssignResource({listOfEmployeeAccount, selectedRateCard,"mainProps":data.mainProps,load,setLoad,handleClose})} color="secondary">Assign Resource</Button>
+        <Button onClick={() =>loadAssignResource({listOfEmployeeAccount, selectedRateCard,"mainProps":data.mainProps,load,setLoad,handleClose, tableData})} color="secondary">Assign Resource</Button>
     </DialogActions>
   </Dialog>
 }
 
 // this method will used for the loading assign resource
 const loadAssignResource=(data)=>{
-  const { listOfEmployeeAccount, selectedRateCard,setLoad,load,handleClose}=data
+  const { setLoad,load,handleClose,tableData}=data
   const { projectId }=data.mainProps
   const { authorization}=data.mainProps.LoginState
   const { SaveEmployeeRecord,GetEmployeeListByProjectId }=data.mainProps.EmployeeAction
-  let accountList=(listOfEmployeeAccount && listOfEmployeeAccount.length >0) && listOfEmployeeAccount.map((item,key)=>item.id)
   let newResourceData={
-    "accountIdList":accountList,
+    "employeeList": tableData,
     "projectId":projectId,
-    "rateCardId":selectedRateCard.rateCardId,
     "active": 1
   }
   setLoad(true);
-  saveAssignResource({newResourceData,load,setLoad, SaveEmployeeRecord,GetEmployeeListByProjectId,authorization,handleClose});
+  saveAssignResource({newResourceData,load,setLoad,SaveEmployeeRecord,GetEmployeeListByProjectId,authorization,handleClose});
 }
 
 // this method will used for calling the save employee record
@@ -168,22 +167,79 @@ const loadingCircle = () => <center> Saving.... <CircularProgress size={40} /> <
 // this method will used for the loading employee list
 const LoadEmployeeList=(props)=>{
   const { EmployeeList}=props.mainProps.MasterDataSet
-  const { listOfEmployeeAccount, setEmployeeAccount}=props
+  const { tableData,setTableData, selectedRateCard}=props
   let options=EmployeeList.length >0 && EmployeeList.map((item,key)=>{return{title:item.firstName+" "+item.lastName,id:item.accountId}});
   return <> <h2>Select the member</h2>
-      <Autocomplete
-        multiple
-        id="tags-outlined"
-        filterSelectedOptions
-        options={[...listOfEmployeeAccount,...options]}
-        value={listOfEmployeeAccount}
-        getOptionLabel={(options) => options.title}
-        getOptionSelected={(option, value) => option.id === value.id}
-        onChange={(event, value) =>value && setEmployeeAccount(value)}
-        style={{ width: "100%" }}
-        renderInput={(params) => <TextField {...params} fullWidth label="Member Name" />}
-      />
+      {EmployeeTable({options, tableData,setTableData, selectedRateCard})}
   </>
+}
+
+const EmployeeTable=(propsData)=>{
+  const { options,tableData,setTableData, selectedRateCard }=propsData;
+  const columns=[
+    { title: 'Member', 
+      field: 'account', 
+      editComponent: props => {
+          return <Autocomplete
+          id="accountId"
+          autoHighlight
+          options={(options && options.length >0) ? options: []}
+          getOptionSelected={(options, value) => options.id === value.id}
+          getOptionLabel={options => (options && options.title) && options.title}
+          onChange={(event, value) => value && props.onChange(value.id)}
+          renderInput={(params) => ( <TextField {...params} label="Expense Type" margin="normal"  /> )}
+        /> 
+      }
+    },
+    { title: 'Onbordaing Date', 
+      field: 'onbordaingDate',
+      editComponent: props=>{
+        return <TextField
+              id="onbordaingDate"
+              label="Expense Date"
+              type="date"
+              onChange={e => props.onChange(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+          />
+      }
+    }
+  ]
+  return <div style={{ maxWidth: "100%" }}>
+    <MaterialTable
+      title=""
+      columns={columns}
+      data={(tableData && tableData.length > 0) ? tableData : []}
+      options={{
+        headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
+        search: false
+      }}
+      icons={{Add: () => <Button variant="contained" color="primary">Add Member</Button> }}
+      editable={{
+        isEditable: rowData => false, 
+        isEditHidden: rowData => true,
+        isDeletable: rowData => false,
+        isDeleteHidden: rowData => true,
+        onRowAdd: newData =>{
+          return new Promise(async(resolve, reject) => {
+            let nameUser=options.filter((item)=>item.id===newData.account)
+            const newUserTableData={
+              ...newData,
+              "accountId": newData.account,
+              "account":(nameUser && nameUser.length >0) && nameUser[0].title,
+              "rateCardId":selectedRateCard.rateCardId,
+              "exitDate":null
+            }
+            setTableData([...tableData, newUserTableData])
+            setTimeout(async()=>{
+              resolve();
+            },API_EXE_TIME)
+        })},
+        onRowUpdate: (newData, oldData) =>{},
+        onRowDelete: oldData =>{}
+      }}
+    />
+  </div>
+
 }
 
 // this method will used for the rate card list into material table
