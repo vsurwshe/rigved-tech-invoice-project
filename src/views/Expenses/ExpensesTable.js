@@ -54,21 +54,21 @@ const ExpensesTable = (props) => {
       /> 
       }
     },
-    { 
-      title: 'Mobile\u00a0Number', 
-      field: 'mobileNumber',
-      editComponent: props=>{
-        return <TextField
-                  id="mobile-number"
-                  label="Mobile Number"
-                  type="text"
-                  onChange={e => props.onChange(e.target.value)}
-                  InputLabelProps={{
-                    shrink: true
-                  }}
-            />
-      } 
-    },
+    // { 
+    //   title: 'Mobile\u00a0Number', 
+    //   field: 'mobileNumber',
+    //   editComponent: props=>{
+    //     return <TextField
+    //               id="mobile-number"
+    //               label="Mobile Number"
+    //               type="text"
+    //               onChange={e => props.onChange(e.target.value)}
+    //               InputLabelProps={{
+    //                 shrink: true
+    //               }}
+    //         />
+    //   } 
+    // },
     { title: 'Description',
       field: 'description',
       editComponent: props=>{
@@ -143,7 +143,7 @@ const ExpensesTable = (props) => {
         "amount":subitem.amount,
         "description":subitem.description,
         "expType":subitem.expType && subitem.expType.name, 
-        "mobileNumber":subitem.mobileNumber,
+        // "mobileNumber":subitem.mobileNumber,
         "expDate":moment(subitem.expDate).format('YYYY-MM-DD'),
         "attachmentUrl":  subitem.attachmentUrl
       }

@@ -33,7 +33,7 @@ const Transition = forwardRef(function Transition(props, ref) { return <Slide di
 
 let ResourcesTable=(props)=>{
     const { projectId }=props
-    const { clientId }=(props.form && props.form.ProjectForm &&props.form.ProjectForm.values) && props.form.ProjectForm.values
+    const { clientId }=(props.form && props.form.ProjectForm &&props.form.ProjectForm.values) ? props.form.ProjectForm.values : ""
     const { GetEmployeeListByProjectId,}=props.EmployeeAction
     const { GetClientDetailsById }=props.ClientAction
     const { employeeListByPojectId }=props.EmpolyeeState
@@ -117,11 +117,11 @@ const LoadAddResourceModel=(data)=>{
       </Toolbar>
     </AppBar>
     <DialogContent>
-      { load ? loadingCircle() :<><Grid container spacing={5}>
-            <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop:20 }}>
+      { load ? loadingCircle() :<><Grid container spacing={3}>
+            <Grid item  xs={8} style={{ paddingLeft: 30, paddingTop:20 }}>
                 {LoadRateCardList({"mainProps":data.mainProps,selectedRateCard,setSelectedRateCard})}
             </Grid>
-            <Grid item xs={12} sm={6} style={{paddingTop:50}}>
+            <Grid item  xs={4} style={{paddingTop:50}}>
                 {LoadEmployeeList({"mainProps":data.mainProps,listOfEmployeeAccount,setEmployeeAccount})}
             </Grid>
         </Grid></>
