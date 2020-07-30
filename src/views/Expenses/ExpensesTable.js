@@ -33,7 +33,7 @@ const ExpensesTable = (props) => {
     { title: "Attatchment",
       field:'attachmentUrl',
       editComponent: dataProps=>{
-      return (props.FileState && props.FileState.fileUrl && props.FileState.fileUrl.length > 0 ) ?<h6>{props.FileState.fileUrl[0]}</h6> 
+      return (props.FileState && props.FileState.fileUrl && props.FileState.fileUrl.length > 0 ) ?<h5>{loadFileUrlName(props.FileState.fileUrl[0])}</h5> 
             :<TextField 
                 type="file"
                 onChange={event => ExpenseFileUpload(event,dataProps)}
@@ -94,13 +94,20 @@ const ExpensesTable = (props) => {
     }
   ];
 
+  const loadFileUrlName=(fileUrl)=>{
+    let fileArray=fileUrl.split("\\");
+    return fileArray.length > 0 ? fileArray[5]: "";
+  }
+
   const ExpenseFileUpload=async (event,props)=>{
     let imageFile = event.target.files[0];
     if (imageFile) {
       var reader = new FileReader();
       reader.onload =async()=>{
         let byteArray=reader.result.split(",")
-        CallFileUpload(byteArray.length >0 && byteArray[1],imageFile.name,imageFile.type)
+        let fileArray=imageFile.name.split(".");
+        let fileName=(fileArray && fileArray.length >0) &&  fileArray[0];
+        CallFileUpload(byteArray.length >0 && byteArray[1],fileName,imageFile.type)
       };
       reader.onerror = function (error) { console.log('Error: ', error); };
       await reader.readAsDataURL(imageFile);
@@ -128,9 +135,8 @@ const ExpensesTable = (props) => {
         "amount":subitem.amount,
         "description":subitem.description,
         "expType":subitem.expType && subitem.expType.name, 
-        // "mobileNumber":subitem.mobileNumber,
         "expDate":moment(subitem.expDate).format('YYYY-MM-DD'),
-        "attachmentUrl":  subitem.attachmentUrl
+        "attachmentUrl":loadFileUrlName(subitem.attachmentUrl)
       }
     }) 
     return (tempData && tempData.length >0 )? tempData : [];

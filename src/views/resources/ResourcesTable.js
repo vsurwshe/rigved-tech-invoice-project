@@ -13,6 +13,8 @@ import TextField from '@material-ui/core/TextField';
 import { FromActions, API_EXE_TIME } from '../../assets/config/Config';
 import { bindActionCreators } from 'redux';
 import ResourceRateCardTable from "./ResourceRateCardTable";
+import moment from 'moment';
+
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -68,14 +70,24 @@ let ResourcesTable=(props)=>{
       { title: 'Category', field: 'category' },
       { title: 'Experience', field: 'experience' },
       { title: 'Skill', field: 'skill' },
-      { title: 'Onboarding\u00a0Date', field: 'onboardingDate' },
+      { title: 'Onboarding\u00a0Date', field: 'onbordaingDate' },
       { title: 'Exit\u00a0Date', field: 'exitDate' },
     ];
 
   // Creating rows
   let data =(exitsEmployeeListByPojectId && exitsEmployeeListByPojectId.length > 0 ) && exitsEmployeeListByPojectId.map((item, key) => {
     let tempData=(item && item.List.length>0) && item.List.map((subitem,key)=>{
-      return  { "data": subitem,"domain":subitem.domain, "employeeNumber":subitem.employeeNumber, "name":subitem.firstName+" "+subitem.lastName, }
+      return  { 
+        "data": subitem,
+        "domain":subitem.domain, 
+        "employeeNumber":subitem.employeeNumber, 
+        "name":subitem.firstName+" "+subitem.lastName, 
+        "category":subitem.category,
+        "experience":subitem.fromExperience+"-"+subitem.toExperience,
+        "skill": subitem.skill,
+        "onbordaingDate":subitem.onbordaingDate && moment(subitem.onbordaingDate).format('YYYY-MM-DD'),
+        "exitDate":subitem.exitDate && moment(subitem.exitDate).format('YYYY-MM-DD')
+      }
     }) 
     return (tempData && tempData.length >0 )? tempData : [];
   });
