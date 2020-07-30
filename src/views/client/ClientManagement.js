@@ -6,6 +6,7 @@ import ClientForm from './ClientForm';
 import { bindActionCreators } from 'redux';
 import * as ClientAction from "../../redux/actions/ClientAction";
 import * as MasterDataAction from "../../redux/actions/MasterDataAction";
+import * as FileAction from "../../redux/actions/FileAction"
 import { API_EXE_TIME } from '../../assets/config/Config';
 
 class ClientManagment extends Component {
@@ -13,7 +14,12 @@ class ClientManagment extends Component {
         createClient: false,
         loadClientList: false,
         clientData: [],
-        deleteModel: false
+        deleteModel: false,
+        operation:"",
+        gstFileUrl:"",
+        tanFileUrl:"",
+        gstUpload:false,
+        tanUpload:false
     }
 
     componentDidMount = async () => {
@@ -32,7 +38,7 @@ class ClientManagment extends Component {
     }
 
     // this method used for the create client from
-    handleCreateClient = (clientData) => { this.setState({ createClient: !this.state.createClient, clientData }) }
+    handleCreateClient = (clientData,operation) => { this.setState({ createClient: !this.state.createClient, clientData, operation }) }
 
     // this method used for the progress bar 
     handleLoadClientList = (loadValue) => { this.setState({ loadClientList: loadValue }) }
@@ -40,13 +46,64 @@ class ClientManagment extends Component {
     // this method used for the load the delete model
     handleDeleteModel = (clientData) => { this.setState({ deleteModel: !this.state.deleteModel, clientData }) };
 
+    // this method used for the handle the gst uploading
+    handleGSTUpload=()=>{this.setState({gstUpload : !this.state.gstUpload})}
+
+    // this method used for the handle the gst uploading
+    handleTANUpload=()=>{ this.setState({tanUpload : !this.state.tanUpload})}
+
     render() {
         const { createClient, clientData } = this.state
         return <Card> {createClient ? this.loadClientForm(clientData) : this.loadClientTable()}</Card>
     }
 
+    uploadGSTFile=async(fileData,name,type)=>{
+        const {SaveFileDetails, SaveFileData}= this.props.FileAction
+        const { authorization } = this.props.LoginState
+        const { loadMessage } = this.props.ClientAction;
+        let newFileData=[{
+            "fileName":name,
+	        "description":"ClientDetail",
+	        "contentType":'png',
+	        "content":`${fileData}`
+        }]
+        await this.handleGSTUpload();
+        await SaveFileDetails(newFileData, authorization,fileData)
+        setTimeout(async () => {
+            await loadMessage();
+            await SaveFileData();
+            await this.handleGSTUpload();
+        }, API_EXE_TIME)
+        this.setState({gstFileUrl : (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length >0)  && this.props.FileState.fileUrl[0]})
+    }
+
+    uploadTANFile=async(fileData,name,type)=>{
+        const {SaveFileDetails, SaveFileData}= this.props.FileAction
+        const { authorization } = this.props.LoginState
+        const { loadMessage} = this.props.ClientAction;
+        let newFileData=[{
+            "fileName":name,
+	        "description":"ClientDetail",
+	        "contentType":'png',
+	        "content":`${fileData}`
+        }]
+        await this.handleTANUpload();
+        await SaveFileDetails(newFileData, authorization)
+        setTimeout(async () => {
+            await loadMessage()
+            await SaveFileData();
+            await this.handleTANUpload();
+        }, API_EXE_TIME)
+        this.setState({tanFileUrl : (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length >0)  && this.props.FileState.fileUrl[0]})
+    }
+
+    clearFileUrl=()=>{
+        this.setState({gstFileUrl:"",tanFileUrl:""})
+    }
+
     // this method used for the loading client form
     loadClientForm = (clientData) => {
+        const {operation, gstFileUrl, tanFileUrl,gstUpload,tanUpload}=this.state
         let newClientData = undefined;
         if (clientData) {
             newClientData = {
@@ -55,12 +112,19 @@ class ClientManagment extends Component {
                 "bankDetailsDtoList": clientData.bankDetailsDtoList && clientData.bankDetailsDtoList[0]
             }
         }
-        return <ClientForm initialValues={newClientData} SaveClientMethod={this.SaveClientDetails} cancle={this.handleCreateClient} />
+        const data={
+            gstFileUrl, 
+            tanFileUrl,
+            operation,
+            gstUpload,
+            tanUpload
+        }
+        return <ClientForm stateData={data} initialValues={newClientData} SaveClientMethod={this.SaveClientDetails} gstFileUpload={this.uploadGSTFile} tanFileUpload={this.uploadTANFile} cancle={this.handleCreateClient} clearFile={this.clearFileUrl} />
     }
 
     loadDeleteModel = () => {
         const { deleteModel, clientData } = this.state
-        const { id, clientName } = (clientData && clientData.rowData) ? clientData.rowData : ''
+        const { id, clientName } = clientData  ? clientData : ''
         return <Dialog open={deleteModel} keepMounted onClose={this.handleDeleteModel} aria-labelledby="alert-dialog-slide-title" aria-describedby="alert-dialog-slide-description"   >
             <DialogTitle id="alert-dialog-slide-title">{'Delete Client Data'}</DialogTitle>
             <DialogContent>
@@ -77,33 +141,32 @@ class ClientManagment extends Component {
     // this method main framework which calling load client table method
     loadClientTable = () => {
         const { loadClientList } = this.state
-        return < div style={{ paddingRight: 10 }}>
-            <h1>Client Management</h1>
-            {loadClientList ? this.loadingCircle() : this.loadingClientTable()}
-        </div>
+        return < div style={{ paddingRight: 10 }}> {loadClientList ? this.loadingCircle() : this.loadingClientTable()} </div>
     }
 
     // this method used for load the client table
-    loadingClientTable = () => <>
+    loadingClientTable = () => {
+        const {operation}=this.state
+        return <>
         {this.loadDeleteModel()}
-        <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={() => this.handleCreateClient()} > Create Client</Button>
-        <ClientTable viewClientDetails={this.viewClientDetails} deleteClientDetails={this.handleDeleteModel} />
+        <ClientTable  operation={operation} createClient={this.handleCreateClient} viewClientDetails={this.viewClientDetails}  deleteClientDetails={this.handleDeleteModel}  />
     </>
-
+    }
     // this method used for the show circular progress bar 
-    loadingCircle = () => <center><CircularProgress size={80} /></center>
+    loadingCircle = () => <center> <h3>Client Managment</h3> <CircularProgress size={80} /> </center>
 
     // this method called when we click the view button in client table
-    viewClientDetails = (props) => { this.handleCreateClient(props.rowData) }
+    viewClientDetails = (data,operation) => {  this.handleCreateClient(data,operation)  }
 
     // this method used for the save the client details
     SaveClientDetails = async (sendUserValues) => {
         const { SaveClientData, loadMessage, GetClientList } = this.props.ClientAction;
         const { authorization } = this.props.LoginState
+        const { gstFileUrl, tanFileUrl} =this.state
         const newUserData = {
             ...sendUserValues,
-            "gstUrl": (sendUserValues.gstUrl && sendUserValues.gstUrl.type) ? sendUserValues.gstUrl.name : sendUserValues.gstUrl,
-            "tanUrl": (sendUserValues.tanUrl && sendUserValues.tanUrl.type) ? sendUserValues.tanUrl.name : sendUserValues.tanUrl,
+            "gstUrl": (gstFileUrl === "" || gstFileUrl === undefined) ? sendUserValues.gstUrl  :gstFileUrl,
+            "tanUrl": (tanFileUrl === "" || tanFileUrl === undefined) ? sendUserValues.tanUrl : tanFileUrl,
             "addressDtos": [sendUserValues.addressDtos],
             "active": true,
             "bankDetailsDtoList": [sendUserValues.bankDetailsDtoList]
@@ -112,6 +175,7 @@ class ClientManagment extends Component {
         setTimeout(async () => {
             await loadMessage()
             await GetClientList(0, 20, authorization);
+            await this.setState({tanFileUrl : "", gstFileUrl:""})
             this.handleCreateClient();
         }, API_EXE_TIME)
     }
@@ -133,6 +197,7 @@ class ClientManagment extends Component {
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({
     ClientAction: bindActionCreators(ClientAction, dispatch),
+    FileAction: bindActionCreators(FileAction, dispatch),
     MasterDataAction: bindActionCreators(MasterDataAction, dispatch)
 })
 
