@@ -29,7 +29,7 @@ const SaveFileDetails = (fileData, authroizationKey) => {
     }
 }
 
-const FetchPhoto = (fileUrl,authroizationKey,clientId) => {
+const FetchPhoto = (fileUrl,authroizationKey,clientId,fileType) => {
     return (dispatch) => {
         return fetch(API_URL+'/file/getFile/'+fileUrl, {
             headers: {
@@ -39,7 +39,8 @@ const FetchPhoto = (fileUrl,authroizationKey,clientId) => {
         })
         .then((response) => {return response.blob();})
         .then((myBlob) => {
-            let ImageUrl= URL.createObjectURL(myBlob);
+            const file = fileType && new Blob([myBlob], {type: 'application/pdf'});
+            let ImageUrl= fileType ? URL.createObjectURL(file) :  URL.createObjectURL(myBlob)
             dispatch(SaveFile(ImageUrl,fileUrl,clientId))
         })
         .catch(error => { return error.message })

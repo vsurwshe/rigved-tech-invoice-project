@@ -113,13 +113,17 @@ const renderSelectField = ({ input, label, meta: { touched, error }, children, .
 // this render date time picker filed
 const renderDateTimePicker = ({ label, input, meta: { touched, invalid, error }, ...custom }) => 
     <TextField
+      id="datetime-local"
       label={label}
       type="date"
-      placeholder={label}
+      defaultValue=""
       error={touched && invalid}
       helperText={touched && error}
       {...input}
       {...custom}
+      InputLabelProps={{
+        shrink: true
+      }}
     />
 
 export{

@@ -9,12 +9,14 @@ import { useLayoutState } from "../context/LayoutContext";
 import { Dashboard } from '@material-ui/icons';
 import Register from '../views/register/UserRegister';
 import ClientManagment from '../views/client/ClientManagement';
+import PurchaseOrderManagement from '../views/purchaseOrder/PurchaseOrderManagement';
 
 
 const RoutesPath=[
     {path:"/register",component: Register},
     {path:"/app/dashborad",component: Dashboard},
     {path:"/client",component: ClientManagment},
+    {path:"/purchaseOrder",component: PurchaseOrderManagement},
 ]
 
 const Layout = (props) => {

@@ -6,6 +6,7 @@ import LoginState from "./reducer/LoginState";
 import ClientState from "./reducer/ClientState";
 import FileState from "./reducer/FileState"
 import MasterDataSet from "./reducer/MasterDataState"
+import PurchaseOrderState from "./reducer/PurchaseOrderState"
 
 // this function save state into local storage.
 const saveToLocalStorage=(state)=>{
@@ -41,7 +42,8 @@ const reducer = combineReducers({
   LoginState,
   ClientState,
   FileState,
-  MasterDataSet
+  MasterDataSet,
+  PurchaseOrderState
 });
 
 // this functions apply logger funtionality during development mode 

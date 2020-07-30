@@ -29,6 +29,11 @@ export default makeStyles(theme => ({
         marginRight: theme.spacing(1),
         width: '25ch',
     },
+    textField2: {
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+        width: '65ch',
+    },
     dialogPaper: {
         maxWidth: '300vh'
     },
