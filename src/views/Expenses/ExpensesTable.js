@@ -7,6 +7,7 @@ import { Button } from '@material-ui/core';
 import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
 import * as ExpenseAction from "../../redux/actions/ExpensesAction";
 import * as FileAction from "../../redux/actions/FileAction";
+import { loadMessage } from "../../redux/actions/ClientAction";
 import moment from 'moment';
 import { bindActionCreators } from 'redux';
 
@@ -169,6 +170,7 @@ const ExpensesTable = (props) => {
             }
             await SaveExpenseRecord([newExpenseData],authorization);
             setTimeout(async()=>{
+              await loadMessage();
               await GetExpensesListByProjectId(0,20,projectId, authorization)
               await SaveFileData();
               resolve();

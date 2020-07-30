@@ -141,7 +141,7 @@ const LoadAddResourceModel=(data)=>{
       }
     </DialogContent>
     <DialogActions>
-        <Button onClick={handleClose} color="primary">Cancle</Button>
+        <Button onClick={handleClose} color="primary">Cancel</Button>
         <Button onClick={() =>loadAssignResource({listOfEmployeeAccount, selectedRateCard,"mainProps":data.mainProps,load,setLoad,handleClose, tableData})} color="secondary">Assign Resource</Button>
     </DialogActions>
   </Dialog>

@@ -11,6 +11,7 @@ import Register from '../views/register/UserRegister';
 import ClientManagment from '../views/client/ClientManagement';
 import PurchaseOrderManagement from '../views/purchaseOrder/PurchaseOrderManagement';
 import ProjectManagement from '../views/project/ProjectManagement';
+import PurchaseOrderFrom from '../views/purchaseOrder/PurchaseOrderFrom';
 
 
 const RoutesPath=[
@@ -18,7 +19,8 @@ const RoutesPath=[
     {path:"/app/dashborad",component: Dashboard},
     {path:"/client",component: ClientManagment},
     {path:"/purchaseOrder",component: PurchaseOrderManagement},
-    {path:"/project",component: ProjectManagement}
+    {path:"/project",component: ProjectManagement},
+    {path:"/purchaseOrder/view",component: PurchaseOrderFrom, exact:true}
 ]
 
 const Layout = (props) => {
@@ -34,7 +36,7 @@ const Layout = (props) => {
             <div className={classnames(classes.content, { [classes.contentShift]: layoutState.isSidebarOpened})}>
                 <div className={classes.fakeToolbar} />
                 <Switch>
-                    { RoutesPath.map((route,key)=>{ return <Route key={key} path={route.path} component={route.component} />})}
+                    { RoutesPath.map((route,key)=>{ return <Route key={key} exact={route.exact} path={route.path} component={route.component} />})}
                 </Switch>
             </div>
         </>
