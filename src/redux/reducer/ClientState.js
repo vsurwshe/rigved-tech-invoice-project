@@ -1,6 +1,7 @@
 const initialState = {
     listOfClient: [],
     clientDetails: [],
+    clientDataById:[],
     common_message: "",
     color: "",
 }
@@ -13,6 +14,8 @@ const ClientState = (state = initialState, action) => {
             return { ...state, clientDetails: action.clientDetails }
         case "CHANGE_MASSAGE":
             return { ...state, common_message: action.message, color: action.color }
+        case "SAVE_CLIENT_DETAILS_BY_ID":
+            return { ...state, clientDataById: action.clientDetails }
         default:
             return state;
     }

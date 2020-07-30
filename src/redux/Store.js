@@ -4,9 +4,12 @@ import logger from 'redux-logger';
 import { reducer as reduxFormReducer } from 'redux-form';
 import LoginState from "./reducer/LoginState";
 import ClientState from "./reducer/ClientState";
-import FileState from "./reducer/FileState"
-import MasterDataSet from "./reducer/MasterDataState"
-import PurchaseOrderState from "./reducer/PurchaseOrderState"
+import FileState from "./reducer/FileState";
+import MasterDataSet from "./reducer/MasterDataState";
+import PurchaseOrderState from "./reducer/PurchaseOrderState";
+import ProjectState from "./reducer/ProjectState";
+import ExpenseState from"./reducer/ExpenseState";
+import EmpolyeeState from "./reducer/EmployeeState"
 
 // this function save state into local storage.
 const saveToLocalStorage=(state)=>{
@@ -42,6 +45,9 @@ const reducer = combineReducers({
   LoginState,
   ClientState,
   FileState,
+  ProjectState,
+  ExpenseState,
+  EmpolyeeState,
   MasterDataSet,
   PurchaseOrderState
 });
@@ -50,7 +56,7 @@ const reducer = combineReducers({
 const enhancer= compose(applyMiddleware(thunk, logger));
 
 // this is common action through out application will be used
-const initialState = reducer({}, {},{},{},{})
+const initialState = reducer({},{},{},{},{},{},{},{})
 const rootReducer = (state, action) => {
   if (action.type === 'CLEAR_DATA') {
     state = initialState

@@ -25,16 +25,15 @@ class ClientManagment extends Component {
     componentDidMount = async () => {
         const { listOfClient } = this.props.ClientState;
         const { authorization } = this.props.LoginState;
+        const { SkillSet,SkillCategory,Domains}=this.props.MasterDataSet
         const { GetClientList } = this.props.ClientAction;
         const { GetSkillSet, GetSkillCategory, GetDomains } = this.props.MasterDataAction;
-        if (listOfClient && listOfClient.length === 0) {
-            this.handleLoadClientList(true);
-            await GetSkillSet(0, 10, authorization);
-            await GetSkillCategory(0, 10, authorization);
-            await GetDomains(0, 10, authorization);
-            await GetClientList(0, 20, authorization);
-            await this.handleLoadClientList(false);
-        }
+        await this.handleLoadClientList(true);
+        (SkillSet && SkillSet.length === 0) && await GetSkillSet(0, 10, authorization);
+        (SkillCategory && SkillCategory.length === 0) && await GetSkillCategory(0, 10, authorization);
+        (Domains && Domains.length === 0) &&  await GetDomains(0, 10, authorization);
+        (listOfClient && listOfClient.length === 0) && await GetClientList(0, 20, authorization);
+        await this.handleLoadClientList(false);
     }
 
     // this method used for the create client from

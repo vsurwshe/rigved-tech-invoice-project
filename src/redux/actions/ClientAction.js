@@ -50,7 +50,22 @@ const SaveClientData=(userData,authroizationKey)=>{
 
 const GetClientDetailsById=(clientId, authroizationKey)=>{
     return(dispatch)=>{
-
+        return CreateInstance()
+            .get('/client/read/'+clientId,HeaderConfig(authroizationKey))
+            .then(response => {
+                if(response.status !== STATUS200){
+                    dispatch(loadMessage(AlertColor.danger ,response.headers.message));
+                }else{
+                    dispatch(SaveClientDetailsById(response.data))
+                }
+            })
+            .catch(error => { 
+                if(error.response.status.toString() === CONFLICTSTATUS){
+                    dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+                }else{
+                    dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+                }
+        })
     }
 }
 
@@ -86,6 +101,13 @@ export function SaveClientList(clientList){
 export function SaveClientDetails(clientDetails){
     return{
         type: "SAVE_CLIENT_DETAILS",
+        clientDetails
+    }
+}
+
+export function SaveClientDetailsById(clientDetails){
+    return{
+        type: "SAVE_CLIENT_DETAILS_BY_ID",
         clientDetails
     }
 }
