@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormLabel, CircularProgress } from '@material-ui/core';
 import { reset, reduxForm, Field, FieldArray, formValueSelector } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
-import { renderTextField, renderTextHiddenField, renderFileInput, renderSelectField, renderTextAreaField } from '../utilites/FromUtilites';
+import { renderTextField, renderTextHiddenField, renderFileInput, renderSelectField, renderTextAreaField, renderAutocompleteByName } from '../utilites/FromUtilites';
 import useStyles from "../client/Styles";
 import { connect } from 'react-redux';
 import RateCardTable from '../rateCard/RateCardTable';
@@ -15,14 +15,14 @@ import * as FileActions from "../../redux/actions/FileAction";
 let ClientForm = (props) => {
     var classes = useStyles();
     const { SaveClientMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues, clearFile } = props
-    const { operation }=props.stateData
+    const { operation } = props.stateData
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(SaveClientMethod)}>
             {LoadGird(props)}
             <div className={classes.buttonStyle}>
                 <center>
-                    {(operation === "edit" || operation === "create")  && <>
-                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> {(initialValues === undefined) ? "SUBMIT" : "EDIT"}</Button> &nbsp;&nbsp;
+                    {(operation === "edit" || operation === "create") && <>
+                        <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> {(initialValues === undefined) ? "SUBMIT" : "EDIT"}</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button></>}&nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await clearFile(); await reset(); cancle() }}> Cancel</Button>
                 </center>
@@ -37,12 +37,12 @@ const LoadGird = (props) => {
     const { Domains, SkillCategory, SkillSet } = props.MasterDataSet
     return <><Grid container spacing={5}>
         <Grid item style={{ paddingLeft: 30 }}>
-            {HeaderPart({ classes, initialValues,props })}
+            {HeaderPart({ classes, initialValues, props })}
         </Grid>
     </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
-                {(initialValues === undefined) ? SectionOne({ classes, props }) : EditSectionOne({classes,initialValues})}
+                {(initialValues === undefined) ? SectionOne({ classes, props }) : EditSectionOne({ classes, initialValues })}
             </Grid>
             <Grid item xs={12} sm={6}>
                 {SectionTwo({ classes, props })}
@@ -57,10 +57,10 @@ const LoadGird = (props) => {
 }
 // this method used for the load header part
 const HeaderPart = (props) => {
-    const {initialValues}=props
+    const { initialValues } = props
     const { color, common_message } = props.props.ClientState
     return <Grid item container direction="row" justify="center" alignItems="center" >
-            {(initialValues === undefined) ? <h2>Rigved Technologies</h2> : <h2>{initialValues.clientName}</h2> } 
+        {(initialValues !== undefined) && <h2>{initialValues.clientName}</h2>}
         <center>{common_message && <Alert color={color} >{common_message}</Alert>}</center>
     </Grid>
 }
@@ -82,9 +82,9 @@ const EditSectionOne = (data) => {
     return <div>
         <Field name="id" component={renderTextHiddenField} />
         <Field name="clientName" component={renderTextHiddenField} validate={[Required]} />
-        <Field name="tanNum" component={renderTextHiddenField}  />
+        <Field name="tanNum" component={renderTextHiddenField} />
         <Field name="gstNum" component={renderTextHiddenField} />
-        <FormLabel component="legend">GST Number :{initialValues.gstNum}</FormLabel><br/>
+        <FormLabel component="legend">GST Number :{initialValues.gstNum}</FormLabel><br />
         <FormLabel component="legend">TAN Number :{initialValues.tanNum}</FormLabel>
     </div>
 }
@@ -132,8 +132,8 @@ const SectionThree = (data) => {
 
 // financials tab
 const Financials = (data) => {
-    const {gstFileUpload,tanFileUpload, initialValues}=data
-    const { gstFileUrl, tanFileUrl, gstUpload, tanUpload}=data.stateData
+    const { gstFileUpload, tanFileUpload, initialValues } = data
+    const { gstFileUrl, tanFileUrl, gstUpload, tanUpload } = data.stateData
     return <>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
@@ -141,33 +141,39 @@ const Financials = (data) => {
             </Grid>
             <Grid item xs={12} sm={4}>
                 <Grid item xs={12}>
-                    {((gstFileUrl === "" || gstFileUrl === undefined)&& initialValues === undefined) ? (gstUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={gstFileUpload} validate={[Required]} lable="GST Card Image" />)
-                        : <>{initialValues === undefined ?  LoadFileUrl({"url":gstFileUrl,"cid": 1,"props":data,"componentName":"GST Image"}) 
-                        : LoadFileUrl({"url":initialValues.gstUrl,"cid": initialValues.id,"props":data,"componentName":"GST Image"})} </>
+                    {((gstFileUrl === "" || gstFileUrl === undefined) && initialValues === undefined) ? (gstUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={gstFileUpload} validate={[Required]} lable="GST Card Image" />)
+                        : <>{initialValues === undefined ?(<h5>GST File: {LoadFileUrlName(gstFileUrl)}</h5>)
+                            : LoadFileUrl({ "url": initialValues.gstUrl, "cid": initialValues.id, "props": data, "componentName": "GST Image" })} </>
                     }
                 </Grid>
                 <Grid item xs={12}>
-                    {((tanFileUrl === "" || tanFileUrl === undefined)&& initialValues === undefined) ? (tanUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={tanFileUpload} validate={[Required]} lable="TAN Card Image" />)
-                        : <>{initialValues === undefined ?  LoadFileUrl({"url":tanFileUrl,"cid": 1,"props":data,"componentName":"TAN Image"}) 
-                        : LoadFileUrl({"url":initialValues.tanUrl,"cid": initialValues.id,"props":data,"componentName":"TAN Image"})} </>
+                    {((tanFileUrl === "" || tanFileUrl === undefined) && initialValues === undefined) ? (tanUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={tanFileUpload} validate={[Required]} lable="TAN Card Image" />)
+                        : <>{initialValues === undefined ? (<h5>TAN File: {LoadFileUrlName(tanFileUrl)}</h5>)
+                            : LoadFileUrl({ "url": initialValues.tanUrl, "cid": initialValues.id, "props": data, "componentName": "TAN Image" })} </>
                     }
                 </Grid>
-            </Grid>  
+            </Grid>
         </Grid>
     </>
 }
 
- let LoadFileUrl=(parameter)=>{
-    const { listOfFiles }=parameter.props.FileState
-    const exitsData=(listOfFiles.length > 0) && listOfFiles.filter(x=> (x.cid=== parameter.cid && x.fileName=== parameter.url));
-    if(exitsData === false || exitsData.length <=0){ GetPhotos(parameter) }
-    return <>{parameter.componentName}:<img src={exitsData.length > 0 && exitsData[0].fileData} alt={parameter.componentName} style={{height: "50%", width:"70%"}} /></>;
+const LoadFileUrlName = (fileUrl) => {
+    let fileArray = fileUrl.split("\\");
+    return fileArray.length > 0 ? fileArray[5] : "";
 }
 
-const GetPhotos=async(parameter)=>{
-    const { FetchPhoto }=parameter.props
-    const { authorization }=parameter.props.LoginState
-    return await FetchPhoto(parameter.url,authorization,parameter.cid);
+
+let LoadFileUrl = (parameter) => {
+    const { listOfFiles } = parameter.props.FileState
+    const exitsData = (listOfFiles.length > 0) && listOfFiles.filter(x => (x.cid === parameter.cid && x.fileName === parameter.url));
+    if (exitsData === false || exitsData.length <= 0) { GetPhotos(parameter) }
+    return <>{parameter.componentName}:<img src={exitsData.length > 0 && exitsData[0].fileData} alt={parameter.componentName} style={{ height: "50%", width: "70%" }} /></>;
+}
+
+const GetPhotos = async (parameter) => {
+    const { FetchPhoto } = parameter.props
+    const { authorization } = parameter.props.LoginState
+    return await FetchPhoto(parameter.url, authorization, parameter.cid);
 }
 
 // this method will used for the showing progress bar
@@ -185,15 +191,12 @@ const BankDetailsDto = () => {
 // this will be render contact
 const RenderContact = ({ classes, fields, meta: { error, submitFailed } }) => {
     const [open, setOpen] = useState(false);
-    const handleClickOpen = () => {
-        setOpen(true)
-        fields.push({})
-    };
+    const handleClickOpen = () => { setOpen(true); fields.push({}) };
     const handleClose = () => { setOpen(false) };
     return <span>
         <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>
-        <Dialog open={open} onClose={handleClose} classes={{paper: classes.dialogPaper}} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
-            <DialogTitle id="responsive-dialog-title">{"Add Contact"}</DialogTitle>
+        <Dialog open={open} onClose={handleClose} classes={{ paper: classes.dialogPaper }} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
+            <DialogTitle id="responsive-dialog-title-1">{"Add Contact"}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
                     {fields.map((member, index) => (
@@ -202,7 +205,7 @@ const RenderContact = ({ classes, fields, meta: { error, submitFailed } }) => {
                             <td><Field name={`${member}.email`} component={renderTextField} validate={[Required, Email]} className={classes.textField1} label="Email" helperText="Ex. admin@rigvedtech.com" /></td>
                             <td><Field name={`${member}.mobileNum`} component={renderTextField} validate={[Required, PhoneNumber]} className={classes.textField1} label="Mobile Number" helperText="Ex. 9130253456" /></td>
                             <td><Field name={`${member}.role`} component={renderTextField} className={classes.textField1} label="Job Designation" helperText="Ex. Developer" /></td>
-                            <td><DeleteOutlineIcon variant="contained" color="secondary" onClick={()=>fields.remove(index)} /></td>
+                            <td><DeleteOutlineIcon variant="contained" color="secondary" onClick={() => fields.remove(index)} /></td>
                         </tr>
                     ))}
                 </DialogContentText>
@@ -222,40 +225,38 @@ const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, met
     const handleClose = () => { setOpen(false) };
     return <span>
         <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>
-        <Dialog open={open} onClose={handleClose} classes={{paper: classes.dialogPaper}} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title"  >
-            <DialogTitle id="responsive-dialog-title">{"Adding Rate Card"}</DialogTitle>
+        <Dialog open={open} onClose={handleClose} classes={{ paper: classes.dialogPaper }} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title">
+            <DialogTitle id="responsive-dialog-title-2">{"Adding Rate Card"}</DialogTitle>
             <DialogContent >
                 <DialogContentText>
                     {fields.map((member, index) => (
-                        <tr key={index} className={classes.selectContainer}>
-                            <td>
-                                <Field name={`${member}.domainName`} className={classes.selectTextField} component={renderSelectField} validate={[Required]} label="Domain" >
-                                    {(domains && domains.length > 0) && domains.map((item, key) => <option key={key} value={item.name}>{item.name}</option>)}
-                                </Field>
-                            </td>
-                            <td>
-                                <Field name={`${member}.skillCategory`} className={classes.selectTextField} component={renderSelectField} validate={[Required]} label="Category" >
-                                    {(skillCategory && skillCategory.length > 0) && skillCategory.map((item, key) => <option key={key} value={item.name}>{item.name}</option>)}
-                                </Field>
-                            </td>
-                            <td>
-                                <Field name={`${member}.skillSet`} className={classes.selectTextField} component={renderSelectField} validate={[Required]} label="Skills" >
-                                    {(skillSet && skillSet.length > 0) && skillSet.map((item, key) => <option key={key} value={item.name}>{item.name}</option>)}
-                                </Field>
-                            </td>
-                            <td>
-                                <Field name={`${member}.fromYearOfExp`} className={classes.selectTextField} component={renderSelectField} validate={[Required]} label="From" >
+                        <Grid container spacing={5}>
+                            <Grid item >
+                                <Field name={`${member}.domainName`} component={renderAutocompleteByName} optionData={domains} validate={[Required]} label="Domain" />
+                            </Grid>
+                            <Grid item >
+                                <Field name={`${member}.skillCategory`} component={renderAutocompleteByName} optionData={skillCategory} validate={[Required]} label="Category" />
+                            </Grid>
+                            <Grid item >
+                                <Field name={`${member}.skillSet`} className={classes.selectTextField} component={renderAutocompleteByName} optionData={skillSet} validate={[Required]} label="Skills" />
+                            </Grid>
+                            <Grid item >
+                                <Field name={`${member}.fromYearOfExp`} style={{ marginTop: "17px" }} component={renderSelectField} validate={[Required]} label="From" >
                                     {[...Array(10)].map((item, key) => <option key={key} value={key}>{key}</option>)}
                                 </Field>
-                            </td>
-                            <td>
-                                <Field name={`${member}.toYearOfExp`} className={classes.selectTextField} component={renderSelectField} validate={[Required]} label="To" >
+                            </Grid>
+                            <Grid item >
+                                <Field name={`${member}.toYearOfExp`} style={{ marginTop: "17px" }} component={renderSelectField} validate={[Required]} label="To" >
                                     {[...Array(10)].map((item, key) => <option key={key} value={key}>{key}</option>)}
                                 </Field>
-                            </td>
-                            <td><Field name={`${member}.rate`} type="text" className={classes.selectTextField} component={renderTextField} label="Rate" /></td>
-                            <td><DeleteOutlineIcon variant="contained" color="secondary" onClick={()=>fields.remove(index)} /></td>
-                        </tr>
+                            </Grid>
+                            <Grid item >
+                                <Field name={`${member}.rate`} type="text"  style={{ marginTop: "17px" }} component={renderTextField} label="Rate" />
+                            </Grid>
+                            <Grid item >
+                                <DeleteOutlineIcon variant="contained" color="secondary" style={{ marginTop: "17px"}} onClick={() => fields.remove(index)} />
+                            </Grid>
+                        </Grid>
                     ))}
                 </DialogContentText>
             </DialogContent>
@@ -271,7 +272,8 @@ const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, met
 const RateCard = (props) => {
     const { rateCardDtos, Domains, SkillCategory, SkillSet, classes } = props
     return <span>
-        <FieldArray name="rateCardDtos" classes={classes} domains={Domains} skillCategory={SkillCategory} skillSet={SkillSet} component={RenderRateCard} validate={[Required]} />
+        <FieldArray name="rateCardDtos"
+            classes={classes} domains={Domains} skillCategory={SkillCategory} skillSet={SkillSet} component={RenderRateCard} validate={[Required]} />
         <RateCardTable data={rateCardDtos} />
     </span>
 }
@@ -292,7 +294,7 @@ ClientForm = connect(state => {
     const rateCardDtos = selector(state, 'rateCardDtos')
     const contactPersonDtos = selector(state, 'contactPersonDtos')
     return { rateCardDtos, contactPersonDtos, ...state }
-},FileActions)(ClientForm)
+}, FileActions)(ClientForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ClientForm'));
 export default reduxForm({ form: 'ClientForm', onSubmitSuccess: afterSubmit })(ClientForm);

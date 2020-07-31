@@ -106,10 +106,10 @@ const renderFromHelper = ({ touched, error }) => {
 }
 
 // this is the render selected filed
-const renderSelectField = ({ input, label, meta: { touched, error }, children, ...custom }) => (
-  <FormControl error={touched && error}>
+const renderSelectField = ({ input, label, style, meta: { touched, error }, children, ...custom }) => (
+  <FormControl error={touched && error} style={style}>
     <InputLabel htmlFor="age-native-simple">{label}</InputLabel>
-    <Select native {...input} {...custom} inputProps={{ name: label, }} > {children} </Select>
+    <Select  native {...input} {...custom}  inputProps={{ name: label, }} > {children} </Select>
     {renderFromHelper({ touched, error })}
   </FormControl>
 )
