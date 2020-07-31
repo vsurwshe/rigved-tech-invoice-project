@@ -13,7 +13,8 @@ const FromActions={
     "CR":"CREATE",
     "VI": "VIEW",
     "ED":"EDIT",
-    "DE":"DELETE"
+    "DE":"DELETE",
+    "VIED":"VIEWEDIT"
 }
 
 export{

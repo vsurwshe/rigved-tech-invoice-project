@@ -104,7 +104,7 @@ return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
           search: false
         }}
         actions={[
-          { icon: () => {return (operation && (operation === FromActions.ED || operation === FromActions.CR)) ?  <div><Button variant="contained" color="primary">Assign Resource</Button></div> : ""},
+          { icon: () => {return (operation && (operation === FromActions.ED || operation === FromActions.VIED)) ?  <div><Button variant="contained" color="primary">Assign Resource</Button></div> : ""},
             onClick: (event, rowData) => { handleClickOpen() },
             isFreeAction: true,
             tooltip: 'Assign Resource'
