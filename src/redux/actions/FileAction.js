@@ -43,7 +43,13 @@ const FetchPhoto = (fileUrl,authroizationKey,clientId,fileType) => {
             let ImageUrl= fileType ? URL.createObjectURL(file) :  URL.createObjectURL(myBlob)
             dispatch(SaveFile(ImageUrl,fileUrl,clientId))
         })
-        .catch(error => { return error.message })
+        .catch(error => {
+            if (error && error.response && error.response.status.toString() === CONFLICTSTATUS) {
+                dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+            } else {
+                dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+            }
+        })
     } 
 }
 //-----------------------------------

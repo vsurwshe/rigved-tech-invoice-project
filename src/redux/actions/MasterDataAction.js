@@ -14,7 +14,7 @@ const GetSkillSet=(firstIndex, lastIndex,authroizationKey)=>{
                 }
             })
             .catch(error => { 
-                if(error.response.status.toString() === CONFLICTSTATUS){
+                if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
                     dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
                 }else{
                     dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
@@ -36,7 +36,7 @@ const GetSkillCategory=(firstIndex, lastIndex,authroizationKey)=>{
                 }
             })
             .catch(error => { 
-                if(error.response.status.toString() === CONFLICTSTATUS){
+                if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
                     dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
                 }else{
                     dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
@@ -58,7 +58,7 @@ const GetDomains=(firstIndex, lastIndex,authroizationKey)=>{
                 }
             })
             .catch(error => { 
-                if(error.response.status.toString() === CONFLICTSTATUS){
+                if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
                     dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
                 }else{
                     dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
@@ -79,7 +79,7 @@ const GetManagerList=(firstIndex, lastIndex,authroizationKey)=>{
                 }
             })
             .catch(error => { 
-                if(error.response.status.toString() === CONFLICTSTATUS){
+                if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
                     dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
                 }else{
                     dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
@@ -100,7 +100,7 @@ const GetExpenseTypeList=(firstIndex, lastIndex,authroizationKey)=>{
                 }
             })
             .catch(error => { 
-                if(error.response.status.toString() === CONFLICTSTATUS){
+                if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
                     dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
                 }else{
                     dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
@@ -121,7 +121,28 @@ const GetEmployeeList = (firstIndex, lastIndex,authroizationKey) => {
                 }
             })
             .catch(error => {
-                if (error.response.status.toString() === CONFLICTSTATUS) {
+                if (error && error.response && error.response.status.toString() === CONFLICTSTATUS) {
+                    dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
+                } else {
+                    dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
+                }
+            })
+    }
+}
+
+const GetRoleList = (firstIndex, lastIndex,authroizationKey) => {
+    return (dispatch) => {
+        return CreateInstance()
+            .get('/masterdata/role/' + firstIndex + '/' + lastIndex, HeaderConfig(authroizationKey))
+            .then(response => {
+                if (response.status !== STATUS200) {
+                    dispatch(loadMessage(AlertColor.danger, response.headers.message));
+                } else {
+                    dispatch(saveRoleList(response.data))
+                }
+            })
+            .catch(error => {
+                if (error && error.response && error.response.status.toString() === CONFLICTSTATUS) {
                     dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
                 } else {
                     dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
@@ -173,6 +194,12 @@ export function saveEmployeeList(EmployeeList){
     }
 }
 
+export function saveRoleList(RoleList){
+    return {
+        type:"SAVE_ROLE_LIST",
+        RoleList
+    }
+}
 
 export function loadMessage(color, message){
     return{
@@ -189,5 +216,6 @@ export {
     GetDomains,
     GetManagerList,
     GetExpenseTypeList,
-    GetEmployeeList
+    GetEmployeeList,
+    GetRoleList
 }

@@ -15,6 +15,7 @@ import EmpolyeeState from "./reducer/EmployeeState"
 const saveToLocalStorage=(state)=>{
   try{
     const seralizedState= JSON.stringify(state);
+    // sessionStorage.setItem("state",seralizedState);
     localStorage.setItem("state",seralizedState);
   }catch(error){
     console.error("Error Occured in saveing value to storage",error);
@@ -24,6 +25,7 @@ const saveToLocalStorage=(state)=>{
 // this functions return the state value form local stoage.
 const loadFormLocalStorgae=()=>{
   try{
+    // const serializedState= sessionStorage.getItem("state");
     const serializedState= localStorage.getItem("state");
     if(serializedState === null){
       return undefined;

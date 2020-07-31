@@ -5,7 +5,8 @@ class Dashborad extends Component {
     state = {  }
     render() { 
         return <>
-        <PageTitle title="Dashboard" button="Latest Reports" />
+            <PageTitle title="Dashboard" button="Latest Reports" />
+            <h1>Dashborad</h1>
         </>
     }
 }

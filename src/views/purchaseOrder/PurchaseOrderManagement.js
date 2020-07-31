@@ -137,7 +137,7 @@ class PurchaseOrderManagement extends Component {
     // this method used for the save the client details
     SavePODetails = async (sendUserValues) => {
         const { purchaseOrderFileUrl } = this.state
-        const { SavePurchaseOrderDetails, loadMessage, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
+        const { SavePurchaseOrderDetails, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
         const { authorization } = this.props.LoginState
         const newUserData = {
             ...sendUserValues,
@@ -154,7 +154,7 @@ class PurchaseOrderManagement extends Component {
 
     // this method will used for the deleting the purchase order details
     DeletePurchaseOrderDetails = async (purchaseOrderId) => {
-        const { DeletePurchaseOrder, loadMessage, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
+        const { DeletePurchaseOrder, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
         const { authorization } = this.props.LoginState
         await this.handleLoadPurchaseOrdertList();
         purchaseOrderId && await DeletePurchaseOrder(purchaseOrderId, authorization);

@@ -128,6 +128,7 @@ class ProjectManagement extends Component {
         />
     </>
     }
+    
     // this method used for the show circular progress bar 
     loadingCircle = () => <center> <h3>Project Management</h3> <CircularProgress size={80} /> </center>
 

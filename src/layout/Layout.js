@@ -7,7 +7,7 @@ import Header from '../views/Header/Header'
 import useStyles from "./styles";
 import { useLayoutState } from "../context/LayoutContext";
 import { Dashboard } from '@material-ui/icons';
-import Register from '../views/register/UserRegister';
+import UserManagement from '../views/register/UserManagement';
 import ClientManagment from '../views/client/ClientManagement';
 import PurchaseOrderManagement from '../views/purchaseOrder/PurchaseOrderManagement';
 import ProjectManagement from '../views/project/ProjectManagement';
@@ -15,7 +15,7 @@ import PurchaseOrderFrom from '../views/purchaseOrder/PurchaseOrderFrom';
 
 
 const RoutesPath=[
-    {path:"/register",component: Register},
+    {path:"/register",component: UserManagement},
     {path:"/app/dashborad",component: Dashboard},
     {path:"/client",component: ClientManagment},
     {path:"/purchaseOrder",component: PurchaseOrderManagement},
@@ -25,10 +25,8 @@ const RoutesPath=[
 
 const Layout = (props) => {
     var classes = useStyles();
-    
     // global
     var layoutState = useLayoutState();
-
     return <div className={classes.root}>
         <>
             <Header history={props.history} />

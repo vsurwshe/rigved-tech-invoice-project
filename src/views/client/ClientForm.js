@@ -10,7 +10,6 @@ import ContactTable from '../contact/ContactTable';
 import { Alert } from '@material-ui/lab';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import { Required, PhoneNumber, GSTIN, TAN, IFSCCode, BankAccount, Email } from '../utilites/FormValidation';
-// import { CreateInstance } from '../../assets/config/APIConfig';
 import * as FileActions from "../../redux/actions/FileAction";
 
 let ClientForm = (props) => {
@@ -131,7 +130,7 @@ const SectionThree = (data) => {
 }
 
 
-// financials
+// financials tab
 const Financials = (data) => {
     const {gstFileUpload,tanFileUpload, initialValues}=data
     const { gstFileUrl, tanFileUrl, gstUpload, tanUpload}=data.stateData
@@ -170,8 +169,11 @@ const GetPhotos=async(parameter)=>{
     const { authorization }=parameter.props.LoginState
     return await FetchPhoto(parameter.url,authorization,parameter.cid);
 }
+
+// this method will used for the showing progress bar
 const loadingCircle = () => <center> Uploading <CircularProgress size={40} /> </center>
 
+// this will be load the bank details related fields
 const BankDetailsDto = () => {
     return <span> <Field name="bankDetailsDtoList.accountNumber" component={renderTextField} validate={[Required, BankAccount]} label="Account Number" fullWidth helperText="Ex. 3456231234567" />
         <Field name="bankDetailsDtoList.ifscCode" component={renderTextField} validate={[Required, IFSCCode]} label="IFSC Code" fullWidth helperText="Ex. SBIN0000123" />
@@ -216,10 +218,7 @@ const RenderContact = ({ classes, fields, meta: { error, submitFailed } }) => {
 // this will be render rate card
 const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, meta: { error, submitFailed } }) => {
     const [open, setOpen] = useState(false);
-    const handleClickOpen = () => {
-        setOpen(true)
-        fields.push({})
-    };
+    const handleClickOpen = () => { setOpen(true); fields.push({}); };
     const handleClose = () => { setOpen(false) };
     return <span>
         <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>

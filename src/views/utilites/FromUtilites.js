@@ -142,6 +142,19 @@ const renderAutocomplete=({label,name,optionData,className, input, meta: { touch
   />
 
 // this render autocompelete 
+const renderAutocompleteByName=({label,name,optionData,className, input, meta: { touched, invalid, error }, ...custom})=>
+  <Autocomplete
+    id={name}
+    autoHighlight
+    options={(optionData && optionData.length >0) ? optionData: []}
+    getOptionLabel={optionData => (optionData && optionData.name) && optionData.name}
+    getOptionSelected={(option, value) => option.id === value.id}
+    onChange={(event, value) => value && input.onChange(value.name)}
+    renderInput={(params) => ( <TextField {...params} label={label} margin="normal"  /> )}
+    {...custom}
+  />
+
+// this render autocompelete 
 const renderAutocompleteWithProps=({label,name,optionData,className, input, meta: { touched, invalid, error }, ...custom})=>
   <Autocomplete
     id={name}
@@ -164,5 +177,6 @@ export{
     renderTextAreaField,
     renderFileInput,
     renderAutocomplete,
+    renderAutocompleteByName,
     renderAutocompleteWithProps
 }

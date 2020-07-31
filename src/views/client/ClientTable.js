@@ -60,6 +60,5 @@ const  ClientTable=(props)=>{
     />
   </div>
 }
-
 const mapStateToProps = state => { return state; };
 export default connect(mapStateToProps)(ClientTable);

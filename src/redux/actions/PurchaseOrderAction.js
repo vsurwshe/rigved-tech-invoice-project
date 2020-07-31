@@ -1,6 +1,7 @@
 import {AlertColor} from '../../assets/config/Config';
 import {CONFLICTSTATUS, STATUS200 } from "../../assets/config/CodeMap";
 import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
+import { loadMessage } from "../actions/ClientAction";
 
 
 const GetPurchaseOrderList=(firstIndex, lastIndex,authroizationKey)=>{
@@ -15,7 +16,7 @@ const GetPurchaseOrderList=(firstIndex, lastIndex,authroizationKey)=>{
             }
         })
         .catch(error => { 
-            if(error.response.status.toString() === CONFLICTSTATUS){
+            if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
                 dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
             }else{
                 dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
@@ -41,7 +42,7 @@ const SavePurchaseOrderDetails=(userData,authroizationKey)=>{
             }
         })
         .catch(error => { 
-            if(error.response && error.response.status.toString() === CONFLICTSTATUS){
+            if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
                 dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
             }else{
                 dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
@@ -91,15 +92,6 @@ export function DeletePurchaseOrderDetails(purchaseOrderDetails){
         purchaseOrderDetails
     }
 }
-
-export function loadMessage(color,message){
-    return{
-        type:"CHANGE_MASSAGE",
-        message,
-        color
-    }
-}
-
 
 export {
     GetPurchaseOrderList,

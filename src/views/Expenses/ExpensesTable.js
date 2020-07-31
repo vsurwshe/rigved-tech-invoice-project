@@ -170,8 +170,8 @@ const ExpensesTable = (props) => {
             }
             await SaveExpenseRecord([newExpenseData],authorization);
             setTimeout(async()=>{
-              await loadMessage();
               await GetExpensesListByProjectId(0,20,projectId, authorization)
+              await loadMessage();
               await SaveFileData();
               resolve();
             },API_EXE_TIME)
