@@ -1,7 +1,7 @@
-import { AlertColor, API_URL } from '../../assets/config/Config';
-import { CONFLICTSTATUS, STATUS200 } from "../../assets/config/CodeMap";
+import { API_URL } from '../../assets/config/Config';
 import { CreateInstance } from '../../assets/config/APIConfig';
 import { loadMessage } from "../actions/ClientAction";
+import { SuccessFunction, ErrorFunction } from "./CommonAction"
 
 const SaveFileDetails = (fileData, authroizationKey) => {
     return (dispatch) => {
@@ -12,20 +12,8 @@ const SaveFileDetails = (fileData, authroizationKey) => {
                     Authorization: authroizationKey
                 }
             })
-            .then(response => {
-                if (response.status !== STATUS200) {
-                    dispatch(loadMessage(AlertColor.danger, response.headers.message));
-                } else {
-                    dispatch(SaveFileData(response.data))
-                }
-            })
-            .catch(error => {
-                if (error && error.response && error.response.status.toString() === CONFLICTSTATUS) {
-                    dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
-                } else {
-                    dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
-                }
-            })
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveFileData, "loadMessage":loadMessage, response}) })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
 
@@ -43,13 +31,7 @@ const FetchPhoto = (fileUrl,authroizationKey,clientId,fileType) => {
             let ImageUrl= fileType ? URL.createObjectURL(file) :  URL.createObjectURL(myBlob)
             dispatch(SaveFile(ImageUrl,fileUrl,clientId))
         })
-        .catch(error => {
-            if (error && error.response && error.response.status.toString() === CONFLICTSTATUS) {
-                dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
-            } else {
-                dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
-            }
-        })
+        .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     } 
 }
 //-----------------------------------

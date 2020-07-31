@@ -1,6 +1,7 @@
 import axios from "axios"
 import {API_URL, AlertColor} from '../../assets/config/Config';
 import { UNAUTHORIZED, OKSTATUS, CONFLICTSTATUS } from "../../assets/config/CodeMap";
+import { SuccessFunction, ErrorFunction } from "./CommonAction"
 
 const LoginUser=(userData) =>{
     const headerConfig={
@@ -59,8 +60,8 @@ const RegisterUser=(userData, authorizationKey)=>{
 export function setAuthrizations(data){
     return{
         type:"SET_ACCOUNT_ID",
-        account_id :data.AccountId,
-        authorization: data.Authorization 
+        account_id :data ? data.AccountId: "",
+        authorization: data ? data.Authorization: "" 
     }
 }
 

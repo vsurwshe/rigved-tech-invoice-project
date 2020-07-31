@@ -24,11 +24,11 @@ class UserManagement extends Component {
         console.log("Props ",this.props, this.props.MasterDataAction)
         const { authorization }=this.props.LoginState;
         const { Domains,SkillSet,RoleList}=this.props.MasterDataSet;  
-        const { GetDomains,GetSkillSet, GetRoleList}=this.props.MasterDataAction;
+        // const { GetDomains,GetSkillSet, GetRoleList}=this.props.MasterDataAction;
         await this.handleLoadValue();
-        (Domains && Domains.length === 0 ) && await GetDomains(0,20,authorization)
-        (SkillSet && SkillSet.length === 0 ) && await GetSkillSet(0,20,authorization)
-        (RoleList && RoleList.length === 0 ) && await GetRoleList(0,20,authorization)
+        (Domains && Domains.length === 0 && this.props.MasterDataAction && this.props.MasterDataAction ) && await this.props.MasterDataAction.GetDomains(0,20,authorization)
+        (SkillSet && SkillSet.length === 0 && this.props.MasterDataAction ) && await this.props.MasterDataAction.GetSkillSet(0,20,authorization)
+        (RoleList && RoleList.length === 0 && this.props.MasterDataAction ) && await this.props.MasterDataAction.GetRoleList(0,20,authorization)
         await this.handleLoadValue();
     }
 

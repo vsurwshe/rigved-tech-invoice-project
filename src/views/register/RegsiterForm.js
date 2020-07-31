@@ -1,11 +1,12 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import { Button, Grid, Accordion, AccordionSummary, AccordionDetails, CircularProgress } from "@material-ui/core";
 import { Field, reduxForm, reset } from 'redux-form';
 import { renderTextField, renderSelectField, renderAutocompleteByName, renderDateTimePicker, radioButton, renderNumberField, renderFileInput } from '../utilites/FromUtilites';
 import useStyles from "./styles";
 import { connect } from 'react-redux';
 import { Required } from '../utilites/FormValidation';
-
+import { bindActionCreators } from 'redux';
+import * as MasterDataAction from '../../redux/actions/MasterDataAction';
 
 // // this is maping roles
 const Roles = [
@@ -19,14 +20,7 @@ let RegisterFrom = (props) => {
     const { RegisterUser,  pristine, reset, submitting, handleSubmit } = props
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(RegisterUser)}>
-            <Grid container spacing={5}>
-                <Grid item xs={12} sm={6}>
-                    {SectionOne({ classes ,"mainProps":props })}
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    {SectionTwo({ classes })}
-                </Grid>
-            </Grid>
+            {LoadGird({classes , props})}
             <div className={classes.buttonStyle}>
                 <center>
                     <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;
@@ -35,6 +29,30 @@ let RegisterFrom = (props) => {
             </div>
         </form>
     </div>
+}
+
+const LoadGird=(propsData)=>{
+    const {classes , props }=propsData
+    // const { GetDomains,GetRoleList,GetSkillSet }= props.MasterDataAction ? propsData.MasterDataAction :{}
+    const { SkillSet,RoleList,Domains}=props.MasterDataSet
+    const { authorization } = props.LoginState
+    async function loadRequiredData(){
+     if(Domains && Domains.length <=0 && props.MasterDataAction)  await props.MasterDataAction.GetDomains(0,20,authorization)
+     if(SkillSet && SkillSet.length <=0 && props.MasterDataAction )  await props.MasterDataAction.GetSkillSet(0,20,authorization)
+     if(RoleList && RoleList.length <=0 && props.MasterDataAction )  await props.MasterDataAction.GetRoleList(0,20,authorization)
+    }
+    useEffect(() => { loadRequiredData() },[Domains,SkillSet,RoleList])
+    console.log("LD",props.MasterDataAction, Domains, SkillSet,RoleList)
+    return <>
+        <Grid container spacing={5}>
+                <Grid item xs={12} sm={6}>
+                    {SectionOne({ classes ,"mainProps":props })}
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    {SectionTwo({ classes })}
+                </Grid>
+            </Grid>
+    </>
 }
 
 const SectionOne = (props) => {
@@ -158,7 +176,10 @@ const OtherInfo = (props) => {
         </AccordionDetails>
     </Accordion>
 }
+const mapDispatchToProps = (dispatch) => ({
+    MasterDataAction: bindActionCreators(MasterDataAction, dispatch),
+})
 
-RegisterFrom = connect(state => { return { ...state } })(RegisterFrom)
+RegisterFrom = connect(state => { return { ...state } },mapDispatchToProps)(RegisterFrom)
 const afterSubmit = (result, dispatch) => dispatch(reset('RegisterFrom'));
 export default reduxForm({ form: 'RegisterFrom', onSubmitSuccess: afterSubmit })(RegisterFrom);

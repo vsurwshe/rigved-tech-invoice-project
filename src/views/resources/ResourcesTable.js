@@ -201,7 +201,7 @@ const EmployeeTable=(propsData)=>{
           getOptionSelected={(options, value) => options.id === value.id}
           getOptionLabel={options => (options && options.title) && options.title}
           onChange={(event, value) => value && props.onChange(value.id)}
-          renderInput={(params) => ( <TextField {...params} label="Expense Type" margin="normal"  /> )}
+          renderInput={(params) => ( <TextField {...params} label="Member Name" margin="normal"  /> )}
         /> 
       }
     },

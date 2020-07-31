@@ -1,50 +1,26 @@
-import {AlertColor} from '../../assets/config/Config';
-import {CONFLICTSTATUS, STATUS200 } from "../../assets/config/CodeMap";
 import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
+import { SuccessFunction, ErrorFunction } from "./CommonAction"
 
 const GetClientList=(firstIndex, lastIndex,authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
             .get('/client/clientList/'+firstIndex+'/'+lastIndex,HeaderConfig(authroizationKey))
-            .then(response => {
-                if(response.status !== STATUS200){
-                    dispatch(loadMessage(AlertColor.danger ,response.headers.message));
-                }else{
-                    dispatch(SaveClientList(response.data))
-                }
-            })
-            .catch(error => { 
-                if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
-                    dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
-                }else{
-                    dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
-                }
-            })
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveClientList, "loadMessage":loadMessage, response}) })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
 
 const SaveClientData=(userData,authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
-        .post('/client/create/',userData,{headers: { 
-            'Content-Type': 'application/json',
-            Authorization: authroizationKey 
-        }})
-        .then(response => {
-            if(response.status !== STATUS200){
-                dispatch(loadMessage(AlertColor.danger ,response.headers.message));
-            }else{
-                dispatch(loadMessage(AlertColor.success,response.headers.message))
-                dispatch(SaveClientList(userData))
+        .post('/client/create/',userData,{
+            headers: { 
+                'Content-Type': 'application/json',
+                Authorization: authroizationKey 
             }
         })
-        .catch(error => { 
-            if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
-                dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
-            }else{
-                dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
-            }
-        })
+        .then(response => { SuccessFunction({ dispatch , "successMethod": SaveClientList, "loadMessage":loadMessage, response, "postMethod":true}) })
+        .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
 
@@ -52,20 +28,15 @@ const GetClientDetailsById=(clientId, authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
             .get('/client/read/'+clientId,HeaderConfig(authroizationKey))
-            .then(response => {
-                if(response.status !== STATUS200){
-                    dispatch(loadMessage(AlertColor.danger ,response.headers.message));
-                }else{
-                    dispatch(SaveClientDetailsById(response.data))
-                }
-            })
-            .catch(error => { 
-                if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
-                    dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
-                }else{
-                    dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
-                }
-        })
+            // .then(response => {
+            //     if(response.status !== STATUS200){
+            //         dispatch(loadMessage(AlertColor.danger ,response.headers.message));
+            //     }else{
+            //         dispatch(SaveClientDetailsById(response.data))
+            //     }
+            // })
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveClientDetailsById, "loadMessage":loadMessage, response}) })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
 
@@ -73,18 +44,8 @@ const DeleteClient=(clientId, authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
         .get('/client/delete/'+clientId,HeaderConfig(authroizationKey))
-        .then(response => {
-            if(response.status !== STATUS200){
-                dispatch(loadMessage(AlertColor.danger ,response.headers.message));
-            }else{
-                dispatch(DeleteClientDetails(response.data))
-        }})
-        .catch(error => { 
-            if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
-                dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
-            }else{
-                dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
-        }})
+        .then(response => { SuccessFunction({ dispatch , "successMethod": DeleteClientDetails, "loadMessage":loadMessage, response}) })
+        .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
 
