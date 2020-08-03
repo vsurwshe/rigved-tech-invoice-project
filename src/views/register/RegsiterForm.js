@@ -40,7 +40,7 @@ const LoadGird = (propsData) => {
             await props.MasterDataAction.GetRoleList(0, 20, authorization)
         }
     }
-    useEffect(() => { loadRequiredData() }, [Domains, SkillSet, RoleList])
+    useEffect(() => { loadRequiredData() })
     return <>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6}>
