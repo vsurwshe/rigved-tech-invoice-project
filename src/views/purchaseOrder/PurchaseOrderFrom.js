@@ -110,7 +110,7 @@ const LoadHeader = (parameter) => {
     return <>
         <h2 className={classes.textField}>{initialValues.clientName}</h2>
         <h4>Purchase Order Number:&nbsp;&nbsp;{initialValues.poNum}</h4>
-        <Field name="poAmount" component={renderTextField} className={classes.textField} label="Puchase Order Amount" helperText={(initialValues === undefined) && "Ex. 10000"} validate={[Required]} />
+        <Field name="poAmount" component={renderTextField} className={classes.textField} label="Puchase Order Amount" helperText={(initialValues === undefined) && "Ex. 10000"} disabled validate={[Required]} />
     </>
 }
 
@@ -119,8 +119,8 @@ const SectionTwo = (data) => {
     const { classes, initialValues } = data
     const { operation } = data.props.stateData
     return <>
-        <Field name="validFrom" component={renderDateTimePicker} className={classes.textField} label="Valid From" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} validate={[Required]} />
-        <Field name="validTo" component={renderDateTimePicker} className={classes.textField} label="Valid to" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} validate={[Required]} />
+        <Field name="validFrom" component={renderDateTimePicker} className={classes.textField} label="Valid From" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} disabled={operation === FromActions.VI} validate={[Required]} />
+        <Field name="validTo" component={renderDateTimePicker} className={classes.textField} label="Valid to" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} disabled={operation === FromActions.VI} validate={[Required]} />
         {operation === FromActions.VI &&<> 
             <Field name="invAmnt" component={renderTextField} disabled={true} className={classes.textField} label="Invoiced Amount" />
             <Field name="balPoAmt" component={renderTextField} disabled={true} className={classes.textField} label="Balance" /></>}

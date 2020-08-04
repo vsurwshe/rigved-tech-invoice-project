@@ -55,7 +55,7 @@ function TablePaginationActions(props) {
 function createData(key, name, email, mobileNum, role) { return { key,name, email, mobileNum, role }; }
 
 const  ContactTable=(props)=>{
-  const {data, operation }= props
+  const {data}= props
   // Creating rows
   const rows=(data && data.length >0 )&& data.map((item,key)=>{ return  createData((key+1),item.name,item.email,item.mobileNum, item.role) });  
   (rows && rows.length > 0) && rows.sort((a, b) => (a.key < b.key ? -1 : 1));

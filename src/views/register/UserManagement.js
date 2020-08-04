@@ -92,7 +92,6 @@ class UserManagement extends Component {
 
     handleAttendanceFileChange=async(event)=>{
         event.preventDefault();
-        console.log("Data",event.target.files)
         let imageFile = event.target.files[0];
         if (imageFile) {
           var reader = new FileReader();

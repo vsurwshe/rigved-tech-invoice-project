@@ -44,6 +44,7 @@ class ProjectManagement extends Component {
         (listOfClient && listOfClient.length === 0) && await GetClientList(0,20,authorization);
         (purchaseOrderList && purchaseOrderList.length === 0) && await GetPurchaseOrderList(0,20,authorization);
         (projectList && projectList.length === 0) && await GetProjectList(0,20,authorization);
+        await loadMessage();
         await this.handleLoadProjectList();
     }
 

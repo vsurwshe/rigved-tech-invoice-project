@@ -15,8 +15,8 @@ const UserActions = (props) => {
     var [isLoading, setIsLoading] = useState(false);
     var [error, setError] = useState(null);
     var [activeTabId, setActiveTabId] = useState(0);
-    var [loginValue, setLoginValue] = useState("ritesh.joshi@rigvedtesh.com");
-    var [passwordValue, setPasswordValue] = useState("tima2209");
+    var [loginValue, setLoginValue] = useState("");
+    var [passwordValue, setPasswordValue] = useState("");
     const data = {
         loginValue,
         passwordValue,

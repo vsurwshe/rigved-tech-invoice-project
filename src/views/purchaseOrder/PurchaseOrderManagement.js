@@ -35,6 +35,7 @@ class PurchaseOrderManagement extends Component {
         if (listOfClient && listOfClient.length === 0) {
             await GetClientList(0, 20, authorization);
         }
+        await loadMessage();
         await this.handleLoadPurchaseOrdertList()
     }
 
