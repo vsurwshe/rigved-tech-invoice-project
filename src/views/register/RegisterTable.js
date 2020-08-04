@@ -9,9 +9,8 @@ import VisibilityIcon from '@material-ui/icons/Visibility';
 
 
 const RegsiterTable=(props)=>{
-    console.log("RT ",props)
     const { userData } = props.LoginState
-    const { fromAction, deleteMethod } = props
+    const { fromAction, deleteMethod, handleAttendance } = props
 
     // creating columns
     const columns = [
@@ -60,6 +59,11 @@ const RegsiterTable=(props)=>{
           onClick: (event, rowData) => { fromAction(null, FromActions.CR); },
           isFreeAction: true,
           tooltip: 'Create Employee'
+        },
+        { icon: () => <div><Button variant="contained" color="primary">Upload Attendance</Button></div>,
+          onClick: (event, rowData) => { handleAttendance()},
+          isFreeAction: true,
+          tooltip: 'Upload Attendance'
         }
       ]}
     />

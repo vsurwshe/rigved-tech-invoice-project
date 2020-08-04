@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Card, CircularProgress } from "@material-ui/core";
+import { Card, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, Button } from "@material-ui/core";
 import { Alert } from '@material-ui/lab';
 import RegsiterForm from './RegsiterForm';
 import { connect } from 'react-redux';
@@ -10,6 +10,8 @@ import { loadMessage } from "../../redux/actions/ClientAction"
 import { API_EXE_TIME } from '../../assets/config/Config';
 import { bindActionCreators } from 'redux';
 import RegisterTable from './RegisterTable';
+import { Field } from 'redux-form';
+import { renderFileInput } from '../utilites/FromUtilites';
 
 class UserManagement extends Component {
     constructor(props){
@@ -21,6 +23,9 @@ class UserManagement extends Component {
             userData:[],
             profileImageUpload:false,
             profileImageUrl:"",
+            attendanceUpload:false,
+            attendanceUrl:"",
+            attendanceModel:false,
         }
     }
 
@@ -30,8 +35,12 @@ class UserManagement extends Component {
     // this function handle the register table loading value
     handleLoadValue=()=>{ this.setState({ load : ! this.state.load })}
 
+    // this handleing the upload to profile image
     handleProfileImageValue=()=>{ this.setState({ profileImageUpload : !this.state.profileImageUpload})}
     
+    // this handleing the upload attendance model
+    handleAttendanceModel=()=>{this.setState({attendanceModel : !this.state.attendanceModel})}
+
     render() { 
         const { fromAction }=this.state
         return fromAction ? this.loadRegisterForm() : this.loadRegisterTable();
@@ -55,13 +64,79 @@ class UserManagement extends Component {
     </Card>
     }
 
-    loadRegisterTable=()=>{
-        return <RegisterTable
-            fromAction={this.handleRegisterFromActions}
+    loadAttendanceModel = () => {
+        const { attendanceModel, projectData, attendanceUrl, attendanceUpload } = this.state
+        
+        return <Dialog open={attendanceModel} keepMounted onClose={this.handleDeleteModel} aria-labelledby="alert-dialog-slide-title" aria-describedby="alert-dialog-slide-description"   >
+            <DialogTitle id="alert-dialog-slide-title">{'Upload excel attendance file'}</DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-slide-description">
+                {(attendanceUrl === "" || attendanceUrl === undefined) ? (attendanceUpload ? this.loadingCircle() : this.loadAttendanceUrl())
+                    : <h5>{this.loadFileUrlName(attendanceUrl)}</h5>}
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={this.handleAttendanceModel} color="primary">Cancel</Button>
+                <Button onClick={event =>this.handleAttendanceFileChange(event)} color="secondary">Upload Attendance</Button>
+            </DialogActions>
+        </Dialog>
+    }
+
+    loadAttendanceUrl=()=><label htmlFor="attendanceFile">
+        <input  name="attendanceFile" type="file" 
+        // onChange={event =>this.handleAttendanceFileChange(event)} 
         />
+    </label>
+
+    loadFileUrlName = (fileUrl) => {
+        let fileArray = fileUrl.split("\\");
+        return fileArray.length > 0 ? fileArray[5] : "";
+    }
+
+    handleAttendanceFileChange=async(event)=>{
+        event.preventDefault();
+        let imageFile = event.target.files[0];
+        if (imageFile) {
+          var reader = new FileReader();
+          reader.onload =async()=>{
+            let byteArray=reader.result.split(",")
+            this.uploadAttendanceFile(byteArray.length >0 && byteArray[1],imageFile.name,imageFile.type)
+          };
+          reader.onerror = function (error) { console.log('Error: ', error); };
+          await reader.readAsDataURL(imageFile);
+        }
+    }
+
+    loadRegisterTable=()=>{
+        return <>
+        {this.loadAttendanceModel()}
+        <RegisterTable
+            fromAction={this.handleRegisterFromActions}
+            handleAttendance={this.handleAttendanceModel}
+        />
+        </>
     }
 
     clearFileUrl=()=>{ this.setState({profileImageUrl:""}) }
+
+    uploadAttendanceFile=async(fileData,name,type)=>{
+        const {SaveFileDetails, SaveFileData}= this.props.FileAction
+        const { authorization } = this.props.LoginState
+        let newFileData=[{
+            "fileName":name,
+	        "description":"ClientDetail",
+	        "contentType":'png',
+	        "content":`${fileData}`
+        }]
+        await this.handleProfileImageValue();
+        await SaveFileDetails(newFileData, authorization)
+        setTimeout(async () => {
+            await loadMessage()
+            await SaveFileData();
+            await this.handleProfileImageValue();
+        }, API_EXE_TIME)
+        this.setState({profileImageUrl : (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length >0)  && this.props.FileState.fileUrl[0]})
+    }
 
     uploadProfileImageFile=async(fileData,name,type)=>{
         const {SaveFileDetails, SaveFileData}= this.props.FileAction
