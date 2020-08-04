@@ -116,10 +116,10 @@ const SectionTwo = (data) => {
     const { uploadFile } = data.props
     const { operation, projectContractFileUrl, projectContractFileUpload } = data.props.stateData
     return <>
-        <Field name="projectStartDate" component={renderDateTimePicker} className={classes.textField} label="Start Date" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} validate={[Required]} />
-        <Field name="projectEndDate" component={renderDateTimePicker} className={classes.textField} label="End Date" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} validate={[Required]} />
-        <Field name="projectCost" component={renderNumberField} className={classes.textField} label="Project Cost" helperText={(initialValues === undefined) && "Ex. 20000"} validate={[Required]} />
-        <Field name="projectDesc" component={renderTextAreaField} fullWidth maxRows={2} label="Project Description" />
+        <Field name="projectStartDate" component={renderDateTimePicker} className={classes.textField} label="Start Date" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} disabled={operation === FromActions.VI} validate={[Required]} />
+        <Field name="projectEndDate" component={renderDateTimePicker} className={classes.textField} label="End Date" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} disabled={operation === FromActions.VI} validate={[Required]} />
+        <Field name="projectCost" component={renderNumberField} className={classes.textField} label="Project Cost" helperText={(initialValues === undefined) && "Ex. 20000"} disabled={operation === FromActions.VI} validate={[Required]} />
+        <Field name="projectDesc" component={renderTextAreaField} fullWidth maxRows={2} label="Project Description" disabled={operation === FromActions.VI} />
         {operation === FromActions.CR &&
             <>{(projectContractFileUpload) ? loadingCircle()
                 : (projectContractFileUrl ? LoadFileUrl({ "url": projectContractFileUrl, "cid": 1, "mainProps": data, "componentName": "Purchase Order Image", "style": { height: "60%", width: "100%" } })

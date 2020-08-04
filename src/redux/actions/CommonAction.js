@@ -1,5 +1,5 @@
 import {AlertColor} from '../../assets/config/Config';
-import {CONFLICTSTATUS, STATUS200, UNAUTHORIZEDSTATUS, STATUS204 } from "../../assets/config/CodeMap";
+import {CONFLICTSTATUS, STATUS200, UNAUTHORIZEDSTATUS } from "../../assets/config/CodeMap";
 import {setAuthrizations} from "./LoginAction"
 
 const SuccessFunction=(props)=>{

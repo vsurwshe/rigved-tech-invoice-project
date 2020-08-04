@@ -67,14 +67,41 @@ let ResourcesTable=(props)=>{
 
     // creating columns
     const columns = [
+      {title: "",field:"accountId", hidden:true},
       { title: 'Emp\u00a0Id', field: 'employeeNumber', width: 20 },
       { title: 'Name', field: 'name' },
       { title: 'Domain', field: 'domain' },
       { title: 'Category', field: 'category' },
       { title: 'Experience', field: 'experience' },
       { title: 'Skill', field: 'skill' },
-      { title: 'Onboarding\u00a0Date', field: 'onbordaingDate' },
-      { title: 'Exit\u00a0Date', field: 'exitDate' },
+      { title: 'Onboarding\u00a0Date', 
+        field: 'onbordaingDate',
+        editComponent: props=>{
+          return <TextField
+                id="onbordaingDate"
+                label="Onbordaing Date"
+                type="date"
+                value={props.value}
+                onChange={e => props.onChange(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                required={true}
+            />
+        } 
+      },
+      { title: 'Exit\u00a0Date', 
+        field: 'exitDate',
+        editComponent: props=>{
+          return <TextField
+                id="exitDate"
+                label="Exit Date"
+                type="date"
+                value={props.value}
+                onChange={e => props.onChange(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                required={true}
+            />
+        } 
+      }
     ];
 
   // Creating rows
@@ -82,6 +109,7 @@ let ResourcesTable=(props)=>{
     let tempData=(item && item.List.length>0) && item.List.map((subitem,key)=>{
       return  { 
         "data": subitem,
+        "accountId":(subitem && subitem.accountId)? subitem.accountId:"",
         "domain":subitem.domain, 
         "employeeNumber":subitem.employeeNumber, 
         "name":subitem.firstName+" "+subitem.lastName, 
@@ -112,6 +140,40 @@ return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
             tooltip: 'Assign Resource'
           }
         ]}
+        editable={{
+          isEditable: rowData => true, 
+          isEditHidden: rowData => false,
+          isDeletable: rowData => false,
+          isDeleteHidden: rowData => true,
+          onRowUpdate: (newData, oldData) =>{
+            return new Promise(async(resolve, reject) => {
+              console.log("Data",newData, oldData)
+              setTimeout(async()=>{
+                //       // await GetExpensesListByProjectId(0,20,projectId, authorization)
+                //       // await SaveFileData();
+                resolve();
+              },API_EXE_TIME)
+            })
+          },
+              // return new Promise(async(resolve, reject) => {
+          //     // const { SaveFileData }= props.FileAction
+          //     // let newExpenseData={
+          //     //   ...newData,
+          //     //   "active":true,
+          //     //   "project":{ "id":projectId },
+          //     //   "expType":{ "id":newData.expType},
+          //     //   "attachmentUrl":  (props.FileState && props.FileState.fileUrl && props.FileState.fileUrl.length > 0 ) ? props.FileState.fileUrl[0] :""
+          //     // }
+          //     // await SaveExpenseRecord([newExpenseData],authorization);
+          //     setTimeout(async()=>{
+          //       // await GetExpensesListByProjectId(0,20,projectId, authorization)
+          //       // await SaveFileData();
+          //       resolve();
+          //     },API_EXE_TIME)
+          // })
+          // },
+          onRowDelete: oldData =>{}
+        }}
       />
   </div>
 </>
