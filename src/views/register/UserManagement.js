@@ -9,24 +9,32 @@ import * as FileAction from "../../redux/actions/FileAction"
 import { loadMessage } from "../../redux/actions/ClientAction"
 import { API_EXE_TIME } from '../../assets/config/Config';
 import { bindActionCreators } from 'redux';
+import RegisterTable from './RegisterTable';
 
 class UserManagement extends Component {
     constructor(props){
         super(props);
         this.state = { 
             load: false,
+            fromAction:false,
+            operation:"",
+            userData:[],
             profileImageUpload:false,
             profileImageUrl:"",
         }
     }
+
+    // this method used for the from actions in project 
+    handleRegisterFromActions = (userData,operation) => { this.setState({ fromAction: !this.state.fromAction, userData, operation}) }
     
+    // this function handle the register table loading value
     handleLoadValue=()=>{ this.setState({ load : ! this.state.load })}
 
     handleProfileImageValue=()=>{ this.setState({ profileImageUpload : !this.state.profileImageUpload})}
     
     render() { 
-        const { load }=this.state
-        return load ? this.loadingCircle() : this.loadRegisterForm();
+        const { fromAction }=this.state
+        return fromAction ? this.loadRegisterForm() : this.loadRegisterTable();
     }
 
     loadRegisterForm=()=>{
@@ -42,8 +50,15 @@ class UserManagement extends Component {
             profileImageUploadMethod={this.uploadProfileImageFile} 
             clearFile={this.clearFileUrl}
             RegisterUser={(values) => { this.RegisterUser(values) }} 
+            cancle={this.handleRegisterFromActions}
         />
     </Card>
+    }
+
+    loadRegisterTable=()=>{
+        return <RegisterTable
+            fromAction={this.handleRegisterFromActions}
+        />
     }
 
     clearFileUrl=()=>{ this.setState({profileImageUrl:""}) }
