@@ -10,8 +10,6 @@ import { loadMessage } from "../../redux/actions/ClientAction"
 import { API_EXE_TIME } from '../../assets/config/Config';
 import { bindActionCreators } from 'redux';
 import RegisterTable from './RegisterTable';
-import { Field } from 'redux-form';
-import { renderFileInput } from '../utilites/FromUtilites';
 
 class UserManagement extends Component {
     constructor(props){
@@ -41,6 +39,9 @@ class UserManagement extends Component {
     // this handleing the upload attendance model
     handleAttendanceModel=()=>{this.setState({attendanceModel : !this.state.attendanceModel})}
 
+    //this method will used for the handling attendance upload
+    handleAttendanceUpload=()=>{this.setState({attendanceUpload : !this.state.attendanceUpload})}
+
     render() { 
         const { fromAction }=this.state
         return fromAction ? this.loadRegisterForm() : this.loadRegisterTable();
@@ -65,9 +66,8 @@ class UserManagement extends Component {
     }
 
     loadAttendanceModel = () => {
-        const { attendanceModel, projectData, attendanceUrl, attendanceUpload } = this.state
-        
-        return <Dialog open={attendanceModel} keepMounted onClose={this.handleDeleteModel} aria-labelledby="alert-dialog-slide-title" aria-describedby="alert-dialog-slide-description"   >
+        const { attendanceModel, attendanceUrl, attendanceUpload } = this.state
+        return <Dialog open={attendanceModel} keepMounted onClose={this.handleAttendanceModel} aria-labelledby="alert-dialog-slide-title" aria-describedby="alert-dialog-slide-description"   >
             <DialogTitle id="alert-dialog-slide-title">{'Upload excel attendance file'}</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
@@ -77,15 +77,12 @@ class UserManagement extends Component {
             </DialogContent>
             <DialogActions>
                 <Button onClick={this.handleAttendanceModel} color="primary">Cancel</Button>
-                <Button onClick={event =>this.handleAttendanceFileChange(event)} color="secondary">Upload Attendance</Button>
             </DialogActions>
         </Dialog>
     }
 
     loadAttendanceUrl=()=><label htmlFor="attendanceFile">
-        <input  name="attendanceFile" type="file" 
-        // onChange={event =>this.handleAttendanceFileChange(event)} 
-        />
+        <input  name="attendanceFile" type="file"  onChange={event =>this.handleAttendanceFileChange(event)} />
     </label>
 
     loadFileUrlName = (fileUrl) => {
@@ -95,6 +92,7 @@ class UserManagement extends Component {
 
     handleAttendanceFileChange=async(event)=>{
         event.preventDefault();
+        console.log("Data",event.target.files)
         let imageFile = event.target.files[0];
         if (imageFile) {
           var reader = new FileReader();
@@ -124,18 +122,19 @@ class UserManagement extends Component {
         const { authorization } = this.props.LoginState
         let newFileData=[{
             "fileName":name,
-	        "description":"ClientDetail",
-	        "contentType":'png',
+	        "description":"attendance",
+	        "contentType":'xls',
 	        "content":`${fileData}`
         }]
-        await this.handleProfileImageValue();
+        await this.handleAttendanceUpload();
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
             await loadMessage()
             await SaveFileData();
-            await this.handleProfileImageValue();
+            await this.handleAttendanceUpload();
+            await this.handleAttendanceModel();
         }, API_EXE_TIME)
-        this.setState({profileImageUrl : (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length >0)  && this.props.FileState.fileUrl[0]})
+        this.setState({attendanceUrl : (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length >0)  && this.props.FileState.fileUrl[0]})
     }
 
     uploadProfileImageFile=async(fileData,name,type)=>{

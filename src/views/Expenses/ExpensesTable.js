@@ -90,13 +90,14 @@ const ExpensesTable = (props) => {
               type="date"
               onChange={e => props.onChange(e.target.value)}
               InputLabelProps={{ shrink: true }}
+              required={true}
           />
       }
     }
   ];
 
   const loadFileUrlName=(fileUrl)=>{
-    let fileArray=fileUrl.split("\\");
+    let fileArray=fileUrl && fileUrl.split("\\");
     return fileArray.length > 0 ? fileArray[5]: "";
   }
 
@@ -170,8 +171,8 @@ const ExpensesTable = (props) => {
             }
             await SaveExpenseRecord([newExpenseData],authorization);
             setTimeout(async()=>{
-              await GetExpensesListByProjectId(0,20,projectId, authorization)
               await loadMessage();
+              await GetExpensesListByProjectId(0,20,projectId, authorization)
               await SaveFileData();
               resolve();
             },API_EXE_TIME)
