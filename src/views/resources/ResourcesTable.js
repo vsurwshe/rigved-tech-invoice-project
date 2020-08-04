@@ -54,6 +54,7 @@ let ResourcesTable=(props)=>{
     if((exitsEmployeeListByPojectId === false || exitsEmployeeListByPojectId.length <=0) && countCall===0){
       setCountCall(countCall + 1)
       GetEmployeeListByProjectId(0,20,projectId,authorization);
+      loadMessage();
       exitsEmployeeListByPojectId=(employeeListByPojectId && employeeListByPojectId.length > 0)&& employeeListByPojectId.filter(item=> item.projectId ===projectId);
     }
 
@@ -61,6 +62,7 @@ let ResourcesTable=(props)=>{
     if(countCallRateCard === 0 && clientId){
       setCountRateCardCall(countCallRateCard+1);
       GetClientDetailsById(clientId,authorization)
+      loadMessage();
     }
 
     // creating columns
@@ -210,7 +212,7 @@ const EmployeeTable=(propsData)=>{
       editComponent: props=>{
         return <TextField
               id="onbordaingDate"
-              label="Expense Date"
+              label="Onbordaing Date"
               type="date"
               onChange={e => props.onChange(e.target.value)}
               InputLabelProps={{ shrink: true }}

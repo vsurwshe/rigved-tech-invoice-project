@@ -12,6 +12,7 @@ import ExpensesTable from '../Expenses/ExpensesTable';
 import ResourcesTable from '../resources/ResourcesTable';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
+import { Alert } from '@material-ui/lab';
 
 let ProjectForm = (props) => {
     var classes = useStyles();
@@ -34,9 +35,12 @@ let ProjectForm = (props) => {
 
 const LoadGird = (props) => {
     var classes = useStyles();
+    const {color, common_message}=props.ClientState
+    console.log("props ",props, props.ClientState)
     const { initialValues } = props
     return <><Grid container spacing={5}>
-    </Grid>
+        {(common_message)&&<center><Alert color={color}>{common_message}</Alert></center>}
+        </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 20 }}>
                 {SectionOne({ classes, props, initialValues })}

@@ -126,6 +126,7 @@ const ExpensesTable = (props) => {
 	      "content":`${fileData}`
       }]
        await SaveFileDetails (newFileData, authorization)
+       await loadMessage();
        return '';
   }
 
@@ -171,7 +172,6 @@ const ExpensesTable = (props) => {
             }
             await SaveExpenseRecord([newExpenseData],authorization);
             setTimeout(async()=>{
-              await loadMessage();
               await GetExpensesListByProjectId(0,20,projectId, authorization)
               await SaveFileData();
               resolve();
