@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as PurchaseOrderAction from '../../redux/actions/PurchaseOrderAction'
 import * as FileAction from '../../redux/actions/FileAction'
+import * as ClientAction from "../../redux/actions/ClientAction"
 import { loadMessage } from '../../redux/actions/ClientAction'
 import { bindActionCreators } from 'redux';
 import { Card, Dialog, DialogTitle, DialogContent, DialogContentText, Button, CircularProgress, DialogActions } from '@material-ui/core';
@@ -24,22 +25,29 @@ class PurchaseOrderManagement extends Component {
     componentDidMount = async () => {
         const { purchaseOrderList } = this.props.PurchaseOrderState
         const { authorization } = this.props.LoginState
+        const { listOfClient } = this.props.ClientState
         const { GetPurchaseOrderList } = this.props.PurchaseOrderAction
+        const { GetClientList }=this.props.ClientAction
+        await this.handleLoadPurchaseOrdertList()
         if (purchaseOrderList && purchaseOrderList.length === 0) {
             await GetPurchaseOrderList(0, 20, authorization);
         }
+        if (listOfClient && listOfClient.length === 0) {
+            await GetClientList(0, 20, authorization);
+        }
+        await this.handleLoadPurchaseOrdertList()
     }
 
-    componentWillReceiveProps = () => {
+    componentWillReceiveProps = async() => {
         const { purchaseOrderDetails } = this.props.location
         const { puchaseOrderData } = this.state
         if (purchaseOrderDetails && purchaseOrderDetails.length > 0 && puchaseOrderData && puchaseOrderData.length <= 0) {
-            this.handleCreatePurchaseOrder(purchaseOrderDetails[0], FromActions.VI);
+            await this.handleCreatePurchaseOrder(purchaseOrderDetails[0], FromActions.VI);
         }
     }
 
     // this method used for the create client from
-    handleCreatePurchaseOrder = (puchaseOrderData, operation) => { console.log("Called CR", operation); this.setState({ createPuchaseOrder: !this.state.createPuchaseOrder, puchaseOrderData, operation }) }
+    handleCreatePurchaseOrder = (puchaseOrderData, operation) => {this.setState({ createPuchaseOrder: !this.state.createPuchaseOrder, puchaseOrderData, operation }) }
 
     // this method used for the progress bar 
     handleLoadPurchaseOrdertList = () => { this.setState({ loadPuchaseOrderList: !this.state.loadPuchaseOrderList }) }
@@ -117,7 +125,7 @@ class PurchaseOrderManagement extends Component {
     // this method main framework which calling load PurchaseOrder table method
     loadPurchaseOrder = () => {
         const { loadPuchaseOrderList } = this.state
-        return < div style={{ paddingRight: 10 }}>  {loadPuchaseOrderList ? this.loadingCircle() : this.loadingPurchaseOrderTable()} </div>
+        return <div>  {loadPuchaseOrderList ? this.loadingCircle() : this.loadingPurchaseOrderTable()} </div>
     }
 
     // this method used for load the client table
@@ -137,7 +145,7 @@ class PurchaseOrderManagement extends Component {
     // this method used for the save the client details
     SavePODetails = async (sendUserValues) => {
         const { purchaseOrderFileUrl } = this.state
-        const { SavePurchaseOrderDetails, loadMessage, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
+        const { SavePurchaseOrderDetails, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
         const { authorization } = this.props.LoginState
         const newUserData = {
             ...sendUserValues,
@@ -154,7 +162,7 @@ class PurchaseOrderManagement extends Component {
 
     // this method will used for the deleting the purchase order details
     DeletePurchaseOrderDetails = async (purchaseOrderId) => {
-        const { DeletePurchaseOrder, loadMessage, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
+        const { DeletePurchaseOrder, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
         const { authorization } = this.props.LoginState
         await this.handleLoadPurchaseOrdertList();
         purchaseOrderId && await DeletePurchaseOrder(purchaseOrderId, authorization);
@@ -170,6 +178,7 @@ class PurchaseOrderManagement extends Component {
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({
     PurchaseOrderAction: bindActionCreators(PurchaseOrderAction, dispatch),
-    FileAction: bindActionCreators(FileAction, dispatch)
+    FileAction: bindActionCreators(FileAction, dispatch),
+    ClientAction: bindActionCreators(ClientAction,dispatch)
 })
 export default connect(mapStateToProps, mapDispatchToProps)(PurchaseOrderManagement);

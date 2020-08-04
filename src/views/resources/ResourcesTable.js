@@ -13,6 +13,7 @@ import TextField from '@material-ui/core/TextField';
 import { FromActions, API_EXE_TIME } from '../../assets/config/Config';
 import { bindActionCreators } from 'redux';
 import ResourceRateCardTable from "./ResourceRateCardTable";
+import { loadMessage } from "../../redux/actions/ClientAction";
 import moment from 'moment';
 
 
@@ -103,7 +104,7 @@ return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
           search: false
         }}
         actions={[
-          { icon: () => {return (operation && (operation === FromActions.ED || operation === FromActions.CR)) ?  <div><Button variant="contained" color="primary">Assign Resource</Button></div> : ""},
+          { icon: () => {return (operation && (operation === FromActions.ED || operation === FromActions.VIED)) ?  <div><Button variant="contained" color="primary">Assign Resource</Button></div> : ""},
             onClick: (event, rowData) => { handleClickOpen() },
             isFreeAction: true,
             tooltip: 'Assign Resource'
@@ -167,6 +168,7 @@ const saveAssignResource=async(propsData)=>{
   const {newResourceData,setLoad,SaveEmployeeRecord,GetEmployeeListByProjectId,authorization,handleClose }=propsData
   if(newResourceData){
     await SaveEmployeeRecord(newResourceData,authorization);
+    await loadMessage();
     await GetEmployeeListByProjectId(0,20,newResourceData.projectId,authorization);
     await setLoad(false);
     await handleClose();
@@ -199,7 +201,7 @@ const EmployeeTable=(propsData)=>{
           getOptionSelected={(options, value) => options.id === value.id}
           getOptionLabel={options => (options && options.title) && options.title}
           onChange={(event, value) => value && props.onChange(value.id)}
-          renderInput={(params) => ( <TextField {...params} label="Expense Type" margin="normal"  /> )}
+          renderInput={(params) => ( <TextField {...params} label="Member Name" margin="normal"  /> )}
         /> 
       }
     },

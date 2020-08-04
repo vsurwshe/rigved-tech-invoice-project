@@ -3,7 +3,7 @@ import { reset, reduxForm, Field } from 'redux-form';
 import { connect } from 'react-redux';
 import { Button, Grid, CircularProgress } from '@material-ui/core';
 import useStyles from "../client/Styles";
-import { renderTextField, renderDateTimePicker, renderFileInput } from '../utilites/FromUtilites';
+import { renderTextField, renderDateTimePicker, renderFileInput, renderAutocomplete } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
 import { FromActions } from '../../assets/config/Config';
 import * as FileAction from "../../redux/actions/FileAction";
@@ -57,14 +57,12 @@ const SectionOne = (data) => {
     const { uploadFile } = data.props
     const { operation, purchaseOrderFileUrl, purchaseOrderFileUpload } = data.props.stateData
     return <>
-        {operation === FromActions.CR ? LoadFields({ classes }) : LoadHeader({ classes, initialValues })}
-        <Field name="poAmount" component={renderTextField} className={classes.textField} label="Puchase Order Amount" helperText={(initialValues === undefined) && "Ex. 10000"} validate={[Required]} />
+        {operation === FromActions.CR ? LoadFields({ classes,"mainProps":data.props }) : LoadHeader({ classes, initialValues })}
         {operation === FromActions.CR &&
             <>{(purchaseOrderFileUpload) ? loadingCircle()
                 : (purchaseOrderFileUrl ? LoadFileUrl({ "url": purchaseOrderFileUrl, "cid": 1, "props": data, "componentName": "Purchase Order Image", "style": { height: "50%", width: "70%" } })
                     : <Field name="poCntrUrl" component={renderFileInput} fullWidth type="file" successFunction={uploadFile} lable="Purchase Order File" />)
-            }</>
-        }
+            }</>}
     </>
 }
 
@@ -88,10 +86,21 @@ const loadingCircle = () => <center> Uploading <CircularProgress size={40} /> </
 
 // this method used for the load the fileds value for name and purchase order number
 const LoadFields = (parameter) => {
-    const { classes } = parameter
+    const { classes,initialValues } = parameter
+    const { listOfClient }=parameter.mainProps.ClientState
+    let clientOptions = listOfClient.length > 0 && listOfClient.map((item, key) => {
+        return { title: item.clientName ? item.clientName : "", id: item.id }
+    })
     return <>
-        <Field name="poNum" component={renderTextField} fullWidth label="Purchase Order Number" helperText="Ex. po121-20/21" validate={[Required]} />
-        <Field name="clientName" component={renderTextField} className={classes.textField}  label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." validate={[Required]} />
+        <Field name="poNum" component={renderTextField} fullWidth label="Purchase Order Number" helperText="Ex. po121-20/21" validate={[Required]} />    
+        <Grid container spacing={5}>
+            <Grid item xs={12} sm={6}>
+                <Field name="clientName" component={renderAutocomplete} optionData={clientOptions} label="Client Name" validate={[Required]} />    
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <Field name="poAmount" component={renderTextField} className={classes.textField} label="Puchase Order Amount" helperText={(initialValues === undefined) && "Ex. 10000"} validate={[Required]} />
+            </Grid>
+        </Grid>
     </>
 }
 
@@ -101,6 +110,7 @@ const LoadHeader = (parameter) => {
     return <>
         <h2 className={classes.textField}>{initialValues.clientName}</h2>
         <h4>Purchase Order Number:&nbsp;&nbsp;{initialValues.poNum}</h4>
+        <Field name="poAmount" component={renderTextField} className={classes.textField} label="Puchase Order Amount" helperText={(initialValues === undefined) && "Ex. 10000"} validate={[Required]} />
     </>
 }
 
@@ -129,8 +139,6 @@ const SectionThree = (data) => {
     })
 }
 
-// make the selector 
-// const selector = formValueSelector('PurchaseOrderForm')
 PurchaseOrderForm = connect(state => { return { ...state } }, FileAction)(PurchaseOrderForm)
 const afterSubmit = (result, dispatch) => dispatch(reset('PurchaseOrderForm'));
 export default reduxForm({ form: 'PurchaseOrderForm', onSubmitSuccess: afterSubmit })(PurchaseOrderForm);

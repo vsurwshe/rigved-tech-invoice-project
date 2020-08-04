@@ -12,6 +12,7 @@ import { bindActionCreators } from 'redux';
 import { API_EXE_TIME } from '../../assets/config/Config';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import { FromActions } from '../../assets/config/Config';
 
 class ProjectManagement extends Component {
     state = { 
@@ -59,7 +60,7 @@ class ProjectManagement extends Component {
     handleProjectContractFileUplaod=()=>{ this.setState({projectContractFileUpload : !this.state.projectContractFileUpload})}
 
     // this method used for the after saving project record showing the tabs
-    handleShowTabs=()=>{this.setState({ showTabs : !this.state.showTabs})}
+    handleShowTabs=(operation)=>{this.setState({ showTabs : !this.state.showTabs, operation})}
 
     render() { 
         const {fromAction, projectData}=this.state
@@ -128,6 +129,7 @@ class ProjectManagement extends Component {
         />
     </>
     }
+    
     // this method used for the show circular progress bar 
     loadingCircle = () => <center> <h3>Project Management</h3> <CircularProgress size={80} /> </center>
 
@@ -162,7 +164,7 @@ class ProjectManagement extends Component {
         setTimeout(async () => {
             await loadMessage()
             await GetProjectList(0, 20, authorization);
-            this.handleShowTabs();
+            this.handleShowTabs(FromActions.VIED);
         }, API_EXE_TIME)
     }
 

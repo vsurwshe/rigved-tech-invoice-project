@@ -56,7 +56,7 @@ const LoadGird = (props) => {
 const SectionOne = (data) => {
     const { classes, initialValues } = data
     const { operation } = data.props.stateData
-    return <> {operation === FromActions.CR ? LoadFields({ classes, "mainProps": data.props }) : LoadHeader({ classes, initialValues, "mainProps": data.props })}</>
+    return <> {(operation === FromActions.CR || operation === FromActions.VIED ) ? LoadFields({ classes, "mainProps": data.props }) : LoadHeader({ classes, initialValues, "mainProps": data.props })}</>
 }
 
 // this method will used for showing fileds as per operations

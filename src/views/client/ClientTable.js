@@ -52,7 +52,7 @@ const  ClientTable=(props)=>{
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' }
       }}
       actions={[
-        {icon: () =><Button variant="contained" color="primary">Create Client</Button>,
+        {icon: () =><div><Button variant="contained" color="primary">Create Client</Button></div>,
           onClick: (event, rowData) => { createClient(null,"create"); },
           isFreeAction: true,
           tooltip: 'Create Client'}
@@ -60,6 +60,5 @@ const  ClientTable=(props)=>{
     />
   </div>
 }
-
 const mapStateToProps = state => { return state; };
 export default connect(mapStateToProps)(ClientTable);

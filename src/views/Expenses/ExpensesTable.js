@@ -152,7 +152,7 @@ const ExpensesTable = (props) => {
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
         search: false
       }}
-      icons={{Add: () => {return (operation && (operation === FromActions.ED || operation === FromActions.CR)) ? <Button variant="contained" color="primary">Add Expense</Button> : ""}}}
+      icons={{Add: () => {return (operation && (operation === FromActions.ED || operation === FromActions.VIED)) ? <Button variant="contained" color="primary">Add Expense</Button> : ""}}}
       editable={{
         isEditable: rowData => false, 
         isEditHidden: rowData => true,
@@ -170,8 +170,8 @@ const ExpensesTable = (props) => {
             }
             await SaveExpenseRecord([newExpenseData],authorization);
             setTimeout(async()=>{
-              await loadMessage();
               await GetExpensesListByProjectId(0,20,projectId, authorization)
+              await loadMessage();
               await SaveFileData();
               resolve();
             },API_EXE_TIME)

@@ -1,8 +1,6 @@
 const initialState = {
     purchaseOrderList: [],
-    purchaseOrderDetails: [],
-    common_message: "",
-    color: ""
+    purchaseOrderDetails: []
 }
 
 const PurchaseOrderState = (state = initialState, action) => {
@@ -11,8 +9,6 @@ const PurchaseOrderState = (state = initialState, action) => {
             return { ...state, purchaseOrderList: action.purchaseOrderList }
         case "SAVE_PURCHASE_ORDER_DATA":
             return { ...state, purchaseOrderDetails: action.purchaseOrderData }
-        case "CHANGE_MASSAGE":
-            return { ...state, common_message: action.message, color: action.color }
         default:
             return state;
     }
