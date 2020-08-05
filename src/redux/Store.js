@@ -10,6 +10,7 @@ import PurchaseOrderState from "./reducer/PurchaseOrderState";
 import ProjectState from "./reducer/ProjectState";
 import ExpenseState from"./reducer/ExpenseState";
 import EmpolyeeState from "./reducer/EmployeeState"
+import InvoiceState from "./reducer/InvoiceState"
 
 // this function save state into local storage.
 const saveToLocalStorage=(state)=>{
@@ -51,7 +52,8 @@ const reducer = combineReducers({
   ExpenseState,
   EmpolyeeState,
   MasterDataSet,
-  PurchaseOrderState
+  PurchaseOrderState,
+  InvoiceState
 });
 
 // this functions apply logger funtionality during development mode 
