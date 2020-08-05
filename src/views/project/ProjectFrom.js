@@ -36,7 +36,6 @@ let ProjectForm = (props) => {
 const LoadGird = (props) => {
     var classes = useStyles();
     const {color, common_message}=props.ClientState
-    console.log("props ",props, props.ClientState)
     const { initialValues } = props
     return <><Grid container spacing={5}>
         {(common_message)&&<center><Alert color={color}>{common_message}</Alert></center>}

@@ -67,13 +67,14 @@ let ResourcesTable=(props)=>{
 
     // creating columns
     const columns = [
-      {title: "",field:"accountId", hidden:true},
-      { title: 'Emp\u00a0Id', field: 'employeeNumber', width: 20 },
-      { title: 'Name', field: 'name' },
-      { title: 'Domain', field: 'domain' },
-      { title: 'Category', field: 'category' },
-      { title: 'Experience', field: 'experience' },
-      { title: 'Skill', field: 'skill' },
+      { title: "",  field:"accountId", hidden:true},
+      { title: "",  field:"projectId", hidden:true},
+      { title: 'Emp\u00a0Id', field: 'employeeNumber', width: 20, editable:"never" },
+      { title: 'Name', field: 'name', editable:"never" },
+      { title: 'Domain', field: 'domain', editable:"never" },
+      { title: 'Category', field: 'category', editable:"never" },
+      { title: 'Experience', field: 'experience', editable:"never" },
+      { title: 'Skill', field: 'skill', editable:"never" },
       { title: 'Onboarding\u00a0Date', 
         field: 'onbordaingDate',
         editComponent: props=>{
@@ -109,6 +110,7 @@ let ResourcesTable=(props)=>{
     let tempData=(item && item.List.length>0) && item.List.map((subitem,key)=>{
       return  { 
         "data": subitem,
+        "projectId":projectId ? projectId: "",
         "accountId":(subitem && subitem.accountId)? subitem.accountId:"",
         "domain":subitem.domain, 
         "employeeNumber":subitem.employeeNumber, 
@@ -147,31 +149,33 @@ return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
           isDeleteHidden: rowData => true,
           onRowUpdate: (newData, oldData) =>{
             return new Promise(async(resolve, reject) => {
-              console.log("Data",newData, oldData)
-              setTimeout(async()=>{
-                //       // await GetExpensesListByProjectId(0,20,projectId, authorization)
-                //       // await SaveFileData();
-                resolve();
-              },API_EXE_TIME)
+              const { clientDataById }=props.ClientState
+              const { authorization }=props.LoginState
+              const { SaveEmployeeRecord }=props.EmployeeAction
+              const { id }=(clientDataById && clientDataById.rateCardDtos && clientDataById.rateCardDtos.length >0) ? clientDataById.rateCardDtos[0]: ""   
+              if(newData){
+                let resourceData={
+                  "employeeList": [
+                    {
+                      "accountId":newData && newData.accountId,
+                      "rateCardId": id && id,
+                      "onbordaingDate": newData && newData.onbordaingDate,
+                      "exitDate": newData && newData.exitDate
+                    }
+                  ],
+                  "projectId": newData && newData.projectId,
+                  "active": 1
+                }
+                await SaveEmployeeRecord(resourceData,authorization);
+                setTimeout(async()=>{
+                  await GetEmployeeListByProjectId(0,20,newData.projectId,authorization);
+                  resolve();
+                },API_EXE_TIME)
+              }else{
+                reject();
+              }
             })
           },
-              // return new Promise(async(resolve, reject) => {
-          //     // const { SaveFileData }= props.FileAction
-          //     // let newExpenseData={
-          //     //   ...newData,
-          //     //   "active":true,
-          //     //   "project":{ "id":projectId },
-          //     //   "expType":{ "id":newData.expType},
-          //     //   "attachmentUrl":  (props.FileState && props.FileState.fileUrl && props.FileState.fileUrl.length > 0 ) ? props.FileState.fileUrl[0] :""
-          //     // }
-          //     // await SaveExpenseRecord([newExpenseData],authorization);
-          //     setTimeout(async()=>{
-          //       // await GetExpensesListByProjectId(0,20,projectId, authorization)
-          //       // await SaveFileData();
-          //       resolve();
-          //     },API_EXE_TIME)
-          // })
-          // },
           onRowDelete: oldData =>{}
         }}
       />
