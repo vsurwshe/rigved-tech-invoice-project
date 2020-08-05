@@ -12,6 +12,15 @@ const GetPurchaseOrderList=(firstIndex, lastIndex,authroizationKey)=>{
     }
 }
 
+const GetPurchaseOrderListByName=(firstIndex, lastIndex,clientName,authroizationKey)=>{
+    let newClientName=clientName.replace(/\s+/g, '');
+    return(dispatch)=>{
+        return CreateInstance()
+        .get('/purchaseOrder/search/'+newClientName+'/'+firstIndex+'/'+lastIndex,HeaderConfig(authroizationKey))
+        .then(response => { SuccessFunction({ dispatch , "successMethod": SavePurchaseOrderListByName, "loadMessage":loadMessage, response}) })
+        .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
 
 const SavePurchaseOrderDetails=(userData,authroizationKey)=>{
     return(dispatch)=>{
@@ -43,6 +52,13 @@ export function SavePurchaseOrderList(purchaseOrderList){
     }
 }
 
+export function SavePurchaseOrderListByName(purchaseOrderList){
+    return{
+        type:"SAVE_PURCHASE_ORDER_LIST_BY_NAME",
+        purchaseOrderList
+    }
+}
+
 export function SavePurchaseOrderData(purchaseOrderData){
     return{
         type:"SAVE_PURCHASE_ORDER_DATA",
@@ -60,5 +76,6 @@ export function DeletePurchaseOrderDetails(purchaseOrderDetails){
 export {
     GetPurchaseOrderList,
     SavePurchaseOrderDetails,
-    DeletePurchaseOrder   
+    DeletePurchaseOrder,
+    GetPurchaseOrderListByName   
 }

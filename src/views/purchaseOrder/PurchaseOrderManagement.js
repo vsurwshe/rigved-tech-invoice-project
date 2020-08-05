@@ -157,6 +157,7 @@ class PurchaseOrderManagement extends Component {
         setTimeout(async () => {
             await loadMessage()
             await GetPurchaseOrderList(0, 20, authorization);
+            await this.clearFileUrl();
             this.handleCreatePurchaseOrder();
         }, API_EXE_TIME)
     }

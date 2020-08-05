@@ -8,6 +8,7 @@ import { Required } from '../utilites/FormValidation';
 import { FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
 import * as FileAction from '../../redux/actions/FileAction'
+import * as PurchaseOrderAction from '../../redux/actions/PurchaseOrderAction';
 import ExpensesTable from '../Expenses/ExpensesTable';
 import ResourcesTable from '../resources/ResourcesTable';
 import { bindActionCreators } from 'redux';
@@ -65,16 +66,19 @@ const SectionOne = (data) => {
 // this method will used for showing fileds as per operations
 const LoadFields = (parameter) => {
     const { change } = parameter.mainProps
+    const { authorization }=parameter.mainProps.LoginState
     const { listOfClient } = parameter.mainProps.ClientState
     const { ManagerList, Domains } = parameter.mainProps.MasterDataSet
-    const { purchaseOrderList } = parameter.mainProps.PurchaseOrderState
+    const { purchaseOrderList, purchaseOrderListByName } = parameter.mainProps.PurchaseOrderState
+    const { GetPurchaseOrderListByName }=parameter.mainProps.PurchaseOrderAction
     let projectManagerOptions = ManagerList.length > 0 && ManagerList.map((item, key) => {
         return { title: item.firstName + " " + item.lastName, id: item.accountId }
     })
+    console.log("Props ",parameter.mainProps)
     let clientOptions = listOfClient.length > 0 && listOfClient.map((item, key) => {
         return { title: item.clientName ? item.clientName : "", id: item.id }
     })
-    let purchaseOrderOptions = purchaseOrderList.length > 0 && purchaseOrderList.map((item, key) => {
+    let purchaseOrderOptions = purchaseOrderListByName.length > 0 && purchaseOrderListByName.map((item, key) => {
         return { title: item.poNum ? item.poNum : "", id: item.id }
     })
     let projectTypeOptions = Domains.length > 0 && Domains.map((item, key) => {
@@ -87,6 +91,7 @@ const LoadFields = (parameter) => {
             onChange={(value) => {
                 change('ProjectForm', 'clientName', value.title);
                 change('ProjectForm', 'clientId', value.id);
+                GetPurchaseOrderListByName(0,20,value.title,authorization)
             }}
             optionData={clientOptions} label="Client Name" validate={[Required]} />
         <Field name="clientId" component={renderTextHiddenField} />
@@ -174,6 +179,7 @@ const Expenses = (data) => {
 const selector = formValueSelector('ProjectForm')
 const mapDispatchToProps = (dispatch) => ({
     FileAction: bindActionCreators(FileAction, dispatch),
+    PurchaseOrderAction: bindActionCreators(PurchaseOrderAction,dispatch),
     change: bindActionCreators(change, dispatch)
 })
 ProjectForm = connect(state => {
