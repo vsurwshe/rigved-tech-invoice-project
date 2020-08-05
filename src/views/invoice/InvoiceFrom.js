@@ -1,33 +1,59 @@
-import React,{useState} from 'react';
+import React,{useState, forwardRef} from 'react';
 import { formValueSelector, reduxForm, change, Field } from 'redux-form';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Button, Grid, TextField } from '@material-ui/core';
+import { Button, Grid, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Slide, AppBar, Toolbar, IconButton } from '@material-ui/core';
 import useStyles from "../client/Styles";
 import { Alert, Autocomplete } from '@material-ui/lab';
-import { FromActions } from '../../assets/config/Config';
 import { renderDateTimePicker, renderAutocompleteWithProps } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
 import * as ClientAction from "../../redux/actions/ClientAction";
 import { GetProjectListByClient } from "../../redux/actions/ProjectAction";
+import Invoice from './Invoice';
+import CloseIcon from '@material-ui/icons/Close';
+
+// this method will used for the transition for model 
+const Transition = forwardRef(function Transition(props, ref) { return <Slide direction="up" ref={ref} {...props} />; });
+
 
 let InvoiceFrom=(props)=>{
     var classes = useStyles();
-    const { SaveMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues, clearFile } = props
-    // const { operation } = props.stateData
+    const { pristine, reset, submitting, handleSubmit, cancle } = props
+    const [viewInvoice, setViewInvoice] = useState(false);
+
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit((values)=>console.log("Value ",values))}>
             {LoadGird(props)}
+            {ShowViewInvoice({"mainProps":props,classes,viewInvoice,setViewInvoice})}
             <div className={classes.buttonStyle}>
                 <center>
                     {/* {(operation === FromActions.CR || operation === FromActions.ED) && <> </>} */}
                     <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}>SUBMIT</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button>&nbsp;&nbsp;
-                    <Button type="button" variant="outlined" color="secondary" onClick={async () => { await clearFile(); await reset(); cancle() }}> Cancel</Button>
+                    <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button> &nbsp;&nbsp;
+                    <Button type="button" variant="outlined" color="primary" onClick={()=> setViewInvoice(true)}>View Invoice</Button> 
                 </center>
             </div>
         </form>
     </div>
+}
+
+const ShowViewInvoice=(propsData)=>{
+    const { viewInvoice, setViewInvoice, classes }=propsData
+    return <Dialog fullScreen open={viewInvoice} onClose={()=> setViewInvoice(false)} TransitionComponent={Transition}>
+    <AppBar  className={classes.dialogAppBar}  style={{float: "right"}} >
+      <Toolbar >
+        <IconButton classes={{ paper: classes.profileMenuIcon }} color="inherit" onClick={()=> setViewInvoice(false)} aria-label="close"> <CloseIcon  /> </IconButton>
+        <DialogTitle>Invoice</DialogTitle>
+      </Toolbar>
+    </AppBar>
+    <DialogContent>
+        <Invoice />
+    </DialogContent>
+    <DialogActions>
+        <Button onClick={()=> setViewInvoice(false)} color="primary">Cancel</Button>
+    </DialogActions>
+</Dialog>
 }
 
 const LoadGird = (props) => {
@@ -53,7 +79,6 @@ const LoadGird = (props) => {
 }
 // this method will used for the load the left side part 
 const SectionOne = (data) => {
-    console.log("Data ", data.mainProps)
     const { listOfClient }=data.mainProps.ClientState
     const { authorization }=data.mainProps.LoginState
     const { projectListByClient }=data.mainProps.ProjectState
