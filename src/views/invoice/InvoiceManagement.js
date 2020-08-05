@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
+import InvoiceFrom from './InvoiceFrom';
+import { connect } from 'react-redux';
+import { Card } from '@material-ui/core';
 
 class InvoiceManagement extends Component {
-    state = {  };
+    state = {  
+
+    };
     
     render() {
-        return <h1>Invoice Management</h1>;
+        return <Card>
+            <InvoiceFrom />
+        </Card>;
     }
 }
 
-export default InvoiceManagement;
+const mapStateToProps = state => { return state; };
+export default connect(mapStateToProps)(InvoiceManagement);
