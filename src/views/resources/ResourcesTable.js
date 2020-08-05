@@ -15,6 +15,8 @@ import { bindActionCreators } from 'redux';
 import ResourceRateCardTable from "./ResourceRateCardTable";
 import { loadMessage } from "../../redux/actions/ClientAction";
 import moment from 'moment';
+import CreateIcon from '@material-ui/icons/Create';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -142,11 +144,15 @@ return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
             tooltip: 'Assign Resource'
           }
         ]}
+        icons={{
+          Edit:() => { return <CreateIcon variant="contained" color="primary" /> },
+          Delete: () => {return <DeleteOutlineIcon variant="contained" color="secondary" />}
+        }}
         editable={{
           isEditable: rowData => true, 
           isEditHidden: rowData => false,
-          isDeletable: rowData => false,
-          isDeleteHidden: rowData => true,
+          isDeletable: rowData => true,
+          isDeleteHidden: rowData => false,
           onRowUpdate: (newData, oldData) =>{
             return new Promise(async(resolve, reject) => {
               const { clientDataById }=props.ClientState

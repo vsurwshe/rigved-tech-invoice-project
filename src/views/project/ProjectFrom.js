@@ -15,6 +15,7 @@ import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
 import { Alert } from '@material-ui/lab';
 
+// this is main component
 let ProjectForm = (props) => {
     var classes = useStyles();
     const { SaveMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues, clearFile } = props
@@ -34,6 +35,7 @@ let ProjectForm = (props) => {
     </div>
 }
 
+// this method will used for the gird structure of this component
 const LoadGird = (props) => {
     var classes = useStyles();
     const {color, common_message}=props.ClientState
@@ -57,6 +59,7 @@ const LoadGird = (props) => {
     </>
 }
 
+// this method will used for the load the left side part 
 const SectionOne = (data) => {
     const { classes, initialValues } = data
     const { operation } = data.props.stateData
@@ -69,12 +72,11 @@ const LoadFields = (parameter) => {
     const { authorization }=parameter.mainProps.LoginState
     const { listOfClient } = parameter.mainProps.ClientState
     const { ManagerList, Domains } = parameter.mainProps.MasterDataSet
-    const { purchaseOrderList, purchaseOrderListByName } = parameter.mainProps.PurchaseOrderState
+    const { purchaseOrderListByName } = parameter.mainProps.PurchaseOrderState
     const { GetPurchaseOrderListByName }=parameter.mainProps.PurchaseOrderAction
     let projectManagerOptions = ManagerList.length > 0 && ManagerList.map((item, key) => {
         return { title: item.firstName + " " + item.lastName, id: item.accountId }
     })
-    console.log("Props ",parameter.mainProps)
     let clientOptions = listOfClient.length > 0 && listOfClient.map((item, key) => {
         return { title: item.clientName ? item.clientName : "", id: item.id }
     })
@@ -115,6 +117,7 @@ const LoadHeader = (parameter) => {
     </>
 }
 
+// this method will used for the right side part of this component
 const SectionTwo = (data) => {
     const { classes, initialValues } = data
     const { uploadFile } = data.props
