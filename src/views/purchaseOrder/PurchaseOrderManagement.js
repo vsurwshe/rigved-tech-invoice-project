@@ -145,7 +145,6 @@ class PurchaseOrderManagement extends Component {
 
     // this method used for the save the client details
     SavePODetails = async (sendUserValues) => {
-        console.log("Data ",sendUserValues)
         const { purchaseOrderFileUrl } = this.state
         const { SavePurchaseOrderDetails, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
         const { authorization } = this.props.LoginState

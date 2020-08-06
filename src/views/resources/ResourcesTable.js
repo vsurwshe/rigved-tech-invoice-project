@@ -39,11 +39,15 @@ const Transition = forwardRef(function Transition(props, ref) { return <Slide di
 let ResourcesTable=(props)=>{
     const { projectId }=props
     const { clientId }=(props.form && props.form.ProjectForm &&props.form.ProjectForm.values) ? props.form.ProjectForm.values : ""
-    const { GetEmployeeListByProjectId,}=props.EmployeeAction
+    const { GetEmployeeListByProjectId,EditEmployeeRecord,DeleteEmployeeRecord}=props.EmployeeAction
     const { GetClientDetailsById }=props.ClientAction
-    const { employeeListByPojectId }=props.EmpolyeeState
     const { operation }=props.stateData
     const { authorization}=props.LoginState
+    const { clientDataById }=props.ClientState
+    const { employeeListByPojectId }=props.EmpolyeeState
+
+
+  
     const [open, setOpen] = useState(false);
     const [countCall,setCountCall]=useState(0)
     const [countCallRateCard,setCountRateCardCall]=useState(0)
@@ -70,6 +74,7 @@ let ResourcesTable=(props)=>{
     // creating columns
     const columns = [
       { title: "",  field:"accountId", hidden:true},
+      { title: "",  field:"emploeeMappedId", hidden:true},
       { title: "",  field:"projectId", hidden:true},
       { title: 'Emp\u00a0Id', field: 'employeeNumber', width: 20, editable:"never" },
       { title: 'Name', field: 'name', editable:"never" },
@@ -114,6 +119,7 @@ let ResourcesTable=(props)=>{
         "data": subitem,
         "projectId":projectId ? projectId: "",
         "accountId":(subitem && subitem.accountId)? subitem.accountId:"",
+        "emploeeMappedId":subitem.emploeeMappedId,
         "domain":subitem.domain, 
         "employeeNumber":subitem.employeeNumber, 
         "name":subitem.firstName+" "+subitem.lastName, 
@@ -126,6 +132,7 @@ let ResourcesTable=(props)=>{
     }) 
     return (tempData && tempData.length >0 )? tempData : [];
   });
+
     
 return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
   <div style={{ maxWidth: "100%" }}>
@@ -155,24 +162,16 @@ return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
           isDeleteHidden: rowData => false,
           onRowUpdate: (newData, oldData) =>{
             return new Promise(async(resolve, reject) => {
-              const { clientDataById }=props.ClientState
-              const { authorization }=props.LoginState
-              const { SaveEmployeeRecord }=props.EmployeeAction
-              const { id }=(clientDataById && clientDataById.rateCardDtos && clientDataById.rateCardDtos.length >0) ? clientDataById.rateCardDtos[0]: ""   
+              const { id }=(clientDataById && clientDataById.rateCardDtos && clientDataById.rateCardDtos.length >0) ? clientDataById.rateCardDtos[0]: ""
               if(newData){
                 let resourceData={
-                  "employeeList": [
-                    {
-                      "accountId":newData && newData.accountId,
-                      "rateCardId": id && id,
-                      "onbordaingDate": newData && newData.onbordaingDate,
-                      "exitDate": newData && newData.exitDate
-                    }
-                  ],
-                  "projectId": newData && newData.projectId,
-                  "active": 1
+                  "emploeeMappedId":newData && newData.emploeeMappedId, 
+                  "accountId":newData && newData.accountId,
+                  "rateCardId": id && id,
+                  "onbordaingDate": newData && newData.onbordaingDate,
+                  "exitDate": newData && newData.exitDate
                 }
-                await SaveEmployeeRecord(resourceData,authorization);
+                await EditEmployeeRecord(resourceData,authorization);
                 setTimeout(async()=>{
                   await GetEmployeeListByProjectId(0,20,newData.projectId,authorization);
                   resolve();
@@ -182,7 +181,15 @@ return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
               }
             })
           },
-          onRowDelete: oldData =>{}
+          onRowDelete: oldData =>{
+            return new Promise(async(resolve, reject) => {
+              (oldData && oldData.emploeeMappedId) && await DeleteEmployeeRecord(oldData.emploeeMappedId, authorization);
+               setTimeout(async()=>{
+                 await GetEmployeeListByProjectId(0,20,projectId, authorization)
+                 resolve();
+               },API_EXE_TIME)
+             })
+          }
         }}
       />
   </div>

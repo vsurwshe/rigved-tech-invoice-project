@@ -50,7 +50,6 @@ const ExpensesTable = (props) => {
     { title: 'Expense\u00a0Type', 
       field: 'expType', 
       editComponent: props => {
-        console.log("3",props)
         return <Autocomplete
         id="exp-type"
         autoHighlight

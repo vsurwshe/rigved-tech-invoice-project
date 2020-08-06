@@ -11,7 +11,12 @@ const EmployeeState=(state=initialState,action)=>{
             return {...state, employeeListByPojectId: [...newEmployeeListByProjectId,{"List":action.employeeList,"projectId": action.projectId}]}
         case "SAVE_EMPOLYEE_BY_RATECARD_ID":
             return {...state, employeeListByRateCardId: action.employeeList}
-    
+        case "SAVE_EMPLOYEE_DETAILS":
+            return {...state, employeeDetails: action.employeeDetails}
+        case "EDIT_EMPLOYEE_DETAILS":
+            return {...state, employeeDetails: action.employeeDetails}
+        case "DELETE_EMPLOYEE_DETAILS":
+            return {...state, employeeDetails: action.employeeDetails}    
         default:
             return state;
     }
