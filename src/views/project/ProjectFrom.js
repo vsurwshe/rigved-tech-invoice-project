@@ -93,7 +93,7 @@ const LoadFields = (parameter) => {
             onChange={(value) => {
                 change('ProjectForm', 'clientName', value.title);
                 change('ProjectForm', 'clientId', value.id);
-                GetPurchaseOrderListByName(0,20,value.title,authorization)
+                GetPurchaseOrderListByName(0,20,value.id,authorization)
             }}
             optionData={clientOptions} label="Client Name" validate={[Required]} />
         <Field name="clientId" component={renderTextHiddenField} />
