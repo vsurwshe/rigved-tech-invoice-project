@@ -34,6 +34,14 @@ const SaveExpenseRecord=(userData,authroizationKey)=>{
     }
 }
 
+const DeleteExpenseRecord=(expenseId, authroizationKey)=>{
+    return(dispatch)=>{
+        return CreateInstance()
+        .get('/project/deleteExp/'+expenseId,HeaderConfig(authroizationKey))
+        .then(response => { SuccessFunction({ dispatch , "successMethod": deleteProject, "loadMessage":loadMessage, response}) })
+        .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
     
 //------------------------------------
 export function saveExpenseList(expenseList){
@@ -58,8 +66,16 @@ export function saveExpenseListByProjectId(expenseList,projectId){
     }
 }
 
+export function deleteProject(expenseData){
+    return{
+        type:"DELETE_EXPENSE_DATA",
+        expenseData
+    }
+}
+
 export{
     GetExpensesList,
     SaveExpenseRecord,
-    GetExpensesListByProjectId
+    GetExpensesListByProjectId,
+    DeleteExpenseRecord
 }

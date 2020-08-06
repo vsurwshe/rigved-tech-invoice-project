@@ -18,7 +18,7 @@ const ExpensesTable = (props) => {
   const { operation }=props.stateData
   const [countCall,setCountCall]=useState(0)
   const { expensesListByProjectId}=props.ExpenseState
-  const { SaveExpenseRecord, GetExpensesListByProjectId } = props.ExpenseAction
+  const { SaveExpenseRecord, GetExpensesListByProjectId, DeleteExpenseRecord } = props.ExpenseAction
   const { ExpenseTypeList }=props.MasterDataSet
   const { authorization }=props.LoginState
   
@@ -216,10 +216,9 @@ const ExpensesTable = (props) => {
         },
         onRowDelete: oldData =>{
           return new Promise(async(resolve, reject) => {
-            alert("Called the delete Function")
+           (oldData && oldData.id) && await DeleteExpenseRecord(oldData.id, authorization);
             setTimeout(async()=>{
-              // await GetExpensesListByProjectId(0,20,projectId, authorization)
-              // await SaveFileData();
+              await GetExpensesListByProjectId(0,20,projectId, authorization)
               resolve();
             },API_EXE_TIME)
           })
