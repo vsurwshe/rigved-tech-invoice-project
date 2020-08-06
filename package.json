@@ -13,6 +13,8 @@
     "apexcharts": "^3.19.2",
     "axios": "^0.19.2",
     "classnames": "^2.2.6",
+    "html2canvas": "^1.0.0-rc.5",
+    "jspdf": "^1.5.3",
     "material-table": "^1.65.0",
     "material-ui": "^0.20.2",
     "material-ui-popup-state": "^1.6.0",

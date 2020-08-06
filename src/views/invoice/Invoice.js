@@ -7,8 +7,8 @@ let Invoice=(props)=>{
 
 const LoadInvoiceTable=(props)=>{
 let tableColSpan="3";
-return <div id="invoice-box" className="invoice-box">
-    <table cellPadding="0" border="1" cellSpacing="0">
+return <div  className="invoice-box">
+    <table id="invoiceProject" cellPadding="0" border="1" cellSpacing="0">
         <tbody>
             {MainTableSectionOne({tableColSpan})}
             {MainTableSectionTwo({"mainProps":props,tableColSpan})}

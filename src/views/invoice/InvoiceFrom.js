@@ -11,6 +11,8 @@ import * as ClientAction from "../../redux/actions/ClientAction";
 import { GetProjectListByClient } from "../../redux/actions/ProjectAction";
 import Invoice from './Invoice';
 import CloseIcon from '@material-ui/icons/Close';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 // this method will used for the transition for model 
 const Transition = forwardRef(function Transition(props, ref) { return <Slide direction="up" ref={ref} {...props} />; });
@@ -52,8 +54,22 @@ const ShowViewInvoice=(propsData)=>{
     </DialogContent>
     <DialogActions>
         <Button onClick={()=> setViewInvoice(false)} color="primary">Cancel</Button>
+        <Button onClick={()=> DwonloadInvoice()} color="secondary">Download Invoice</Button>
     </DialogActions>
 </Dialog>
+}
+
+const DwonloadInvoice=()=>{
+    let htmlTable=document.getElementById('invoiceProject');
+    html2canvas(htmlTable,{ 
+        allowTaint: true, 
+        backgroundColor:"rgba(255, 255, 255, 1)",
+    }).then((canvas) => {
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p','pt', 'a4');
+    pdf.addImage(imgData, 'PNG', 25, 100);
+    pdf.save("download.pdf");  
+  });
 }
 
 const LoadGird = (props) => {
