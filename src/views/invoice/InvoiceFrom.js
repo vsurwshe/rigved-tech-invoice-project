@@ -98,11 +98,11 @@ const SectionOne = (data) => {
         setProjectListCountCall(projectListCountCall+1);
     }
 
-    let clientOptions = listOfClient.length > 0 && listOfClient.map((item, key) => {
+    let clientOptions = (listOfClient && listOfClient.length > 0) && listOfClient.map((item, key) => {
         return { title: item.clientName ? item.clientName : "", id: item.id }
     })
 
-    let projectOptions=projectListByClient.length >0 && projectListByClient.map((item,key)=>{
+    let projectOptions=(projectListByClient  && projectListByClient.length >0) && projectListByClient.map((item,key)=>{
         return { title: item.clientName ? item.clientName : "", id: item.id }
     })
     console.log("Client id",clientId,projectListCountCall);
