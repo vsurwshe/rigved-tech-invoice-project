@@ -22,7 +22,6 @@ const MainTableSectionOne=(propsData)=>{
     return <table className="table-border-bottom">
         <tbody>
             <tr> <td ><center>Tax Invoice</center></td></tr>
-            <tr> <td ><div style={{padding:6}}></div></td></tr>
         </tbody>
     </table>
 }

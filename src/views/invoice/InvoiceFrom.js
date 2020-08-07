@@ -1,5 +1,5 @@
 import React,{useState, forwardRef} from 'react';
-import { formValueSelector, reduxForm, change, Field } from 'redux-form';
+import { reduxForm, change, Field } from 'redux-form';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Grid, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Slide, AppBar, Toolbar, IconButton } from '@material-ui/core';
@@ -13,6 +13,7 @@ import Invoice from './Invoice';
 import CloseIcon from '@material-ui/icons/Close';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import MaterialTable from 'material-table';
 
 // this method will used for the transition for model 
 const Transition = forwardRef(function Transition(props, ref) { return <Slide direction="up" ref={ref} {...props} />; });
@@ -74,13 +75,13 @@ const DwonloadInvoice=()=>{
 
 const PostInvoiceData=(propsData)=>{
     const { values, viewSectionThree, setViewSectionThree }=propsData
-    console.log("Subimt Data",propsData)
+    console.log("Subimt Data",propsData, values, viewSectionThree,)
     setViewSectionThree(true);
 }
 
 const LoadGird = (props) => {
     var classes = useStyles();
-    const { projectIdList, setProjectIdList,viewSectionThree, setViewSectionThree }=props
+    const { projectIdList, setProjectIdList,viewSectionThree}=props
     const {color, common_message}=props.mainProps.ClientState
     return <><Grid container spacing={5}>
         {(common_message)&&<center><Alert color={color}>{common_message}</Alert></center>}
@@ -102,7 +103,7 @@ const LoadGird = (props) => {
 }
 // this method will used for the load the left side part 
 const SectionOne = (data) => {
-    const { projectIdList, setProjectIdList }=data
+    const { setProjectIdList }=data
     const { listOfClient }=data.mainProps.ClientState
     const { authorization }=data.mainProps.LoginState
     const { projectListByClient }=data.mainProps.ProjectState
@@ -152,11 +153,43 @@ const SectionTwo = (data) => {
 }
 
 const SectionThree=(propsData)=>{
-    return <h1>SectionThree</h1>
+    let columns=[
+        { title: 'Row 1', field: '1'},
+        { title: 'Row 2', field: '2'},
+        { title: 'Row 3', field: '3'}
+    ];
+    let data=[
+        {"1":1,"2":2,"3":3},
+        {"1":1,"2":2,"3":3},
+        {"1":1,"2":2,"3":3}
+    ];
+    return LoadInvoiceResourceTable({columns,data});
+}
+
+const LoadInvoiceResourceTable=(propsData)=>{
+    const { columns, data}= propsData
+    return <div style={{ maxWidth: "100%" }}>
+    <MaterialTable
+      title=""
+      columns={columns}
+      data={data.length > 0 ? data : []}
+      options={{
+        headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
+        search: false,
+        selection: true
+      }}
+      actions={[
+        { icon: () => <div><Button variant="contained" color="primary">Genrate Invoice</Button></div>,
+          onClick: (event, rowData) => { console.log(rowData) },
+          tooltip: 'Create Project'
+        }
+      ]}
+    />
+  </div>
 }
 
 // make the selector 
-const selector = formValueSelector('InvoiceFrom')
+// const selector = formValueSelector('InvoiceFrom')
 const mapDispatchToProps = (dispatch) => ({
     ClientAction: bindActionCreators(ClientAction,dispatch),
     ProjectAction:bindActionCreators(ProjectAction,dispatch),
