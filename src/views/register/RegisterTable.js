@@ -50,7 +50,7 @@ const RegsiterTable=(props)=>{
     <MaterialTable
       title="Employee Management"
       columns={columns}
-      data={data.length > 0 ? data : []}
+      data={(data && data.length > 0 )? data : []}
       options={{
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' }
       }}
