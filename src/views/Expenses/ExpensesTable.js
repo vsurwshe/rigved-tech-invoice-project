@@ -10,13 +10,15 @@ import * as FileAction from "../../redux/actions/FileAction";
 import { loadMessage } from "../../redux/actions/ClientAction";
 import moment from 'moment';
 import { bindActionCreators } from 'redux';
+import CreateIcon from '@material-ui/icons/Create';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 const ExpensesTable = (props) => {
   const { projectId }=props 
   const { operation }=props.stateData
   const [countCall,setCountCall]=useState(0)
   const { expensesListByProjectId}=props.ExpenseState
-  const { SaveExpenseRecord, GetExpensesListByProjectId } = props.ExpenseAction
+  const { SaveExpenseRecord, GetExpensesListByProjectId, DeleteExpenseRecord } = props.ExpenseAction
   const { ExpenseTypeList }=props.MasterDataSet
   const { authorization }=props.LoginState
   
@@ -31,6 +33,8 @@ const ExpensesTable = (props) => {
 
   // creating columns
   const columns = [
+    { title:"", field:"id", hidden:true},
+    { title:"", field:"attachmentUrl1", hidden:true},
     { title: "Attatchment",
       field:'attachmentUrl',
       editComponent: dataProps=>{
@@ -40,7 +44,8 @@ const ExpensesTable = (props) => {
                 onChange={event => ExpenseFileUpload(event,dataProps)}
                 InputLabelProps={{ shrink: true }}
             /> 
-      }
+      },
+      editable:"onAdd"
     },
     { title: 'Expense\u00a0Type', 
       field: 'expType', 
@@ -49,11 +54,13 @@ const ExpensesTable = (props) => {
         id="exp-type"
         autoHighlight
         options={(expenseTypeListOptions && expenseTypeListOptions.length >0) ? expenseTypeListOptions: []}
-        getOptionLabel={expenseTypeListOptions => (expenseTypeListOptions && expenseTypeListOptions.title) && expenseTypeListOptions.title}
+        value={props.value}
+        getOptionLabel={(expenseTypeListOptions) => expenseTypeListOptions.title ? expenseTypeListOptions.title : ""}
         onChange={(event, value) => value && props.onChange(value.id)}
         renderInput={(params) => ( <TextField {...params} label="Expense Type" margin="normal"  /> )}
       /> 
-      }
+      },
+      editable:"onAdd"
     },
     { title: 'Description',
       field: 'description',
@@ -63,6 +70,7 @@ const ExpensesTable = (props) => {
               multiline
               label="Description"
               type="text"
+              value={props.value}
               rows={1}
               onChange={e => props.onChange(e.target.value)}
               InputLabelProps={{ shrink: true }}
@@ -76,6 +84,7 @@ const ExpensesTable = (props) => {
               id="amount"
               label="Amount"
               type="number"
+              value={props.value}
               onChange={e => props.onChange(e.target.value)}
               InputLabelProps={{ shrink: true }}
           />
@@ -88,16 +97,18 @@ const ExpensesTable = (props) => {
               id="expDate"
               label="Expense Date"
               type="date"
+              value={props.value}
               onChange={e => props.onChange(e.target.value)}
               InputLabelProps={{ shrink: true }}
+              required={true}
           />
       }
     }
   ];
 
   const loadFileUrlName=(fileUrl)=>{
-    let fileArray=fileUrl.split("\\");
-    return fileArray.length > 0 ? fileArray[5]: "";
+    let fileArray=fileUrl && fileUrl.split("\\");
+    return fileArray && fileArray.length > 0 ? fileArray[5]: "";
   }
 
   const ExpenseFileUpload=async (event,props)=>{
@@ -125,6 +136,7 @@ const ExpensesTable = (props) => {
 	      "content":`${fileData}`
       }]
        await SaveFileDetails (newFileData, authorization)
+       await loadMessage();
        return '';
   }
 
@@ -133,6 +145,8 @@ const ExpensesTable = (props) => {
     let tempData=(item && item.List.length>0) && item.List.map((subitem,key)=>{
       return  { 
         "data": subitem, 
+        "id":subitem.id,
+        "attachmentUrl1":subitem.attachmentUrl,
         "amount":subitem.amount,
         "description":subitem.description,
         "expType":subitem.expType && subitem.expType.name, 
@@ -152,12 +166,16 @@ const ExpensesTable = (props) => {
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
         search: false
       }}
-      icons={{Add: () => {return (operation && (operation === FromActions.ED || operation === FromActions.VIED)) ? <Button variant="contained" color="primary">Add Expense</Button> : ""}}}
+      icons={{
+        Add: () => { return (operation && (operation === FromActions.ED || operation === FromActions.VIED)) ? <Button variant="contained" color="primary">Add Expense</Button> : ""},
+        Edit:() => { return <CreateIcon variant="contained" color="primary" /> },
+        Delete: () => {return <DeleteOutlineIcon variant="contained" color="secondary" />}
+      }}
       editable={{
-        isEditable: rowData => false, 
-        isEditHidden: rowData => true,
-        isDeletable: rowData => false,
-        isDeleteHidden: rowData => true,
+        isEditable: rowData => true, 
+        isEditHidden: rowData => false,
+        isDeletable: rowData => true,
+        isDeleteHidden: rowData => false,
         onRowAdd: newData =>{
           return new Promise(async(resolve, reject) => {
             const { SaveFileData }= props.FileAction
@@ -171,17 +189,44 @@ const ExpensesTable = (props) => {
             await SaveExpenseRecord([newExpenseData],authorization);
             setTimeout(async()=>{
               await GetExpensesListByProjectId(0,20,projectId, authorization)
-              await loadMessage();
               await SaveFileData();
               resolve();
             },API_EXE_TIME)
         })},
-        onRowUpdate: (newData, oldData) =>{},
-        onRowDelete: oldData =>{}
+        onRowUpdate: (newData, oldData) =>{
+          return new Promise(async(resolve, reject) => {
+            let filterExpenseOptions=expenseTypeListOptions && expenseTypeListOptions.filter(item=>item.title === newData.expType);
+            let newExpenseData={
+              "id":newData.id,
+              "expDate":newData.expDate,
+              "attachmentUrl":newData.attachmentUrl1,
+              "amount":newData.amount,
+              "description":newData.description,
+              "active": true,
+              "project": { "id": projectId},
+              "expType": { "id": (filterExpenseOptions && filterExpenseOptions.length >0) && filterExpenseOptions[0].id }
+            } 
+            await SaveExpenseRecord([newExpenseData],authorization);
+            setTimeout(async()=>{
+              await GetExpensesListByProjectId(0,20,projectId, authorization)
+              resolve();
+            },API_EXE_TIME)
+          })
+        },
+        onRowDelete: oldData =>{
+          return new Promise(async(resolve, reject) => {
+           (oldData && oldData.id) && await DeleteExpenseRecord(oldData.id, authorization);
+            setTimeout(async()=>{
+              await GetExpensesListByProjectId(0,20,projectId, authorization)
+              resolve();
+            },API_EXE_TIME)
+          })
+        }
       }}
     />
   </div>
 }
+
 
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({

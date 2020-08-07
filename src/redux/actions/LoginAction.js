@@ -29,20 +29,6 @@ const RegisterUserDetails=(userData, authorizationKey)=>{
 
     return(dispatch)=>{
         return axios.post(API_URL + "/registration/registration", userData,headerConfig)
-        // .then(response => {
-        //         if(response.data.status !== OKSTATUS){
-        //             dispatch(loadMessage(AlertColor.danger,response.headers.message));
-        //         }else{
-        //             dispatch(loadMessage(AlertColor.success,response.headers.message))
-        //             dispatch(saveUser(userData))
-        //         }})
-        // .catch(error => { 
-        //     if(error && error.response && error.response.status.toString() === CONFLICTSTATUS){
-        //         dispatch(loadMessage(AlertColor.danger, error.response.headers.message));
-        //     }else{
-        //         dispatch(loadMessage(AlertColor.danger, 'Something went worng..!'));
-        //     }
-        // })
         .then(response => { SuccessFunction({ dispatch , "successMethod": saveUser, "loadMessage":loadMessage, response, "postMethod":true}) })
         .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
@@ -55,6 +41,13 @@ export function setAuthrizations(data){
         type:"SET_ACCOUNT_ID",
         account_id :data ? data.AccountId: "",
         authorization: data ? data.Authorization: "" 
+    }
+}
+
+export function saveUserData(userData){
+    return{
+        type:"SAVE_USER_DATA",
+        userData
     }
 }
 

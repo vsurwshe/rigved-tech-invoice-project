@@ -13,6 +13,8 @@ const ExpenseState=(state= initialState,action)=>{
         case "SAVE_EXPENSES_LIST_BY_PROJECT_ID":
             let newExpensesListByProjectId =state.expensesListByProjectId.filter(item=> item.projectId !== action.projectId); 
             return {...state, expensesListByProjectId: [...newExpensesListByProjectId,{"List":action.expenseList,"projectId": action.projectId}]}
+        case "DELETE_EXPENSE_DATA":
+            return {...state, expenseDetails: action.expenseData}
         default:
             return state;
     }

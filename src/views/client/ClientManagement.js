@@ -112,13 +112,7 @@ class ClientManagment extends Component {
                 "bankDetailsDtoList": clientData.bankDetailsDtoList && clientData.bankDetailsDtoList[0]
             }
         }
-        const data={
-            gstFileUrl, 
-            tanFileUrl,
-            operation,
-            gstUpload,
-            tanUpload
-        }
+        const data={ gstFileUrl,  tanFileUrl, operation, gstUpload, tanUpload }
         return <ClientForm stateData={data} initialValues={newClientData} SaveClientMethod={this.SaveClientDetails} gstFileUpload={this.uploadGSTFile} tanFileUpload={this.uploadTANFile} cancle={this.handleCreateClient} clearFile={this.clearFileUrl} />
     }
 

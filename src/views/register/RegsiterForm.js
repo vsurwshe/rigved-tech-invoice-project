@@ -10,14 +10,15 @@ import * as MasterDataAction from '../../redux/actions/MasterDataAction';
 
 let RegisterFrom = (props) => {
     var classes = useStyles();
-    const { RegisterUser, pristine, reset, submitting, handleSubmit } = props
+    const { RegisterUser, pristine, reset, submitting, handleSubmit, clearFile, cancle } = props
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(RegisterUser)}>
             {LoadGird({ classes, props })}
             <div className={classes.buttonStyle}>
                 <center>
-                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;
-                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button>
+                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;&nbsp;&nbsp;
+                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button> &nbsp;&nbsp;&nbsp;&nbsp;
+                    <Button type="button" variant="outlined" color="secondary" onClick={async () => { await clearFile(); await reset(); cancle() }}> Cancel</Button>
                 </center>
             </div>
         </form>

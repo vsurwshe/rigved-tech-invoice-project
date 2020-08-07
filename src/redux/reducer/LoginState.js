@@ -5,7 +5,8 @@ const initialState = {
     authorization: "",
     common_message: "",
     color:"",
-    saveUserData: []
+    saveUserData: [],
+    userData:[]
 }
   
 const LoginState = (state = initialState, action) => {
@@ -20,6 +21,8 @@ const LoginState = (state = initialState, action) => {
       return { ...state, common_message: action.message, color: action.color }
     case "USER_SAVED":
       return {...state, saveUserData: action.saveUserData}
+    case "SAVE_USER_DATA":
+      return {...state, userData: action.userData}
     default:
       return state
   }

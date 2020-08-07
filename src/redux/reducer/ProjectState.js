@@ -9,6 +9,8 @@ const ProjectState = (state = initialState, action) => {
             return { ...state, projectList: action.projectList }
         case "SAVE_PROJECT_DATA":
             return { ...state, projectDetails: action.projectData }
+        case "DELETE_PROJECT_DATA":
+            return { ...state, projectDetails: action.projectData }
         default:
             return state;
     }

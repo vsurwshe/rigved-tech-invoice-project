@@ -3,12 +3,13 @@ import {CONFLICTSTATUS, STATUS200, UNAUTHORIZEDSTATUS } from "../../assets/confi
 import {setAuthrizations} from "./LoginAction"
 
 const SuccessFunction=(props)=>{
-    const { dispatch, successMethod, loadMessage, response, postMethod, id}=props
-    if(response && response.status !== STATUS200){
+    const { dispatch, successMethod, loadMessage, response, postMethod, id,check}=props
+    if(response && response.status !== STATUS200 && !check){
         dispatch(loadMessage(AlertColor.danger , response.headers.message));
     }else{
-        postMethod && dispatch(loadMessage(AlertColor.danger , response.headers.message));
+        postMethod && dispatch(loadMessage(AlertColor.success , response.headers.message));
         id ? dispatch(successMethod(response.data,id)) : dispatch(successMethod(response.data))
+        postMethod && dispatch(loadMessage("" , ""));
     }
 }
 

@@ -15,6 +15,8 @@ import { bindActionCreators } from 'redux';
 import ResourceRateCardTable from "./ResourceRateCardTable";
 import { loadMessage } from "../../redux/actions/ClientAction";
 import moment from 'moment';
+import CreateIcon from '@material-ui/icons/Create';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -37,11 +39,15 @@ const Transition = forwardRef(function Transition(props, ref) { return <Slide di
 let ResourcesTable=(props)=>{
     const { projectId }=props
     const { clientId }=(props.form && props.form.ProjectForm &&props.form.ProjectForm.values) ? props.form.ProjectForm.values : ""
-    const { GetEmployeeListByProjectId,}=props.EmployeeAction
+    const { GetEmployeeListByProjectId,EditEmployeeRecord,DeleteEmployeeRecord}=props.EmployeeAction
     const { GetClientDetailsById }=props.ClientAction
-    const { employeeListByPojectId }=props.EmpolyeeState
     const { operation }=props.stateData
     const { authorization}=props.LoginState
+    const { clientDataById }=props.ClientState
+    const { employeeListByPojectId }=props.EmpolyeeState
+
+
+  
     const [open, setOpen] = useState(false);
     const [countCall,setCountCall]=useState(0)
     const [countCallRateCard,setCountRateCardCall]=useState(0)
@@ -54,6 +60,7 @@ let ResourcesTable=(props)=>{
     if((exitsEmployeeListByPojectId === false || exitsEmployeeListByPojectId.length <=0) && countCall===0){
       setCountCall(countCall + 1)
       GetEmployeeListByProjectId(0,20,projectId,authorization);
+      loadMessage();
       exitsEmployeeListByPojectId=(employeeListByPojectId && employeeListByPojectId.length > 0)&& employeeListByPojectId.filter(item=> item.projectId ===projectId);
     }
 
@@ -61,18 +68,48 @@ let ResourcesTable=(props)=>{
     if(countCallRateCard === 0 && clientId){
       setCountRateCardCall(countCallRateCard+1);
       GetClientDetailsById(clientId,authorization)
+      loadMessage();
     }
 
     // creating columns
     const columns = [
-      { title: 'Emp\u00a0Id', field: 'employeeNumber', width: 20 },
-      { title: 'Name', field: 'name' },
-      { title: 'Domain', field: 'domain' },
-      { title: 'Category', field: 'category' },
-      { title: 'Experience', field: 'experience' },
-      { title: 'Skill', field: 'skill' },
-      { title: 'Onboarding\u00a0Date', field: 'onbordaingDate' },
-      { title: 'Exit\u00a0Date', field: 'exitDate' },
+      { title: "",  field:"accountId", hidden:true},
+      { title: "",  field:"emploeeMappedId", hidden:true},
+      { title: "",  field:"projectId", hidden:true},
+      { title: 'Emp\u00a0Id', field: 'employeeNumber', width: 20, editable:"never" },
+      { title: 'Name', field: 'name', editable:"never" },
+      { title: 'Domain', field: 'domain', editable:"never" },
+      { title: 'Category', field: 'category', editable:"never" },
+      { title: 'Experience', field: 'experience', editable:"never" },
+      { title: 'Skill', field: 'skill', editable:"never" },
+      { title: 'Onboarding\u00a0Date', 
+        field: 'onbordaingDate',
+        editComponent: props=>{
+          return <TextField
+                id="onbordaingDate"
+                label="Onbordaing Date"
+                type="date"
+                value={props.value}
+                onChange={e => props.onChange(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                required={true}
+            />
+        } 
+      },
+      { title: 'Exit\u00a0Date', 
+        field: 'exitDate',
+        editComponent: props=>{
+          return <TextField
+                id="exitDate"
+                label="Exit Date"
+                type="date"
+                value={props.value}
+                onChange={e => props.onChange(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                required={true}
+            />
+        } 
+      }
     ];
 
   // Creating rows
@@ -80,6 +117,9 @@ let ResourcesTable=(props)=>{
     let tempData=(item && item.List.length>0) && item.List.map((subitem,key)=>{
       return  { 
         "data": subitem,
+        "projectId":projectId ? projectId: "",
+        "accountId":(subitem && subitem.accountId)? subitem.accountId:"",
+        "emploeeMappedId":subitem.emploeeMappedId,
         "domain":subitem.domain, 
         "employeeNumber":subitem.employeeNumber, 
         "name":subitem.firstName+" "+subitem.lastName, 
@@ -92,6 +132,7 @@ let ResourcesTable=(props)=>{
     }) 
     return (tempData && tempData.length >0 )? tempData : [];
   });
+
     
 return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
   <div style={{ maxWidth: "100%" }}>
@@ -110,6 +151,46 @@ return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
             tooltip: 'Assign Resource'
           }
         ]}
+        icons={{
+          Edit:() => { return <CreateIcon variant="contained" color="primary" /> },
+          Delete: () => {return <DeleteOutlineIcon variant="contained" color="secondary" />}
+        }}
+        editable={{
+          isEditable: rowData => true, 
+          isEditHidden: rowData => false,
+          isDeletable: rowData => true,
+          isDeleteHidden: rowData => false,
+          onRowUpdate: (newData, oldData) =>{
+            return new Promise(async(resolve, reject) => {
+              const { id }=(clientDataById && clientDataById.rateCardDtos && clientDataById.rateCardDtos.length >0) ? clientDataById.rateCardDtos[0]: ""
+              if(newData){
+                let resourceData={
+                  "emploeeMappedId":newData && newData.emploeeMappedId, 
+                  "accountId":newData && newData.accountId,
+                  "rateCardId": id && id,
+                  "onbordaingDate": newData && newData.onbordaingDate,
+                  "exitDate": newData && newData.exitDate
+                }
+                await EditEmployeeRecord(resourceData,authorization);
+                setTimeout(async()=>{
+                  await GetEmployeeListByProjectId(0,20,newData.projectId,authorization);
+                  resolve();
+                },API_EXE_TIME)
+              }else{
+                reject();
+              }
+            })
+          },
+          onRowDelete: oldData =>{
+            return new Promise(async(resolve, reject) => {
+              (oldData && oldData.emploeeMappedId) && await DeleteEmployeeRecord(oldData.emploeeMappedId, authorization);
+               setTimeout(async()=>{
+                 await GetEmployeeListByProjectId(0,20,projectId, authorization)
+                 resolve();
+               },API_EXE_TIME)
+             })
+          }
+        }}
       />
   </div>
 </>
@@ -210,7 +291,7 @@ const EmployeeTable=(propsData)=>{
       editComponent: props=>{
         return <TextField
               id="onbordaingDate"
-              label="Expense Date"
+              label="Onbordaing Date"
               type="date"
               onChange={e => props.onChange(e.target.value)}
               InputLabelProps={{ shrink: true }}

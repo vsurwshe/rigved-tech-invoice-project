@@ -5,6 +5,7 @@ import CreateIcon from '@material-ui/icons/Create';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import MaterialTable from 'material-table';
+import { FromActions } from '../../assets/config/Config';
 
 const  ClientTable=(props)=>{
   const {listOfClient}= props.ClientState
@@ -19,14 +20,14 @@ const  ClientTable=(props)=>{
       title: "",
       width:8,
       render: (rowData)=> {
-          return<VisibilityIcon variant="contained" color="primary" onClick={()=>viewClientDetails(rowData.data,"view")} />
+          return<VisibilityIcon variant="contained" color="primary" onClick={()=>viewClientDetails(rowData.data,FromActions.VI)} />
       }
     },
     {
       title: "",
       width:8,
       render: (rowData)=> {
-          return<CreateIcon variant="contained" color="primary" onClick={()=>viewClientDetails(rowData.data,"edit")} />
+          return<CreateIcon variant="contained" color="primary" onClick={()=>viewClientDetails(rowData.data,FromActions.ED)} />
       }
     },
     {
@@ -53,7 +54,7 @@ const  ClientTable=(props)=>{
       }}
       actions={[
         {icon: () =><div><Button variant="contained" color="primary">Create Client</Button></div>,
-          onClick: (event, rowData) => { createClient(null,"create"); },
+          onClick: (event, rowData) => { createClient(null,FromActions.CR); },
           isFreeAction: true,
           tooltip: 'Create Client'}
       ]}

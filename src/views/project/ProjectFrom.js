@@ -8,11 +8,14 @@ import { Required } from '../utilites/FormValidation';
 import { FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
 import * as FileAction from '../../redux/actions/FileAction'
+import * as PurchaseOrderAction from '../../redux/actions/PurchaseOrderAction';
 import ExpensesTable from '../Expenses/ExpensesTable';
 import ResourcesTable from '../resources/ResourcesTable';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
+import { Alert } from '@material-ui/lab';
 
+// this is main component
 let ProjectForm = (props) => {
     var classes = useStyles();
     const { SaveMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues, clearFile } = props
@@ -32,11 +35,14 @@ let ProjectForm = (props) => {
     </div>
 }
 
+// this method will used for the gird structure of this component
 const LoadGird = (props) => {
     var classes = useStyles();
+    const {color, common_message}=props.ClientState
     const { initialValues } = props
     return <><Grid container spacing={5}>
-    </Grid>
+        {(common_message)&&<center><Alert color={color}>{common_message}</Alert></center>}
+        </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 20 }}>
                 {SectionOne({ classes, props, initialValues })}
@@ -53,6 +59,7 @@ const LoadGird = (props) => {
     </>
 }
 
+// this method will used for the load the left side part 
 const SectionOne = (data) => {
     const { classes, initialValues } = data
     const { operation } = data.props.stateData
@@ -62,16 +69,18 @@ const SectionOne = (data) => {
 // this method will used for showing fileds as per operations
 const LoadFields = (parameter) => {
     const { change } = parameter.mainProps
+    const { authorization }=parameter.mainProps.LoginState
     const { listOfClient } = parameter.mainProps.ClientState
     const { ManagerList, Domains } = parameter.mainProps.MasterDataSet
-    const { purchaseOrderList } = parameter.mainProps.PurchaseOrderState
+    const { purchaseOrderListByName } = parameter.mainProps.PurchaseOrderState
+    const { GetPurchaseOrderListByName }=parameter.mainProps.PurchaseOrderAction
     let projectManagerOptions = ManagerList.length > 0 && ManagerList.map((item, key) => {
         return { title: item.firstName + " " + item.lastName, id: item.accountId }
     })
     let clientOptions = listOfClient.length > 0 && listOfClient.map((item, key) => {
         return { title: item.clientName ? item.clientName : "", id: item.id }
     })
-    let purchaseOrderOptions = purchaseOrderList.length > 0 && purchaseOrderList.map((item, key) => {
+    let purchaseOrderOptions = purchaseOrderListByName.length > 0 && purchaseOrderListByName.map((item, key) => {
         return { title: item.poNum ? item.poNum : "", id: item.id }
     })
     let projectTypeOptions = Domains.length > 0 && Domains.map((item, key) => {
@@ -84,6 +93,7 @@ const LoadFields = (parameter) => {
             onChange={(value) => {
                 change('ProjectForm', 'clientName', value.title);
                 change('ProjectForm', 'clientId', value.id);
+                GetPurchaseOrderListByName(0,20,value.id,authorization)
             }}
             optionData={clientOptions} label="Client Name" validate={[Required]} />
         <Field name="clientId" component={renderTextHiddenField} />
@@ -107,15 +117,16 @@ const LoadHeader = (parameter) => {
     </>
 }
 
+// this method will used for the right side part of this component
 const SectionTwo = (data) => {
     const { classes, initialValues } = data
     const { uploadFile } = data.props
     const { operation, projectContractFileUrl, projectContractFileUpload } = data.props.stateData
     return <>
-        <Field name="projectStartDate" component={renderDateTimePicker} className={classes.textField} label="Start Date" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} validate={[Required]} />
-        <Field name="projectEndDate" component={renderDateTimePicker} className={classes.textField} label="End Date" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} validate={[Required]} />
-        <Field name="projectCost" component={renderNumberField} className={classes.textField} label="Project Cost" helperText={(initialValues === undefined) && "Ex. 20000"} validate={[Required]} />
-        <Field name="projectDesc" component={renderTextAreaField} fullWidth maxRows={2} label="Project Description" />
+        <Field name="projectStartDate" component={renderDateTimePicker} className={classes.textField} label="Start Date" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} disabled={operation === FromActions.VI} validate={[Required]} />
+        <Field name="projectEndDate" component={renderDateTimePicker} className={classes.textField} label="End Date" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} disabled={operation === FromActions.VI} validate={[Required]} />
+        <Field name="projectCost" component={renderNumberField} className={classes.textField} label="Project Cost" helperText={(initialValues === undefined) && "Ex. 20000"} disabled={operation === FromActions.VI} validate={[Required]} />
+        <Field name="projectDesc" component={renderTextAreaField} fullWidth maxRows={2} label="Project Description" disabled={operation === FromActions.VI} />
         {operation === FromActions.CR &&
             <>{(projectContractFileUpload) ? loadingCircle()
                 : (projectContractFileUrl ? LoadFileUrl({ "url": projectContractFileUrl, "cid": 1, "mainProps": data, "componentName": "Purchase Order Image", "style": { height: "60%", width: "100%" } })
@@ -171,6 +182,7 @@ const Expenses = (data) => {
 const selector = formValueSelector('ProjectForm')
 const mapDispatchToProps = (dispatch) => ({
     FileAction: bindActionCreators(FileAction, dispatch),
+    PurchaseOrderAction: bindActionCreators(PurchaseOrderAction,dispatch),
     change: bindActionCreators(change, dispatch)
 })
 ProjectForm = connect(state => {

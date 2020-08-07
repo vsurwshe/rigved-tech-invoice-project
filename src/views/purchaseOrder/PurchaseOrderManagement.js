@@ -35,6 +35,7 @@ class PurchaseOrderManagement extends Component {
         if (listOfClient && listOfClient.length === 0) {
             await GetClientList(0, 20, authorization);
         }
+        await loadMessage();
         await this.handleLoadPurchaseOrdertList()
     }
 
@@ -149,6 +150,7 @@ class PurchaseOrderManagement extends Component {
         const { authorization } = this.props.LoginState
         const newUserData = {
             ...sendUserValues,
+            "clientName":sendUserValues.clientName && sendUserValues.clientName.title,
             "poCntrUrl": (purchaseOrderFileUrl === "" || purchaseOrderFileUrl === undefined) ? sendUserValues.poCntrUrl : purchaseOrderFileUrl,
             "active": true,
         }
@@ -156,6 +158,7 @@ class PurchaseOrderManagement extends Component {
         setTimeout(async () => {
             await loadMessage()
             await GetPurchaseOrderList(0, 20, authorization);
+            await this.clearFileUrl();
             this.handleCreatePurchaseOrder();
         }, API_EXE_TIME)
     }

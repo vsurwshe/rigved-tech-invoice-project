@@ -11,6 +11,7 @@ import { Alert } from '@material-ui/lab';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import { Required, PhoneNumber, GSTIN, TAN, IFSCCode, BankAccount, Email } from '../utilites/FormValidation';
 import * as FileActions from "../../redux/actions/FileAction";
+import { FromActions } from '../../assets/config/Config';
 
 let ClientForm = (props) => {
     var classes = useStyles();
@@ -21,7 +22,7 @@ let ClientForm = (props) => {
             {LoadGird(props)}
             <div className={classes.buttonStyle}>
                 <center>
-                    {(operation === "edit" || operation === "create") && <>
+                    {(operation === FromActions.ED || operation === FromActions.CR) && <>
                         <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> {(initialValues === undefined) ? "SUBMIT" : "EDIT"}</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button></>}&nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await clearFile(); await reset(); cancle() }}> Cancel</Button>
@@ -42,15 +43,15 @@ const LoadGird = (props) => {
     </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
-                {(initialValues === undefined) ? SectionOne({ classes, props }) : EditSectionOne({ classes, initialValues })}
+                {(initialValues === undefined) ? SectionOne({ classes, "mainProps":props }) : EditSectionOne({ classes, initialValues })}
             </Grid>
             <Grid item xs={12} sm={6}>
-                {SectionTwo({ classes, props })}
+                {SectionTwo({ classes,"mainProps":props })}
             </Grid>
         </Grid>
         <Grid container spacing={5} style={{ paddingLeft: 10 }}>
             <Grid item xs={12}>
-                {SectionThree({ classes, rateCardDtos, contactPersonDtos, Domains, SkillCategory, SkillSet, props })}
+                {SectionThree({ classes, rateCardDtos, contactPersonDtos, Domains, SkillCategory, SkillSet,"mainProps":props })}
             </Grid>
         </Grid>
     </>
@@ -89,10 +90,9 @@ const EditSectionOne = (data) => {
     </div>
 }
 
-
 // section two
 const SectionTwo = (data) => {
-    const { initialValues } = data.props
+    const { initialValues } = data.mainProps
     return (initialValues === undefined) ? AddressDto(data) : AddressTextArea();
 }
 
@@ -105,7 +105,9 @@ const AddressTextArea = () => {
         parse={value => JSON.parse(value)}
         component={renderTextAreaField}
         maxRows={2} label="HQ Address"
-        fullWidth />
+        fullWidth 
+        disabled
+        />
 }
 // this method used for the show the address inputs 
 const AddressDto = (props) => {
@@ -123,7 +125,7 @@ const AddressDto = (props) => {
 const SectionThree = (data) => {
     const tabsData = [
         { label: "Contact Person", component: ContactAddress(data) },
-        { label: "Financials", component: Financials(data.props) },
+        { label: "Financials", component: Financials(data.mainProps) },
         { label: "Rate Card", component: RateCard(data) }
     ]
     return <SimpleTabs tabData={tabsData} />
@@ -189,12 +191,12 @@ const BankDetailsDto = () => {
 }
 
 // this will be render contact
-const RenderContact = ({ classes, fields, meta: { error, submitFailed } }) => {
+const RenderContact = ({ classes, fields,operation, meta: { error, submitFailed } }) => {
     const [open, setOpen] = useState(false);
     const handleClickOpen = () => { setOpen(true); fields.push({}) };
     const handleClose = () => { setOpen(false) };
     return <span>
-        <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>
+        { (operation !== FromActions.VI )&&<Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>}
         <Dialog open={open} onClose={handleClose} classes={{ paper: classes.dialogPaper }} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
             <DialogTitle id="responsive-dialog-title-1">{"Add Contact"}</DialogTitle>
             <DialogContent>
@@ -219,12 +221,12 @@ const RenderContact = ({ classes, fields, meta: { error, submitFailed } }) => {
 }
 
 // this will be render rate card
-const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, meta: { error, submitFailed } }) => {
+const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, operation, meta: { error, submitFailed } }) => {
     const [open, setOpen] = useState(false);
     const handleClickOpen = () => { setOpen(true); fields.push({}); };
     const handleClose = () => { setOpen(false) };
     return <span>
-        <Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>
+        {(operation !== FromActions.VI)&&<Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>}
         <Dialog open={open} onClose={handleClose} classes={{ paper: classes.dialogPaper }} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title">
             <DialogTitle id="responsive-dialog-title-2">{"Adding Rate Card"}</DialogTitle>
             <DialogContent >
@@ -269,21 +271,33 @@ const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, met
 }
 
 // rate card
-const RateCard = (props) => {
-    const { rateCardDtos, Domains, SkillCategory, SkillSet, classes } = props
+const RateCard = (data) => {
+    const { rateCardDtos, Domains, SkillCategory, SkillSet, classes } = data
+    const { operation }=(data.mainProps && data.mainProps.stateData) ? data.mainProps.stateData : ""
     return <span>
         <FieldArray name="rateCardDtos"
-            classes={classes} domains={Domains} skillCategory={SkillCategory} skillSet={SkillSet} component={RenderRateCard} validate={[Required]} />
+            classes={classes} 
+            domains={Domains} 
+            skillCategory={SkillCategory} 
+            skillSet={SkillSet} 
+            component={RenderRateCard} 
+            validate={[Required]}
+            operation={operation}/>
         <RateCardTable data={rateCardDtos} />
     </span>
 }
 
 // contact address
-const ContactAddress = (props) => {
-    const { contactPersonDtos, classes } = props
+const ContactAddress = (data) => {
+    const { contactPersonDtos, classes } = data
+    const { operation }=(data.mainProps && data.mainProps.stateData) ? data.mainProps.stateData : ""
     return <span>
-        <FieldArray name="contactPersonDtos" classes={classes} component={RenderContact} validate={[Required]} />
-        <ContactTable data={contactPersonDtos} />
+        <FieldArray name="contactPersonDtos" 
+            classes={classes} 
+            component={RenderContact} 
+            validate={[Required]} 
+            operation={operation}/>
+        <ContactTable data={contactPersonDtos}  />
     </span>
 }
 
