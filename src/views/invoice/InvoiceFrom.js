@@ -8,7 +8,7 @@ import { Alert, Autocomplete } from '@material-ui/lab';
 import { renderDateTimePicker, renderAutocompleteWithProps } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
 import * as ClientAction from "../../redux/actions/ClientAction";
-import { GetProjectListByClient } from "../../redux/actions/ProjectAction";
+import * as ProjectAction from "../../redux/actions/ProjectAction"
 import Invoice from './Invoice';
 import CloseIcon from '@material-ui/icons/Close';
 import jsPDF from 'jspdf';
@@ -22,14 +22,14 @@ let InvoiceFrom=(props)=>{
     var classes = useStyles();
     const { pristine, reset, submitting, handleSubmit, cancle } = props
     const [viewInvoice, setViewInvoice] = useState(false);
+    const [projectIdList, setProjectIdList] = useState([])
 
     return <div className={classes.girdContainer}>
-        <form onSubmit={handleSubmit((values)=>console.log("Value ",values))}>
-            {LoadGird(props)}
+        <form onSubmit={handleSubmit((values)=>console.log("Value ",values,projectIdList))}>
+            {LoadGird({"mainProps":props,projectIdList, setProjectIdList})}
             {ShowViewInvoice({"mainProps":props,classes,viewInvoice,setViewInvoice})}
             <div className={classes.buttonStyle}>
                 <center>
-                    {/* {(operation === FromActions.CR || operation === FromActions.ED) && <> </>} */}
                     <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}>SUBMIT</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button>&nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button> &nbsp;&nbsp;
@@ -74,16 +74,17 @@ const DwonloadInvoice=()=>{
 
 const LoadGird = (props) => {
     var classes = useStyles();
-    const {color, common_message}=props.ClientState
+    const { projectIdList, setProjectIdList }=props
+    const {color, common_message}=props.mainProps.ClientState
     return <><Grid container spacing={5}>
         {(common_message)&&<center><Alert color={color}>{common_message}</Alert></center>}
         </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6}  style={{ paddingLeft: 30, paddingTop: 30 }}>
-                {SectionOne({ classes, "mainProps":props })}
+                {SectionOne({ classes, "mainProps":props.mainProps, projectIdList, setProjectIdList })}
             </Grid>
             <Grid item xs={12} sm={6}  style={{ paddingLeft: 30, paddingTop: 30 }} >
-                {SectionTwo({ classes, "mainProps":props })}
+                {SectionTwo({ classes, "mainProps":props.mainProps })}
             </Grid>
         </Grid>
         {/* <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
@@ -95,23 +96,17 @@ const LoadGird = (props) => {
 }
 // this method will used for the load the left side part 
 const SectionOne = (data) => {
+    const { projectIdList, setProjectIdList }=data
     const { listOfClient }=data.mainProps.ClientState
     const { authorization }=data.mainProps.LoginState
     const { projectListByClient }=data.mainProps.ProjectState
     const { GetClientList }=data.mainProps.ClientAction
+    const { GetProjectListByClient }=data.mainProps.ProjectAction
     const [clientCall, setClientCall] = useState(0);
-    const [projectListCountCall, setProjectListCountCall] = useState(0);
-    const [clientId, setClientId] = useState(null);
-    const [projectIdList, setProjectIdList] = useState([])
 
     if(listOfClient.length <=0 && clientCall === 0){
         GetClientList(0,20,authorization);
         setClientCall(clientCall+1);
-    }
-
-    if(projectListCountCall===0 && clientId){
-        GetProjectListByClient(0,20,clientId,authorization);
-        setProjectListCountCall(projectListCountCall+1);
     }
 
     let clientOptions = (listOfClient && listOfClient.length > 0) && listOfClient.map((item, key) => {
@@ -119,14 +114,13 @@ const SectionOne = (data) => {
     })
 
     let projectOptions=(projectListByClient  && projectListByClient.length >0) && projectListByClient.map((item,key)=>{
-        return { title: item.clientName ? item.clientName : "", id: item.id }
+        return { title: item.clientName ? item.projectName : "", id: item.id }
     })
-    console.log("Client id",clientId,projectListCountCall);
     return <>
         <Field name="clientName" component={renderAutocompleteWithProps}
         onChange={(value) => {
             change('ProjectForm', 'clientName', value.title);
-            setClientId(value.id);
+            GetProjectListByClient(0,20,value.id,authorization)
         }}
         optionData={clientOptions} label="Client Name" validate={[Required]} />
         <Autocomplete
@@ -136,7 +130,7 @@ const SectionOne = (data) => {
               options={(projectOptions && projectOptions.length >0) ? projectOptions: []}
               getOptionLabel={projectOptions => (projectOptions && projectOptions.title) && projectOptions.title}
               getOptionSelected={(option, value) => option.id === value.id}
-              onChange={(event, value) => value && setProjectIdList([value.id])}
+              onChange={(event, value) => {console.log("ch ",value); value && setProjectIdList(value)}}
               renderInput={(params) => ( <TextField {...params} label="Project" margin="normal"  /> )}
         />
     </>
@@ -155,6 +149,7 @@ const SectionTwo = (data) => {
 const selector = formValueSelector('InvoiceFrom')
 const mapDispatchToProps = (dispatch) => ({
     ClientAction: bindActionCreators(ClientAction,dispatch),
+    ProjectAction:bindActionCreators(ProjectAction,dispatch),
     change: bindActionCreators(change, dispatch)
 })
 InvoiceFrom = connect(state => {

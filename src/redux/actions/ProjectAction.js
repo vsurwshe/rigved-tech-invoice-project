@@ -15,8 +15,8 @@ const GetProjectList = (firstIndex, lastIndex, authroizationKey) => {
 const GetProjectListByClient = (firstIndex, lastIndex, clientId, authroizationKey) => {
     return (dispatch) => {
         return CreateInstance()
-            .get('/project/projectList/' +clientId+'/'+firstIndex + '/' + lastIndex, HeaderConfig(authroizationKey))
-            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveProjectList, "loadMessage":loadMessage, response}) })
+            .get('/project/projectList/' +firstIndex + '/' + lastIndex+'/'+clientId, HeaderConfig(authroizationKey))
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveProjectListByClient, "loadMessage":loadMessage, response}) })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
