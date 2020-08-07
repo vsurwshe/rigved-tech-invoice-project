@@ -2,18 +2,20 @@ import React,{useState, forwardRef} from 'react';
 import { reduxForm, change, Field } from 'redux-form';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Button, Grid, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Slide, AppBar, Toolbar, IconButton } from '@material-ui/core';
+import { Button, Grid, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Slide, AppBar, Toolbar, IconButton, CircularProgress } from '@material-ui/core';
 import useStyles from "../client/Styles";
 import { Alert, Autocomplete } from '@material-ui/lab';
 import { renderDateTimePicker, renderAutocompleteWithProps } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
 import * as ClientAction from "../../redux/actions/ClientAction";
 import * as ProjectAction from "../../redux/actions/ProjectAction"
+import * as InvoiceAction from "../../redux/actions/InvoiceAction"
 import Invoice from './Invoice';
 import CloseIcon from '@material-ui/icons/Close';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import MaterialTable from 'material-table';
+import { API_EXE_TIME } from '../../assets/config/Config';
 
 // this method will used for the transition for model 
 const Transition = forwardRef(function Transition(props, ref) { return <Slide direction="up" ref={ref} {...props} />; });
@@ -25,9 +27,11 @@ let InvoiceFrom=(props)=>{
     const [viewInvoice, setViewInvoice] = useState(false);
     const [projectIdList, setProjectIdList] = useState([])
     const [viewSectionThree, setViewSectionThree] = useState(false)
+    const [loading, setLoading] = useState(false)
+    
     return <div className={classes.girdContainer}>
-        <form onSubmit={handleSubmit((values)=>PostInvoiceData({values, viewSectionThree, setViewSectionThree}))}>
-            {LoadGird({"mainProps":props,projectIdList, setProjectIdList,viewSectionThree, setViewSectionThree})}
+        <form onSubmit={handleSubmit((values)=>PostInvoiceData({"mainProps":props,values, projectIdList,viewSectionThree, setViewSectionThree, setLoading}))}>
+            {LoadGird({"mainProps":props,projectIdList, setProjectIdList,viewSectionThree, setViewSectionThree,loading, setLoading})}
             {ShowViewInvoice({"mainProps":props,classes,viewInvoice,setViewInvoice})}
             <div className={classes.buttonStyle}>
                 <center>
@@ -41,6 +45,7 @@ let InvoiceFrom=(props)=>{
     </div>
 }
 
+// this method will used for the showing invoice after posting successfully resource table
 const ShowViewInvoice=(propsData)=>{
     const { viewInvoice, setViewInvoice, classes }=propsData
     return <Dialog fullScreen open={viewInvoice} onClose={()=> setViewInvoice(false)} TransitionComponent={Transition}>
@@ -60,6 +65,7 @@ const ShowViewInvoice=(propsData)=>{
 </Dialog>
 }
 
+// this method will used for the download the invoice table as pdf
 const DwonloadInvoice=()=>{
     let htmlTable=document.getElementById('invoiceProject');
     html2canvas(htmlTable,{ 
@@ -73,20 +79,33 @@ const DwonloadInvoice=()=>{
   });
 }
 
-const PostInvoiceData=(propsData)=>{
-    const { values, viewSectionThree, setViewSectionThree }=propsData
-    console.log("Subimt Data",propsData, values, viewSectionThree,)
-    setViewSectionThree(true);
+// this method will used for the saving the genrate invoice
+const PostInvoiceData=async(propsData)=>{
+    const { values, setViewSectionThree, projectIdList, setLoading }=propsData
+    const { authorization }=propsData.mainProps.LoginState
+    const { GenerateInvoice }=propsData.mainProps.InvoiceAction
+    let newInvoiceData={
+        "fromDate":(values && values.fromDate) &&values.fromDate,
+        "toDate":(values && values.toDate) &&values.toDate,
+        "projectId":(projectIdList && projectIdList.length > 0)&&projectIdList[0].id
+    }
+    // await setLoading(true);
+    await GenerateInvoice(newInvoiceData,authorization);
+    setTimeout(async()=>{
+        // await setLoading(false);
+        await setViewSectionThree(true);
+    },API_EXE_TIME)
 }
 
+// this method will used for the loading gird structure of invoice form component
 const LoadGird = (props) => {
     var classes = useStyles();
-    const { projectIdList, setProjectIdList,viewSectionThree}=props
+    const { projectIdList, setProjectIdList,viewSectionThree,loading}=props
     const {color, common_message}=props.mainProps.ClientState
     return <><Grid container spacing={5}>
         {(common_message)&&<center><Alert color={color}>{common_message}</Alert></center>}
         </Grid>
-        <Grid container spacing={5}>
+         <Grid container spacing={5}>
             <Grid item xs={12} sm={6}  style={{ paddingLeft: 30, paddingTop: 30 }}>
                 {SectionOne({ classes, "mainProps":props.mainProps, projectIdList, setProjectIdList })}
             </Grid>
@@ -96,11 +115,14 @@ const LoadGird = (props) => {
         </Grid>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
-                {viewSectionThree && SectionThree({ classes, "mainProps": props })}
+                {viewSectionThree && SectionThree({ "mainProps": props.mainProps })}
             </Grid>
         </Grid>
     </>
 }
+
+const LoadingCircle=(message)=><center> <h3>{message}</h3> <CircularProgress size={80} /> </center>
+
 // this method will used for the load the left side part 
 const SectionOne = (data) => {
     const { setProjectIdList }=data
@@ -131,14 +153,14 @@ const SectionOne = (data) => {
         }}
         optionData={clientOptions} label="Client Name" validate={[Required]} />
         <Autocomplete
-              id="projectList"
-              autoHighlight
-              multiple
-              options={(projectOptions && projectOptions.length >0) ? projectOptions: []}
-              getOptionLabel={projectOptions => (projectOptions && projectOptions.title) && projectOptions.title}
-              getOptionSelected={(option, value) => option.id === value.id}
-              onChange={(event, value) =>  value && setProjectIdList(value)}
-              renderInput={(params) => ( <TextField {...params} label="Project" margin="normal"  /> )}
+            id="projectList"
+            autoHighlight
+            multiple
+            options={(projectOptions && projectOptions.length >0) ? projectOptions: []}
+            getOptionLabel={projectOptions => (projectOptions && projectOptions.title) && projectOptions.title}
+            getOptionSelected={(option, value) => option.id === value.id}
+            onChange={(event, value) =>  value && setProjectIdList(value)}
+            renderInput={(params) => ( <TextField {...params} label="Project" margin="normal"  /> )}
         />
     </>
 }
@@ -152,7 +174,9 @@ const SectionTwo = (data) => {
     </>
 }
 
+// this sections will used for the showing structure
 const SectionThree=(propsData)=>{
+    console.log("SE3 ",propsData);
     let columns=[
         { title: 'Row 1', field: '1'},
         { title: 'Row 2', field: '2'},
@@ -192,11 +216,9 @@ const LoadInvoiceResourceTable=(propsData)=>{
 // const selector = formValueSelector('InvoiceFrom')
 const mapDispatchToProps = (dispatch) => ({
     ClientAction: bindActionCreators(ClientAction,dispatch),
+    InvoiceAction: bindActionCreators(InvoiceAction,dispatch),
     ProjectAction:bindActionCreators(ProjectAction,dispatch),
     change: bindActionCreators(change, dispatch)
 })
-InvoiceFrom = connect(state => {
-    // can select values individually
-    return { ...state}
-}, mapDispatchToProps)(InvoiceFrom)
+InvoiceFrom = connect(state => { return { ...state}}, mapDispatchToProps)(InvoiceFrom)
 export default reduxForm({ form: 'InvoiceFrom' })(InvoiceFrom);

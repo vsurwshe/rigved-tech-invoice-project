@@ -18,7 +18,7 @@ const GenerateInvoice = (invoiceData, authroizationKey) => {
                 'Content-Type': 'application/json',
                 Authorization: authroizationKey 
             }})
-            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceList, "loadMessage":loadMessage, response}) })
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
@@ -32,9 +32,9 @@ export function SaveInvoiceList(invoiceList) {
     }
 }
 
-export function SaveGenratedInvoiceData(invoiceData) {
+export function SaveInvoiceEmployeeData(invoiceData) {
     return {
-        type: "SAVE_INVOICE_DATA",
+        type: "SAVE_INVOICE_EMPLOYEE_DATA",
         invoiceData
     }
 }
