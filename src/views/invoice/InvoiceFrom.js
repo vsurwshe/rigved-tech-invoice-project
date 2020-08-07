@@ -23,10 +23,10 @@ let InvoiceFrom=(props)=>{
     const { pristine, reset, submitting, handleSubmit, cancle } = props
     const [viewInvoice, setViewInvoice] = useState(false);
     const [projectIdList, setProjectIdList] = useState([])
-
+    const [viewSectionThree, setViewSectionThree] = useState(false)
     return <div className={classes.girdContainer}>
-        <form onSubmit={handleSubmit((values)=>console.log("Value ",values,projectIdList))}>
-            {LoadGird({"mainProps":props,projectIdList, setProjectIdList})}
+        <form onSubmit={handleSubmit((values)=>PostInvoiceData({values, viewSectionThree, setViewSectionThree}))}>
+            {LoadGird({"mainProps":props,projectIdList, setProjectIdList,viewSectionThree, setViewSectionThree})}
             {ShowViewInvoice({"mainProps":props,classes,viewInvoice,setViewInvoice})}
             <div className={classes.buttonStyle}>
                 <center>
@@ -46,7 +46,7 @@ const ShowViewInvoice=(propsData)=>{
     <AppBar  className={classes.dialogAppBar}  style={{float: "right"}} >
       <Toolbar >
         <IconButton classes={{ paper: classes.profileMenuIcon }} color="inherit" onClick={()=> setViewInvoice(false)} aria-label="close"> <CloseIcon  /> </IconButton>
-        <DialogTitle>Invoice</DialogTitle>
+        <DialogTitle>Generated Invoice</DialogTitle>
       </Toolbar>
     </AppBar>
     <DialogContent>
@@ -68,13 +68,19 @@ const DwonloadInvoice=()=>{
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p','pt', 'a4');
     pdf.addImage(imgData, 'PNG', 25, 100);
-    pdf.save("download.pdf");  
+    pdf.save("downloadInvoice.pdf");  
   });
+}
+
+const PostInvoiceData=(propsData)=>{
+    const { values, viewSectionThree, setViewSectionThree }=propsData
+    console.log("Subimt Data",propsData)
+    setViewSectionThree(true);
 }
 
 const LoadGird = (props) => {
     var classes = useStyles();
-    const { projectIdList, setProjectIdList }=props
+    const { projectIdList, setProjectIdList,viewSectionThree, setViewSectionThree }=props
     const {color, common_message}=props.mainProps.ClientState
     return <><Grid container spacing={5}>
         {(common_message)&&<center><Alert color={color}>{common_message}</Alert></center>}
@@ -87,11 +93,11 @@ const LoadGird = (props) => {
                 {SectionTwo({ classes, "mainProps":props.mainProps })}
             </Grid>
         </Grid>
-        {/* <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
+        <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
-                {SectionThree({ classes, "mainProps": props })}
+                {viewSectionThree && SectionThree({ classes, "mainProps": props })}
             </Grid>
-        </Grid> */}
+        </Grid>
     </>
 }
 // this method will used for the load the left side part 
@@ -130,7 +136,7 @@ const SectionOne = (data) => {
               options={(projectOptions && projectOptions.length >0) ? projectOptions: []}
               getOptionLabel={projectOptions => (projectOptions && projectOptions.title) && projectOptions.title}
               getOptionSelected={(option, value) => option.id === value.id}
-              onChange={(event, value) => {console.log("ch ",value); value && setProjectIdList(value)}}
+              onChange={(event, value) =>  value && setProjectIdList(value)}
               renderInput={(params) => ( <TextField {...params} label="Project" margin="normal"  /> )}
         />
     </>
@@ -143,6 +149,10 @@ const SectionTwo = (data) => {
         <Field name="fromDate" component={renderDateTimePicker} className={classes.textField} label="From Date" helperText="Ex. 01/01/2000" validate={[Required]} />
         <Field name="toDate" component={renderDateTimePicker} className={classes.textField} label="To Date" helperText="Ex. 01/01/2000" validate={[Required]} />
     </>
+}
+
+const SectionThree=(propsData)=>{
+    return <h1>SectionThree</h1>
 }
 
 // make the selector 

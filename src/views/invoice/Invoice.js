@@ -6,125 +6,149 @@ let Invoice=(props)=>{
 }
 
 const LoadInvoiceTable=(props)=>{
-let tableColSpan="3";
 return <div  className="invoice-box">
     <table id="invoiceProject" cellPadding="0" border="1" cellSpacing="0">
         <tbody>
-            {MainTableSectionOne({tableColSpan})}
-            {MainTableSectionTwo({"mainProps":props,tableColSpan})}
-            {MainTableSectionThree({"mainProps":props,tableColSpan})}
-            {MainTableSectionFourth({"mainProps":props,tableColSpan})}
+            {MainTableSectionOne()}
+            {MainTableSectionTwo({"mainProps":props})}
+            {MainTableSectionThree({"mainProps":props})}
+            {MainTableSectionFourth({"mainProps":props})}
         </tbody>
     </table>
 </div>
 }
 
 const MainTableSectionOne=(propsData)=>{ 
-    const { tableColSpan }=propsData
-    return <>
-        <tr> <td colSpan={tableColSpan}><center>Tax Invoice</center></td></tr>
-        <tr> <td colSpan={tableColSpan}><div style={{padding:6}}></div></td></tr>
-    </>
+    return <table className="table-border-bottom">
+        <tbody>
+            <tr> <td ><center>Tax Invoice</center></td></tr>
+            <tr> <td ><div style={{padding:6}}></div></td></tr>
+        </tbody>
+    </table>
 }
 
 const MainTableSectionTwo=(propsData)=>{
-    const { tableColSpan, mainProps }=propsData
-    return <>
-        <tr>
-            <td colSpan={tableColSpan}>
-                <table>
-                    <tbody>
-                        {FormSection({"mainProps":mainProps,tableColSpan})}
-                        {ContactAndInvoiceDetailsRow({"mainProps":mainProps})}
-                        {ToSection({"mainProps":mainProps})}
-                    </tbody>
-                </table>
-            </td>
-        </tr>
-    </>
+    const { mainProps }=propsData
+    return <table>
+                <tbody>
+                    {FormSection({"mainProps":mainProps})}
+                    {ContactAndInvoiceDetailsRow({"mainProps":mainProps})}
+                    {ToSection({"mainProps":mainProps})}
+                </tbody>
+        </table>
 }
 
 // this will load the from Section row
 const FormSection=(propsData)=>{
-    const { tableColSpan }=propsData
-    return<tr>
-        <td colSpan={tableColSpan}><h1>V & Y</h1></td>
-    </tr>
+    return<table>
+        <tbody>
+            <tr>
+                <td>
+                    <p style={{fontSize:12 , lineHeight:"normal"}}>
+                        <b>Name: Rigved Technologies Pvt Ltd</b><br/>
+                        <b>Registered Address:</b> <br/>
+                        04th Floor, 408, Plot no A-1, Rupa Solitaire,<br/>
+                        Millennium Business Park, Mahape,<br/>
+                        Mumbai, Maharashtra, 400710, India.
+                    </p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 }
 
 // this will load the Conact info and Details Row
 const ContactAndInvoiceDetailsRow=(propsData)=>{
-    return<tr>
-        <td className="title"> <h1>V & Y</h1></td>
-        <td>
-            Invoice #: <br />
-            Date: <br />
-        </td>
-</tr>
+    return<table>
+        <tbody>
+            <tr>
+                <td>
+                    <p style={{fontSize:12 , lineHeight:"normal"}}>
+                           Contact No : 9004353333<br/>
+                           Email Id: deepika.singh@rigvedtech.com <br/>
+                           CIN No.: U74900MH2008PTC186830<br/>
+                        <b>Pan No.: AAECR1228G</b><br/>
+                        <b>GSTIN No.: 27AAECR1228G1ZL</b><br/>
+                        <b>SAC CODE : 998313</b>
+                    </p>
+                </td>
+                <td>
+                    <p style={{fontSize:12 , lineHeight:"normal"}}>
+                        Invoice #: <br />
+                        Date:
+                    </p>  
+                </td>
+            </tr>
+        </tbody>
+    </table>
 }
 
 // this will load the to info details row
 const ToSection=(propsData)=>{
-    return <tr>
-    <td className="title">
-        <b>Form :</b> <br />
-        V & Y Soft. Tech. Pvt. Ltd.<br />
-        Nanded-Hyderbad Hwy,<br />
-        Mahashtraha, IN-431603.
-    </td>
-    <td className="title">
-        <b>To :</b><br />
-        Acme Corp.<br />
-        John Doe<br />
-        john@example.com
-    </td>
-    <td></td>
-</tr>
+    return <table>
+            <tbody>
+                <tr>
+                    <td>
+                        <p style={{fontSize:12 ,fontWeight:"bold", lineHeight:"normal"}}>
+                            To,<br/>
+                            Hurix Systems Pvt. Ltd,<br/>
+                            5th Floor, Central Wing, Unit No - 9 & 10,<br/>
+                            Sai Trinity Pashan-SUS Road, Pashan, Pune - 411021
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p style={{fontSize:12 , fontWeight:"bold", lineHeight:"normal"}}>
+                            Pan No.: AAECR1228G<br/>
+                            GSTIN No.: 27AAECR1228G1ZL<br/>
+                        </p>
+                    </td>
+                </tr>
+            </tbody>
+    </table> 
 }
 
 const MainTableSectionThree=(propsData)=>{
-    const { tableColSpan }=propsData
-    return <>
-        <tr className="heading">
-            <td>Payment Method</td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr className="details">
-            <td>
-                {/* {props.payments && props.payments.mode} */}
-            </td>
-            <td>
-                {/* {props.payments && props.payments.transctionsId} */}
-            </td>
-            <td></td>
-        </tr>
-
-        <tr className="heading">
-            <td>Item</td>
-            <td>Qty</td>
-            <td>Price</td>
-        </tr>
-        {/* {props.invoiceItem && props.invoiceItem.map((item, key) => {
-            return <tr key={key} className="item" >
-                <td>{item.itemName}</td>
-                <td>{item.itemQty}</td>
-                <td>{item.itemPrice}</td></tr>
-        })
-        } */}
-        <tr className="total">
-            <td></td>
-            <td>Total:</td>
-            <td>$1200</td>
-        </tr>
-    </>
+    return <table cellPadding="0" border="1" cellSpacing="0">
+        <tbody>
+            <tr className="heading">
+                <td>Payment Method</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr className="details">
+                <td> {/* {props.payments && props.payments.mode} */}</td>
+                <td> {/* {props.payments && props.payments.transctionsId} */}</td>
+                <td></td>
+            </tr>
+            <tr className="heading">
+                <td>Item</td>
+                <td>Qty</td>
+                <td>Price</td>
+            </tr>
+            {/* {props.invoiceItem && props.invoiceItem.map((item, key) => {
+                return <tr key={key} className="item" >
+                    <td>{item.itemName}</td>
+                    <td>{item.itemQty}</td>
+                    <td>{item.itemPrice}</td></tr>
+            })
+            } */}
+            <tr className="total">
+                <td></td>
+                <td>Total:</td>
+                <td>$1200</td>
+            </tr>
+        </tbody>
+    </table>
 }
 
 const MainTableSectionFourth=(propsData)=>{
-    const { tableColSpan }=propsData
-    return <>
-        <tr><td colSpan={tableColSpan}>Sections 4</td></tr>
-    </>
+    return <table>
+        <tbody>
+            <tr><td>Sections 4</td></tr>
+        </tbody>
+    </table>
 }
 
 export default Invoice;

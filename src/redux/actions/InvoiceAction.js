@@ -11,6 +11,18 @@ const GetInvoiceList = (firstIndex, lastIndex, authroizationKey) => {
     }
 }
 
+const GenerateInvoice = (invoiceData, authroizationKey) => {
+    return (dispatch) => {
+        return CreateInstance()
+            .post('/innvoice/create/',invoiceData,{headers: { 
+                'Content-Type': 'application/json',
+                Authorization: authroizationKey 
+            }})
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceList, "loadMessage":loadMessage, response}) })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
 //-------------------------------------
 
 export function SaveInvoiceList(invoiceList) {
@@ -20,8 +32,15 @@ export function SaveInvoiceList(invoiceList) {
     }
 }
 
+export function SaveGenratedInvoiceData(invoiceData) {
+    return {
+        type: "SAVE_INVOICE_DATA",
+        invoiceData
+    }
+}
 
 
 export{
-    GetInvoiceList
+    GetInvoiceList,
+    GenerateInvoice
 }
