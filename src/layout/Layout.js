@@ -12,7 +12,7 @@ import ClientManagment from '../views/client/ClientManagement';
 import PurchaseOrderManagement from '../views/purchaseOrder/PurchaseOrderManagement';
 import ProjectManagement from '../views/project/ProjectManagement';
 import PurchaseOrderFrom from '../views/purchaseOrder/PurchaseOrderFrom';
-import InvoiceManagement from '../views/invoice/InvoiceManagement'
+
 
 const RoutesPath=[
     {path:"/register",component: UserManagement},
@@ -20,7 +20,6 @@ const RoutesPath=[
     {path:"/client",component: ClientManagment},
     {path:"/purchaseOrder",component: PurchaseOrderManagement},
     {path:"/project",component: ProjectManagement},
-    {path:"/invoice",component: InvoiceManagement},
     {path:"/purchaseOrder/view",component: PurchaseOrderFrom, exact:true}
 ]
 

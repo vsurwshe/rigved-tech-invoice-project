@@ -37,16 +37,5 @@ export default makeStyles(theme => ({
     dialogPaper: {
         maxWidth: '300vh'
     },
-    dialogAppBar: {
-        position: 'relative',
-    },
-    dialogTitle: {
-      marginLeft: theme.spacing(2),
-      flex: 1,
-    },
-    dialogProfileMenuIcon: {
-        marginRight: theme.spacing(2),
-        color: theme.palette.text.hint,
-    }
     
 }))
