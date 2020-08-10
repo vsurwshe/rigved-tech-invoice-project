@@ -90,7 +90,7 @@ const PostInvoiceData=async(propsData)=>{
         "projectId":(projectIdList && projectIdList.length > 0)&&projectIdList[0].id
     }
     // await setLoading(true);
-    await GenerateInvoice(newInvoiceData,authorization);
+    // await GenerateInvoice(newInvoiceData,authorization);
     setTimeout(async()=>{
         // await setLoading(false);
         await setViewSectionThree(true);
@@ -174,21 +174,44 @@ const SectionTwo = (data) => {
     </>
 }
 
+// this is month name array
+var months = ['', 'JANUARY', 'FEBRUARY', 'MARCH',  'APRIL', 'MAY', 'JUNE', 'JULY',  'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+
 // this sections will used for the showing structure
 const SectionThree=(propsData)=>{
     console.log("SE3 ",propsData);
+    const {invoiceEmployeeData }=propsData.mainProps.InvoiceState
     let columns=[
-        { title: 'Row 1', field: '1'},
-        { title: 'Row 2', field: '2'},
-        { title: 'Row 3', field: '3'}
+        {title: "EMP\u00a0ID", field:"employeeId"},
+        {title: "EMP\u00a0NAME", field:"employeeName"},
+        {title: "TOTAL\u00a0DAYS", field:"totalDays"},
+        {title: "TOTAL\u00a0AMOUNT", field:"totalAmt"}
     ];
-    let data=[
-        {"1":1,"2":2,"3":3},
-        {"1":1,"2":2,"3":3},
-        {"1":1,"2":2,"3":3}
-    ];
+    let data=[];
+    (invoiceEmployeeData && invoiceEmployeeData.length > 0)&& invoiceEmployeeData.map((item,key)=>{
+        let monthString =item.attendancepermonth ? item.attendancepermonth : "";
+        let firstArray=monthString && monthString.split(',');
+        let data = [];
+        firstArray.forEach(element => {
+            let monthNumber;
+            let filterEqualArray;
+            if(element.includes("{")){
+                let tempArray=element.split('{')
+                filterEqualArray= tempArray[1].split("=");
+            }else if(element.includes("}")){
+                let tempArray=element.split('}')
+                filterEqualArray= tempArray[0].split("=");
+            }else{
+                filterEqualArray= element.split("=");
+            }
+            monthNumber=filterEqualArray && filterEqualArray[0].replace(/ /g, "");
+            data.push({ title:months[monthNumber], field: monthNumber})
+        });
+        columns.splice(2,0,...data)
+    })
     return LoadInvoiceResourceTable({columns,data});
 }
+
 
 const LoadInvoiceResourceTable=(propsData)=>{
     const { columns, data}= propsData
