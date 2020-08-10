@@ -192,7 +192,6 @@ const SectionThree=(propsData)=>{
         let monthString =item.attendancepermonth ? item.attendancepermonth : "";
         let firstArray=monthString && monthString.split(',');
         let tempColunmsData = [];
-        let tempData=[];
         data.push({
             "employeeId":item.employeeId,
             "employeeName":item.employeeName,
@@ -213,7 +212,7 @@ const SectionThree=(propsData)=>{
             }
             monthNumber=filterEqualArray && filterEqualArray[0].replace(/ /g, "");
             key === 0 && tempColunmsData.push({ title:months[monthNumber], field: months[monthNumber]})
-            data[key][months[monthNumber]]= filterEqualArray[1]
+            data[key][months[monthNumber]]= (filterEqualArray[1] && filterEqualArray[1].includes("}"))? (filterEqualArray[1].split('}')[0]):filterEqualArray[1]
         });
         columns.splice(2,0,...tempColunmsData)
     })

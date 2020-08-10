@@ -58,7 +58,7 @@ const FormSection=(propsData)=>{
 
 // this will load the Conact info and Details Row
 const ContactAndInvoiceDetailsRow=(propsData)=>{
-    return<table>
+    return<table style={{marginTop:"-20px"}}>
         <tbody>
             <tr>
                 <td>
@@ -84,7 +84,7 @@ const ContactAndInvoiceDetailsRow=(propsData)=>{
 
 // this will load the to info details row
 const ToSection=(propsData)=>{
-    return <table>
+    return <table style={{marginTop:"-25px"}}>
             <tbody>
                 <tr>
                     <td>
@@ -94,10 +94,6 @@ const ToSection=(propsData)=>{
                             5th Floor, Central Wing, Unit No - 9 & 10,<br/>
                             Sai Trinity Pashan-SUS Road, Pashan, Pune - 411021
                         </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
                         <p style={{fontSize:12 , fontWeight:"bold", lineHeight:"normal"}}>
                             Pan No.: AAECR1228G<br/>
                             GSTIN No.: 27AAECR1228G1ZL<br/>
@@ -145,9 +141,42 @@ const MainTableSectionThree=(propsData)=>{
 const MainTableSectionFourth=(propsData)=>{
     return <table>
         <tbody>
-            <tr><td>Sections 4</td></tr>
+            <tr><td>{FooterBankSections(propsData)}</td></tr>
+            <tr><td>{FooterDigitalSignSections(propsData)}</td></tr>
         </tbody>
     </table>
 }
+
+const FooterBankSections=(propsData)=>{
+    return <table>
+    <tbody>
+        <tr>
+            <td>
+                <p style={{fontSize:12 , fontWeight:"bold", lineHeight:"normal"}}>
+                    Cheque should be drawn in Favour of. <u>Rigved Technologies Private Limited</u>
+                </p>
+                <p style={{fontSize:12 , lineHeight:"normal"}}>
+                    <b>Bank Details:</b> <br/>
+                    Account Name.: Rigved Technologies Private Limited<br/>
+                    Bank Name: Axis Bank Ltd<br/>
+                    Bank Account No: 916020022757685<br/>
+                    IFSC Code: UTIB0000183<br />
+                    Account Type: Current<br/>
+                    Bank Address: Vile Parle East Mumbai.
+                </p>
+            </td>
+        </tr>
+    </tbody>
+</table>
+}
+
+const FooterDigitalSignSections=(propsData)=>{
+    return<table style={{float:"right", position:"relative", width:"30%", marginTop:"-45px"}}>
+        <tbody>
+            <tr><td><p style={{fontSize:12 , fontWeight:"bold", lineHeight:"normal"}}>For Rigved Technologies Pvt Ltd</p></td></tr>
+        </tbody>
+    </table> 
+}
+
 
 export default Invoice;

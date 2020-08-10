@@ -45,9 +45,6 @@ let ResourcesTable=(props)=>{
     const { authorization}=props.LoginState
     const { clientDataById }=props.ClientState
     const { employeeListByPojectId }=props.EmpolyeeState
-
-
-  
     const [open, setOpen] = useState(false);
     const [countCall,setCountCall]=useState(0)
     const [countCallRateCard,setCountRateCardCall]=useState(0)
@@ -224,14 +221,14 @@ const LoadAddResourceModel=(data)=>{
     </DialogContent>
     <DialogActions>
         <Button onClick={handleClose} color="primary">Cancel</Button>
-        <Button onClick={() =>loadAssignResource({listOfEmployeeAccount, selectedRateCard,"mainProps":data.mainProps,load,setLoad,handleClose, tableData})} color="secondary">Assign Resource</Button>
+        <Button onClick={() =>loadAssignResource({listOfEmployeeAccount, selectedRateCard,"mainProps":data.mainProps,load,setLoad,handleClose,tableData,setTableData})} color="secondary">Assign Resource</Button>
     </DialogActions>
   </Dialog>
 }
 
 // this method will used for the loading assign resource
 const loadAssignResource=(data)=>{
-  const { setLoad,load,handleClose,tableData}=data
+  const { setLoad,load,handleClose,tableData,setTableData}=data
   const { projectId }=data.mainProps
   const { authorization}=data.mainProps.LoginState
   const { SaveEmployeeRecord,GetEmployeeListByProjectId }=data.mainProps.EmployeeAction
@@ -241,16 +238,17 @@ const loadAssignResource=(data)=>{
     "active": 1
   }
   setLoad(true);
-  saveAssignResource({newResourceData,load,setLoad,SaveEmployeeRecord,GetEmployeeListByProjectId,authorization,handleClose});
+  saveAssignResource({newResourceData,load,setLoad,SaveEmployeeRecord,GetEmployeeListByProjectId,authorization,handleClose,setTableData});
 }
 
 // this method will used for calling the save employee record
 const saveAssignResource=async(propsData)=>{
-  const {newResourceData,setLoad,SaveEmployeeRecord,GetEmployeeListByProjectId,authorization,handleClose }=propsData
+  const {newResourceData,setLoad,SaveEmployeeRecord,GetEmployeeListByProjectId,authorization,handleClose,setTableData }=propsData
   if(newResourceData){
     await SaveEmployeeRecord(newResourceData,authorization);
     await loadMessage();
     await GetEmployeeListByProjectId(0,20,newResourceData.projectId,authorization);
+    await setTableData([]);
     await setLoad(false);
     await handleClose();
   }
