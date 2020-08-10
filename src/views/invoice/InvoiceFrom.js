@@ -90,7 +90,7 @@ const PostInvoiceData=async(propsData)=>{
         "projectId":(projectIdList && projectIdList.length > 0)&&projectIdList[0].id
     }
     // await setLoading(true);
-    // await GenerateInvoice(newInvoiceData,authorization);
+    await GenerateInvoice(newInvoiceData,authorization);
     setTimeout(async()=>{
         // await setLoading(false);
         await setViewSectionThree(true);
@@ -191,7 +191,14 @@ const SectionThree=(propsData)=>{
     (invoiceEmployeeData && invoiceEmployeeData.length > 0)&& invoiceEmployeeData.map((item,key)=>{
         let monthString =item.attendancepermonth ? item.attendancepermonth : "";
         let firstArray=monthString && monthString.split(',');
-        let data = [];
+        let tempColunmsData = [];
+        let tempData=[];
+        data.push({
+            "employeeId":item.employeeId,
+            "employeeName":item.employeeName,
+            "totalDays":item.totalDays,
+            "totalAmt":item.totalAmt
+        })
         firstArray.forEach(element => {
             let monthNumber;
             let filterEqualArray;
@@ -205,9 +212,10 @@ const SectionThree=(propsData)=>{
                 filterEqualArray= element.split("=");
             }
             monthNumber=filterEqualArray && filterEqualArray[0].replace(/ /g, "");
-            data.push({ title:months[monthNumber], field: monthNumber})
+            key === 0 && tempColunmsData.push({ title:months[monthNumber], field: months[monthNumber]})
+            data[key][months[monthNumber]]= filterEqualArray[1]
         });
-        columns.splice(2,0,...data)
+        columns.splice(2,0,...tempColunmsData)
     })
     return LoadInvoiceResourceTable({columns,data});
 }
