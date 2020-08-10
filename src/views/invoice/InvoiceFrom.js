@@ -214,7 +214,7 @@ const SectionThree=(propsData)=>{
             key === 0 && tempColunmsData.push({ title:months[monthNumber], field: months[monthNumber]})
             data[key][months[monthNumber]]= (filterEqualArray[1] && filterEqualArray[1].includes("}"))? (filterEqualArray[1].split('}')[0]):filterEqualArray[1]
         });
-        columns.splice(2,0,...tempColunmsData)
+        columns.splice(4,0,...tempColunmsData)
     })
     return LoadInvoiceResourceTable({columns,data});
 }
