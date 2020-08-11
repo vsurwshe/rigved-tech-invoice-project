@@ -15,6 +15,20 @@ const renderTextField = ({ label, name, input, meta: { touched, invalid, error }
     />
   )
 
+// this is render password text filed
+const renderPasswordTextField = ({ label, name, input, meta: { touched, invalid, error }, ...custom }) => (
+  <TextField
+    id={name}
+    type="password"
+    label={label}
+    placeholder={label}
+    error={touched && invalid}
+    helperText={touched && error}
+    {...input}
+    {...custom}
+  />
+)
+
 // this is render text filed
 const renderTextHiddenField = ({ label, name, input, meta: { touched, invalid, error }, ...custom }) => (
   <TextField
@@ -178,5 +192,6 @@ export{
     renderFileInput,
     renderAutocomplete,
     renderAutocompleteByName,
-    renderAutocompleteWithProps
+    renderAutocompleteWithProps,
+    renderPasswordTextField
 }

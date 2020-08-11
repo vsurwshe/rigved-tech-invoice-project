@@ -49,7 +49,7 @@ const RegsiterTable=(props)=>{
 
   return <div style={{ maxWidth: "100%" }}>
     <MaterialTable
-      title={TableHeaderText.CLIENTTABLE}
+      title={TableHeaderText.REGISTERTABLE}
       columns={columns}
       data={(data && data.length > 0 )? data : []}
       options={{

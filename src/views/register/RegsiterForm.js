@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Button, Grid, Accordion, AccordionSummary, AccordionDetails, CircularProgress } from "@material-ui/core";
-import { Field, reduxForm, reset } from 'redux-form';
-import { renderTextField, renderAutocompleteByName, renderDateTimePicker, radioButton, renderNumberField, renderFileInput } from '../utilites/FromUtilites';
+import { Field, reduxForm, reset, getFormSyncErrors, getFormValues, isInvalid } from 'redux-form';
+import { renderTextField, renderAutocompleteByName, renderDateTimePicker, radioButton, renderNumberField, renderFileInput, renderPasswordTextField } from '../utilites/FromUtilites';
 import useStyles from "./styles";
 import { connect } from 'react-redux';
 import { Required } from '../utilites/FormValidation';
@@ -10,7 +10,8 @@ import * as MasterDataAction from '../../redux/actions/MasterDataAction';
 
 let RegisterFrom = (props) => {
     var classes = useStyles();
-    const { RegisterUser, pristine, reset, submitting, handleSubmit, clearFile, cancle } = props
+    const { RegisterUser, pristine, reset, submitting, handleSubmit, clearFile, cancle, synchronousError } = props
+    console.log("Error ",synchronousError)
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(RegisterUser)}>
             {LoadGird({ classes, props })}
@@ -27,21 +28,6 @@ let RegisterFrom = (props) => {
 
 const LoadGird = (propsData) => {
     const { classes, props } = propsData
-    const { SkillSet, RoleList, Domains } = props.MasterDataSet
-    const { authorization } = props.LoginState
-    async function loadRequiredData() {
-        if (Domains && Domains.length <= 0 && props.MasterDataAction) {
-            await props.MasterDataAction.GetDomains(0, 20, authorization)
-        }
-        if (SkillSet && SkillSet.length <= 0 && props.MasterDataAction) {
-            await props.MasterDataAction.GetSkillSet(0, 20, authorization
-            )
-        }
-        if (RoleList && RoleList.length <= 0 && props.MasterDataAction) {
-            await props.MasterDataAction.GetRoleList(0, 20, authorization)
-        }
-    }
-    useEffect(() => { loadRequiredData() })
     return <>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6}>
@@ -80,8 +66,8 @@ const PersonalInfo = (props) => {
                 <Field name="designation" component={renderTextField} label="Job Title" style={{ margin: 8 }} fullWidth helperText="Ex. Java Full Stack Developer" margin="normal" InputLabelProps={{ shrink: true }} />
                 <Field name="firstName" className={classes.textField} component={renderTextField} label="First Name" />
                 <Field name="lastName" className={classes.textField} component={renderTextField} label="Last Name" />
-                <Field name="expInYears" className={classes.textField} component={renderNumberField} label="Expriance" helperText="Ex. 2 years" margin="normal" />
-                <Field name="password" className={classes.textField} component={renderTextField} label="Password" margin="normal" helperText="Password must contain [1...9][A...Z] and any special symbol" />
+                <Field name="expInYears" className={classes.textField} component={renderNumberField} label="Experience" helperText="Ex. 2 years" margin="normal" />
+                <Field name="password" className={classes.textField} component={renderPasswordTextField} label="Password" margin="normal" helperText="Password must contain [1...9][A...Z] and any special symbol" />
                 <Field name="gender" className={classes.textField} component={radioButton} mainLableName="Gender" label={["male", "female"]} />
             </div>
         </AccordionDetails>
@@ -166,6 +152,35 @@ const mapDispatchToProps = (dispatch) => ({
     MasterDataAction: bindActionCreators(MasterDataAction, dispatch),
 })
 
-RegisterFrom = connect(state => { return { ...state } }, mapDispatchToProps)(RegisterFrom)
+const validate=(values)=>{
+    console.log("Calling validtions")
+    const errors={}
+    if(!values.expInYears <0){
+        errors.expInYears="Experience is not negative value"
+    }
+    if(!(values.primerySkill === values.secounderySkill)){
+        errors.primerySkill="Primary and secondary values should not be same"
+    }else if(values.secounderySkill === values.primerySkill){
+        errors.secounderySkill="Primary and secondary values should not be same"
+    }
+    if(!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/i.test(values.password)){
+        errors.password="Password should contain minimum eight characters, at least one letter [A...Za...Z], one number[1...9] and one special character";
+    }
+    return errors
+}
+
+RegisterFrom = connect(state => ({
+    values: getFormValues("RegisterFrom")(state),
+    synchronousError: getFormSyncErrors("RegisterFrom")(state),
+    invalid: isInvalid("RegisterFrom")(state)
+}))(RegisterFrom);
+  
+RegisterFrom = connect(state => {
+     return { ...state} 
+}, mapDispatchToProps)(RegisterFrom)
 const afterSubmit = (result, dispatch) => dispatch(reset('RegisterFrom'));
-export default reduxForm({ form: 'RegisterFrom', onSubmitSuccess: afterSubmit })(RegisterFrom);
+export default reduxForm({ 
+    form: 'RegisterFrom', 
+    validate,
+    onSubmitSuccess: afterSubmit 
+})(RegisterFrom);
