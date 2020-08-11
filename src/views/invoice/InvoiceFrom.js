@@ -23,21 +23,22 @@ const Transition = forwardRef(function Transition(props, ref) { return <Slide di
 
 let InvoiceFrom=(props)=>{
     var classes = useStyles();
-    const { pristine, reset, submitting, handleSubmit, cancle } = props
+    const { pristine, reset, submitting, handleSubmit} = props
+    const { SaveInvoiceEmployeeData }=props.InvoiceAction
     const [viewInvoice, setViewInvoice] = useState(false);
     const [projectIdList, setProjectIdList] = useState([])
     const [viewSectionThree, setViewSectionThree] = useState(false)
     const [loading, setLoading] = useState(false)
-    
+    console.log("Props ", props)
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit((values)=>PostInvoiceData({"mainProps":props,values, projectIdList,viewSectionThree, setViewSectionThree, setLoading}))}>
-            {LoadGird({"mainProps":props,projectIdList, setProjectIdList,viewSectionThree, setViewSectionThree,loading, setLoading})}
+            { LoadGird({"mainProps":props,projectIdList, setProjectIdList,viewSectionThree, setViewSectionThree,loading, setLoading})}
             {ShowViewInvoice({"mainProps":props,classes,viewInvoice,setViewInvoice})}
             <div className={classes.buttonStyle}>
                 <center>
                     <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}>SUBMIT</Button> &nbsp;&nbsp;
-                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button>&nbsp;&nbsp;
-                    <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button> &nbsp;&nbsp;
+                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={async()=>{ await reset(); await SaveInvoiceEmployeeData([])}}> Clear Values</Button>&nbsp;&nbsp;
+                    {/* <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button> &nbsp;&nbsp; */}
                     <Button type="button" variant="outlined" color="primary" onClick={()=> setViewInvoice(true)}>View Invoice</Button> 
                 </center>
             </div>
@@ -89,23 +90,23 @@ const PostInvoiceData=async(propsData)=>{
         "toDate":(values && values.toDate) &&values.toDate,
         "projectId":(projectIdList && projectIdList.length > 0)&&projectIdList[0].id
     }
-    // await setLoading(true);
+    await setLoading(true);
     await GenerateInvoice(newInvoiceData,authorization);
     setTimeout(async()=>{
-        // await setLoading(false);
+        await setLoading(false);
         await setViewSectionThree(true);
     },API_EXE_TIME)
 }
 
 // this method will used for the loading gird structure of invoice form component
-const LoadGird = (props) => {
+const LoadGird = (props)=> {
     var classes = useStyles();
     const { projectIdList, setProjectIdList,viewSectionThree,loading}=props
     const {color, common_message}=props.mainProps.ClientState
     return <><Grid container spacing={5}>
         {(common_message)&&<center><Alert color={color}>{common_message}</Alert></center>}
         </Grid>
-         <Grid container spacing={5}>
+        <Grid container spacing={5}>
             <Grid item xs={12} sm={6}  style={{ paddingLeft: 30, paddingTop: 30 }}>
                 {SectionOne({ classes, "mainProps":props.mainProps, projectIdList, setProjectIdList })}
             </Grid>
@@ -113,15 +114,17 @@ const LoadGird = (props) => {
                 {SectionTwo({ classes, "mainProps":props.mainProps })}
             </Grid>
         </Grid>
+        <center>{loading && LoadingCircle("Saving") }</center>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
                 {viewSectionThree && SectionThree({ "mainProps": props.mainProps })}
             </Grid>
         </Grid>
+        
     </>
 }
 
-const LoadingCircle=(message)=><center> <h3>{message}</h3> <CircularProgress size={80} /> </center>
+const LoadingCircle=(message)=><center> {message} <CircularProgress size={40} /> </center>
 
 // this method will used for the load the left side part 
 const SectionOne = (data) => {
@@ -179,7 +182,6 @@ var months = ['', 'JANUARY', 'FEBRUARY', 'MARCH',  'APRIL', 'MAY', 'JUNE', 'JULY
 
 // this sections will used for the showing structure
 const SectionThree=(propsData)=>{
-    console.log("SE3 ",propsData);
     const {invoiceEmployeeData }=propsData.mainProps.InvoiceState
     let columns=[
         {title: "EMP\u00a0ID", field:"employeeId"},
