@@ -6,6 +6,7 @@ import { FromActions } from '../../assets/config/Config';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import VisibilityIcon from '@material-ui/icons/Visibility';
+import { TableHeaderText } from '../../assets/config/TextConfig';
 
 
 const RegsiterTable=(props)=>{
@@ -48,7 +49,7 @@ const RegsiterTable=(props)=>{
 
   return <div style={{ maxWidth: "100%" }}>
     <MaterialTable
-      title="Employee Management"
+      title={TableHeaderText.CLIENTTABLE}
       columns={columns}
       data={(data && data.length > 0 )? data : []}
       options={{
