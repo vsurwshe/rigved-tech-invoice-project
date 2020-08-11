@@ -6,7 +6,8 @@ import {
   HelpOutline as FAQIcon,
   ArrowBack as ArrowBackIcon,
   SupervisedUserCircle as UserIcon,
-  Assignment as ProjectIcon
+  Assignment as ProjectIcon,
+  FileCopy as InvoiceIcon
 } from "@material-ui/icons";
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import { useTheme } from "@material-ui/styles";
