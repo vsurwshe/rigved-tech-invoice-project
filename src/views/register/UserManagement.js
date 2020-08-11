@@ -71,7 +71,7 @@ class UserManagement extends Component {
             <DialogTitle id="alert-dialog-slide-title">{'Upload excel attendance file'}</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
-                {(attendanceUrl === "" || attendanceUrl === undefined) ? (attendanceUpload ? this.loadingCircle() : this.loadAttendanceUrl())
+                {(attendanceUrl === "" || attendanceUrl === undefined) ? (attendanceUpload ? this.loadingCircle("Uploading") : this.loadAttendanceUrl())
                     : <h5>{this.loadFileUrlName(attendanceUrl)}</h5>}
                 </DialogContentText>
             </DialogContent>
@@ -156,7 +156,7 @@ class UserManagement extends Component {
     }
 
     // this method used for the show circular progress bar 
-    loadingCircle = () => <center> <h3>Register.... User..</h3> <CircularProgress size={80} /> </center>
+    loadingCircle = (message) => <center> <h3>{message}</h3> <CircularProgress size={80} /> </center>
 
     RegisterUser = async(sendUserValues) => {
         const { profileImageUrl }=this.state

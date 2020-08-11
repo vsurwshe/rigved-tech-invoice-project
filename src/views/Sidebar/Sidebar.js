@@ -6,7 +6,8 @@ import {
   HelpOutline as FAQIcon,
   ArrowBack as ArrowBackIcon,
   SupervisedUserCircle as UserIcon,
-  Assignment as ProjectIcon
+  Assignment as ProjectIcon,
+  FileCopy as InvoiceIcon
 } from "@material-ui/icons";
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import { useTheme } from "@material-ui/styles";
@@ -31,11 +32,12 @@ const structure = [
   { id: 1, label: "Client", link: "/client", icon: <UserIcon /> },
   { id: 2, label: "Purchase Order", link: "/purchaseOrder", icon: <ShoppingCartIcon />},
   { id: 3, label: "Project", link: "/project", icon: <ProjectIcon />},
-  { id: 4, type: "divider" },
-  { id: 5, type: "title", label: "HELP" },
-  { id: 6, label: "Support", link: "", icon: <SupportIcon /> },
-  { id: 7, label: "FAQ", link: "", icon: <FAQIcon /> },
-  { id: 8, type: "divider" },
+  { id: 4, label: "Invoice", link: "/invoice", icon: <InvoiceIcon />},
+  { id: 5, type: "divider" },
+  { id: 6, type: "title", label: "HELP" },
+  { id: 7, label: "Support", link: "", icon: <SupportIcon /> },
+  { id: 8, label: "FAQ", link: "", icon: <FAQIcon /> },
+  { id: 9, type: "divider" },
 ];
 
 function Sidebar({ location }) {
