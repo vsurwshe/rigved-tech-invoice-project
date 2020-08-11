@@ -64,6 +64,7 @@ class UserManagement extends Component {
         return fromAction ? this.loadRegisterForm() : this.loadRegisterTable();
     }
 
+    // this method will used for the loading resgister from
     loadRegisterForm = () => {
         const { common_message, color } = this.props.LoginState
         const { profileImageUpload, profileImageUrl } = this.state
@@ -82,6 +83,7 @@ class UserManagement extends Component {
         </Card>
     }
 
+    // this method will used for the loading attendance model
     loadAttendanceModel = () => {
         const { attendanceModel, attendanceUrl, attendanceUpload } = this.state
         return <Dialog open={attendanceModel} keepMounted onClose={this.handleAttendanceModel} aria-labelledby="alert-dialog-slide-title" aria-describedby="alert-dialog-slide-description"   >
@@ -98,15 +100,18 @@ class UserManagement extends Component {
         </Dialog>
     }
 
+    // this method will used for th show input for attendance file
     loadAttendanceUrl = () => <label htmlFor="attendanceFile">
         <input name="attendanceFile" type="file" onChange={event => this.handleAttendanceFileChange(event)} />
     </label>
 
+    // this method will used for the showing attendance file name
     loadFileUrlName = (fileUrl) => {
         let fileArray = fileUrl.split("\\");
         return fileArray.length > 0 ? fileArray[5] : "";
     }
 
+    // this method will used for the handling the attendance file upload
     handleAttendanceFileChange = async (event) => {
         event.preventDefault();
         let imageFile = event.target.files[0];
@@ -121,6 +126,7 @@ class UserManagement extends Component {
         }
     }
 
+    // this method will used for the loading Resgister table
     loadRegisterTable = () => {
         const { load }=this.state
         return <>
@@ -133,6 +139,7 @@ class UserManagement extends Component {
         </>
     }
 
+    // this method will used for the reseting the value of file state variable
     clearFileUrl = () => { this.setState({ profileImageUrl: "" }) }
 
     uploadAttendanceFile = async (fileData, name, type) => {
@@ -155,6 +162,7 @@ class UserManagement extends Component {
         this.setState({ attendanceUrl: (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && this.props.FileState.fileUrl[0] })
     }
 
+    // this method will used for the uploding profile image 
     uploadProfileImageFile = async (fileData, name, type) => {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
         const { authorization } = this.props.LoginState
@@ -177,10 +185,12 @@ class UserManagement extends Component {
     // this method used for the show circular progress bar 
     loadingCircle = (message) => <center> <h3>{message}</h3> <CircularProgress size={80} /> </center>
 
+    // this method will used for the saving user data
     RegisterUser = async (sendUserValues) => {
         const { profileImageUrl } = this.state
         const { RegisterUserDetails, loadMessage } = this.props.LoginActions
         const { authorization } = this.props.LoginState
+        const { GetEmployeeList }=this.props.MasterDataAction
         const newUserData = {
             ...sendUserValues,
             "profilePic": profileImageUrl,
@@ -189,19 +199,20 @@ class UserManagement extends Component {
         this.handleLoadValue()
         await RegisterUserDetails(newUserData, authorization)
         setTimeout(async () => {
+            await GetEmployeeList(0,20,authorization)
             await loadMessage()
+            alert("Your Employee Data Saved");
             this.clearFileUrl();
             this.handleLoadValue();
         }, API_EXE_TIME)
     }
-
 }
 
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({
     LoginActions: bindActionCreators(LoginActions, dispatch),
     MasterDataAction: bindActionCreators(MasterDataAction, dispatch),
-    FileAction: bindActionCreators(FileAction, dispatch),
+    FileAction: bindActionCreators(FileAction, dispatch)
 })
 export default connect(mapStateToProps, mapDispatchToProps)(UserManagement);
 

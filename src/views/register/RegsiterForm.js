@@ -1,17 +1,15 @@
 import React from 'react';
 import { Button, Grid, Accordion, AccordionSummary, AccordionDetails, CircularProgress } from "@material-ui/core";
-import { Field, reduxForm, reset, getFormSyncErrors, getFormValues, isInvalid } from 'redux-form';
+import { Field, reduxForm, reset } from 'redux-form';
 import { renderTextField, renderAutocompleteByName, renderDateTimePicker, radioButton, renderNumberField, renderFileInput, renderPasswordTextField } from '../utilites/FromUtilites';
 import useStyles from "./styles";
 import { connect } from 'react-redux';
-import { Required } from '../utilites/FormValidation';
 import { bindActionCreators } from 'redux';
 import * as MasterDataAction from '../../redux/actions/MasterDataAction';
 
 let RegisterFrom = (props) => {
     var classes = useStyles();
-    const { RegisterUser, pristine, reset, submitting, handleSubmit, clearFile, cancle, synchronousError } = props
-    console.log("Error ",synchronousError)
+    const { RegisterUser, pristine, reset, submitting, handleSubmit, clearFile, cancle } = props
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(RegisterUser)}>
             {LoadGird({ classes, props })}
@@ -141,46 +139,43 @@ const OtherInfo = (props) => {
         <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content" id="additional-actions1-header" > OTHER INFORMATION</AccordionSummary>
         <AccordionDetails>
             <div>
-                <Field name="employeeNumber" component={renderTextField} label="Employee Code" style={{ margin: 8 }} fullWidth helperText="Ex. RV0001 " margin="normal" InputLabelProps={{ shrink: true }} validate={[Required]} />
+                <Field name="employeeNumber" component={renderTextField} label="Employee Code" style={{ margin: 8 }} fullWidth helperText="Ex. RV0001 " margin="normal" InputLabelProps={{ shrink: true }} />
                 <Field name="dob" component={renderDateTimePicker} label="Date of Birth" style={{ margin: 8 }} fullWidth helperText="Ex. 15/02/2020" margin="normal" InputLabelProps={{ shrink: true }} />
                 <Field name="ctc" component={renderTextField} label="CTC" style={{ margin: 8 }} fullWidth helperText="Ex. 5000" margin="normal" InputLabelProps={{ shrink: true }} />
             </div>
         </AccordionDetails>
     </Accordion>
 }
+
 const mapDispatchToProps = (dispatch) => ({
     MasterDataAction: bindActionCreators(MasterDataAction, dispatch),
 })
 
-const validate=(values)=>{
-    console.log("Calling validtions")
-    const errors={}
-    if(!values.expInYears <0){
-        errors.expInYears="Experience is not negative value"
+const validate = (values) => {
+    const errors = {}
+    // this condition checks employee number is provide or not
+    if (!values.employeeNumber) {
+        errors.employeeNumber = 'Employee Number is Required'
     }
-    if(!(values.primerySkill === values.secounderySkill)){
-        errors.primerySkill="Primary and secondary values should not be same"
-    }else if(values.secounderySkill === values.primerySkill){
-        errors.secounderySkill="Primary and secondary values should not be same"
+
+    // this condition checks employee expriance is not provide negtive value
+    if (values.expInYears && values.expInYears < 0) {
+        errors.expInYears = "Experience is not negative value"
     }
-    if(!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/i.test(values.password)){
-        errors.password="Password should contain minimum eight characters, at least one letter [A...Za...Z], one number[1...9] and one special character";
+
+    // this condition checks employee primary skill and secondary skill should not be same
+    if (values.primerySkill && values.primerySkill === values.secounderySkill && values.primerySkill !== "") {
+        errors.primerySkill = "Primary and secondary skills should not be same"
+        errors.secounderySkill = "Primary and secondary skills should not be same"
+    }
+
+    // this condition checks employee password should conatin all required data
+    if (values.password && !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/i.test(values.password)) {
+        errors.password = "Password should contain minimum eight characters, at least one letter [A...Za...Z], one number[1...9] and one special character";
     }
     return errors
 }
 
-RegisterFrom = connect(state => ({
-    values: getFormValues("RegisterFrom")(state),
-    synchronousError: getFormSyncErrors("RegisterFrom")(state),
-    invalid: isInvalid("RegisterFrom")(state)
-}))(RegisterFrom);
-  
-RegisterFrom = connect(state => {
-     return { ...state} 
-}, mapDispatchToProps)(RegisterFrom)
-const afterSubmit = (result, dispatch) => dispatch(reset('RegisterFrom'));
-export default reduxForm({ 
-    form: 'RegisterFrom', 
-    validate,
-    onSubmitSuccess: afterSubmit 
-})(RegisterFrom);
+RegisterFrom = connect(state => { return { ...state } }, mapDispatchToProps)(RegisterFrom)
+const afterSubmit = (result, dispatch) => {dispatch(reset('RegisterFrom'))};
+export default reduxForm({ form: 'RegisterFrom', validate, onSubmitSuccess: afterSubmit })(RegisterFrom);

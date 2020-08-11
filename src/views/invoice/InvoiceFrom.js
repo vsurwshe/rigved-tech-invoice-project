@@ -29,7 +29,6 @@ let InvoiceFrom=(props)=>{
     const [projectIdList, setProjectIdList] = useState([])
     const [viewSectionThree, setViewSectionThree] = useState(false)
     const [loading, setLoading] = useState(false)
-    console.log("Props ", props)
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit((values)=>PostInvoiceData({"mainProps":props,values, projectIdList,viewSectionThree, setViewSectionThree, setLoading}))}>
             { LoadGird({"mainProps":props,projectIdList, setProjectIdList,viewSectionThree, setViewSectionThree,loading, setLoading})}
@@ -190,7 +189,7 @@ const SectionThree=(propsData)=>{
         {title: "TOTAL\u00a0AMOUNT", field:"totalAmt"}
     ];
     let data=[];
-    (invoiceEmployeeData && invoiceEmployeeData.length > 0)&& invoiceEmployeeData.map((item,key)=>{
+    (invoiceEmployeeData && invoiceEmployeeData.length > 0) && invoiceEmployeeData.map((item,key)=>{
         let monthString =item.attendancepermonth ? item.attendancepermonth : "";
         let firstArray=monthString && monthString.split(',');
         let tempColunmsData = [];
@@ -217,11 +216,12 @@ const SectionThree=(propsData)=>{
             data[key][months[monthNumber]]= (filterEqualArray[1] && filterEqualArray[1].includes("}"))? (filterEqualArray[1].split('}')[0]):filterEqualArray[1]
         });
         columns.splice(4,0,...tempColunmsData)
+        return "";
     })
     return LoadInvoiceResourceTable({columns,data});
 }
 
-
+// this method will used for the loading resource table
 const LoadInvoiceResourceTable=(propsData)=>{
     const { columns, data}= propsData
     return <div style={{ maxWidth: "100%" }}>

@@ -3,27 +3,27 @@ import { TextField, FormControlLabel, Checkbox, FormControl, RadioGroup, Radio, 
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 // this is render text filed
-const renderTextField = ({ label, name, input, meta: { touched, invalid, error }, ...custom }) => (
+const renderTextField = ({ label, name, input,helperText, meta: { touched, invalid, error }, ...custom }) => (
     <TextField
       id={name}
       label={label}
       placeholder={label}
       error={touched && invalid}
-      helperText={touched && error}
+      helperText={error ? error : helperText}
       {...input}
       {...custom}
     />
   )
 
 // this is render password text filed
-const renderPasswordTextField = ({ label, name, input, meta: { touched, invalid, error }, ...custom }) => (
+const renderPasswordTextField = ({ label, name, input,helperText, meta: { touched, invalid, error }, ...custom }) => (
   <TextField
     id={name}
     type="password"
     label={label}
     placeholder={label}
     error={touched && invalid}
-    helperText={touched && error}
+    helperText={error ? error : helperText}
     {...input}
     {...custom}
   />
@@ -44,7 +44,7 @@ const renderTextHiddenField = ({ label, name, input, meta: { touched, invalid, e
 )
 
 // this is render text area filed
-const renderTextAreaField = ({ maxRows,name,label, input, meta: { touched, invalid, error }, ...custom }) => (
+const renderTextAreaField = ({ maxRows,name,label,helperText, input, meta: { touched, invalid, error }, ...custom }) => (
   <TextField
     id={name}
     label={label}
@@ -52,21 +52,21 @@ const renderTextAreaField = ({ maxRows,name,label, input, meta: { touched, inval
     multiline
     rows={maxRows}
     error={touched && invalid}
-    helperText={touched && error}
+    helperText={error ? error: helperText}
     {...input}
     {...custom}
   />
 )
 
 // this is render text filed
-const renderNumberField = ({ label, name,input, meta: { touched, invalid, error }, ...custom }) => (
+const renderNumberField = ({ label, name,input,helperText, meta: { touched, invalid, error }, ...custom }) => (
   <TextField
     id={name}
     type="number"
     label={label}
     placeholder={label}
     error={touched && invalid}
-    helperText={touched && error}
+    helperText={error ? error: helperText}
     {...input}
     {...custom}
   />
@@ -164,7 +164,7 @@ const renderAutocompleteByName=({label,name,optionData,className, input, meta: {
     getOptionLabel={optionData => (optionData && optionData.name) && optionData.name}
     getOptionSelected={(option, value) => option.id === value.id}
     onChange={(event, value) => value && input.onChange(value.name)}
-    renderInput={(params) => ( <TextField {...params} label={label} margin="normal"  /> )}
+    renderInput={(params) => ( <TextField {...params} error={(touched && invalid) || error} helperText={error && error} label={label} margin="normal"  /> )}
     {...custom}
   />
 
