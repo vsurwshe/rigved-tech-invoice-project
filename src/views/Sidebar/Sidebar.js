@@ -6,8 +6,7 @@ import {
   HelpOutline as FAQIcon,
   ArrowBack as ArrowBackIcon,
   SupervisedUserCircle as UserIcon,
-  Assignment as ProjectIcon,
-  FileCopy as InvoiceIcon
+  Assignment as ProjectIcon
 } from "@material-ui/icons";
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import { useTheme } from "@material-ui/styles";
@@ -32,7 +31,6 @@ const structure = [
   { id: 1, label: "Client", link: "/client", icon: <UserIcon /> },
   { id: 2, label: "Purchase Order", link: "/purchaseOrder", icon: <ShoppingCartIcon />},
   { id: 3, label: "Project", link: "/project", icon: <ProjectIcon />},
-  { id: 3, label: "Invoice", link: "/invoice", icon: <InvoiceIcon />},
   { id: 4, type: "divider" },
   { id: 5, type: "title", label: "HELP" },
   { id: 6, label: "Support", link: "", icon: <SupportIcon /> },

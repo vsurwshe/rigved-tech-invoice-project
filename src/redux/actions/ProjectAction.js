@@ -12,15 +12,6 @@ const GetProjectList = (firstIndex, lastIndex, authroizationKey) => {
     }
 }
 
-const GetProjectListByClient = (firstIndex, lastIndex, clientId, authroizationKey) => {
-    return (dispatch) => {
-        return CreateInstance()
-            .get('/project/projectList/' +firstIndex + '/' + lastIndex+'/'+clientId, HeaderConfig(authroizationKey))
-            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveProjectListByClient, "loadMessage":loadMessage, response}) })
-            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
-    }
-}
-
 const SaveProjectRecord=(userData,authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
@@ -51,13 +42,6 @@ export function SaveProjectList(projectList) {
     }
 }
 
-export function SaveProjectListByClient(projectList) {
-    return {
-        type: "SAVE_PROJECT_LIST_BY_CLIENT",
-        projectList
-    }
-}
-
 export function SaveProject(projectData) {
     return {
         type: "SAVE_PROJECT_DATA",
@@ -74,7 +58,6 @@ export function DeleteProject(projectData){
 
 export {
     GetProjectList,
-    GetProjectListByClient,
     SaveProjectRecord,
     DeleteProjectRecord
 }
