@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormLabel, CircularProgress } from '@material-ui/core';
+import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormLabel, CircularProgress, TextField, FormControl, InputLabel, Select } from '@material-ui/core';
 import { reset, reduxForm, Field, FieldArray, formValueSelector } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
 import { renderTextField, renderTextHiddenField, renderFileInput, renderSelectField, renderTextAreaField, renderAutocompleteByName } from '../utilites/FromUtilites';
@@ -7,19 +7,28 @@ import useStyles from "../client/Styles";
 import { connect } from 'react-redux';
 import RateCardTable from '../rateCard/RateCardTable';
 import ContactTable from '../contact/ContactTable';
-import { Alert } from '@material-ui/lab';
+import { Alert, Autocomplete } from '@material-ui/lab';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import { Required, PhoneNumber, GSTIN, TAN, IFSCCode, BankAccount, Email } from '../utilites/FormValidation';
 import * as FileActions from "../../redux/actions/FileAction";
-import { FromActions } from '../../assets/config/Config';
+import { FromActions, API_EXE_TIME } from '../../assets/config/Config';
+import MaterialTable from 'material-table';
+import CreateIcon from '@material-ui/icons/Create';
+
 
 let ClientForm = (props) => {
     var classes = useStyles();
-    const { SaveClientMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues, clearFile } = props
+    const { SaveClientMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues, clearFile,rateCardDtosProps } = props
     const { operation } = props.stateData
+    const [rateCardDtos,setRateCardDtos] = useState([])
+    const [rateCardCountCall, setRateCardCountCall] = useState(0)
+    if(rateCardDtosProps && rateCardDtosProps.length >0 && rateCardCountCall===0){
+        setRateCardCountCall(rateCardCountCall+1);
+        setRateCardDtos(rateCardDtosProps)
+    }
     return <div className={classes.girdContainer}>
-        <form onSubmit={handleSubmit(SaveClientMethod)}>
-            {LoadGird(props)}
+        <form onSubmit={handleSubmit((values)=> SaveClientMethod({values,rateCardDtos}))}>
+            {LoadGird({"mainProps":props,rateCardDtos,setRateCardDtos })}
             <div className={classes.buttonStyle}>
                 <center>
                     {(operation === FromActions.ED || operation === FromActions.CR) && <>
@@ -32,34 +41,34 @@ let ClientForm = (props) => {
     </div>
 }
 
-const LoadGird = (props) => {
+const LoadGird = (propsData) => {
     var classes = useStyles();
-    const { rateCardDtos, contactPersonDtos, initialValues } = props
-    const { Domains, SkillCategory, SkillSet } = props.MasterDataSet
+    const { contactPersonDtos, initialValues, rateCardDtos,setRateCardDtos } = propsData
+    const { Domains, SkillCategory, SkillSet } = propsData.mainProps.MasterDataSet
     return <><Grid container spacing={5}>
         <Grid item style={{ paddingLeft: 30 }}>
-            {HeaderPart({ classes, initialValues, props })}
+            {HeaderPart({ classes, initialValues, mainProps:propsData.mainProps })}
         </Grid>
     </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
-                {(initialValues === undefined) ? SectionOne({ classes, "mainProps":props }) : EditSectionOne({ classes, initialValues })}
+                {(initialValues === undefined) ? SectionOne({ classes, "mainProps":propsData.mainProps }) : EditSectionOne({ classes, initialValues })}
             </Grid>
             <Grid item xs={12} sm={6}>
-                {SectionTwo({ classes,"mainProps":props })}
+                {SectionTwo({ classes,"mainProps":propsData.mainProps })}
             </Grid>
         </Grid>
         <Grid container spacing={5} style={{ paddingLeft: 10 }}>
             <Grid item xs={12}>
-                {SectionThree({ classes, rateCardDtos, contactPersonDtos, Domains, SkillCategory, SkillSet,"mainProps":props })}
+                {SectionThree({ classes, contactPersonDtos, Domains, SkillCategory, SkillSet,"mainProps":propsData.mainProps,rateCardDtos,setRateCardDtos })}
             </Grid>
         </Grid>
     </>
 }
 // this method used for the load header part
-const HeaderPart = (props) => {
-    const { initialValues } = props
-    const { color, common_message } = props.props.ClientState
+const HeaderPart = (propsData) => {
+    const { initialValues } = propsData
+    const { color, common_message } = propsData.mainProps.ClientState
     return <Grid item container direction="row" justify="center" alignItems="center" >
         {(initialValues !== undefined) && <h2>{initialValues.clientName}</h2>}
         <center>{common_message && <Alert color={color} >{common_message}</Alert>}</center>
@@ -92,8 +101,8 @@ const EditSectionOne = (data) => {
 
 // section two
 const SectionTwo = (data) => {
-    const { initialValues } = data.mainProps
-    return (initialValues === undefined) ? AddressDto(data) : AddressTextArea();
+    const { operation }=data.mainProps.stateData
+    return (operation != FromActions.VI) ? AddressDto(data) : AddressTextArea();
 }
 
 // this method used for the load the address into text area
@@ -220,71 +229,11 @@ const RenderContact = ({ classes, fields,operation, meta: { error, submitFailed 
     </span>
 }
 
-// this will be render rate card
-const RenderRateCard = ({ classes, domains, skillCategory, skillSet, fields, operation, meta: { error, submitFailed } }) => {
-    const [open, setOpen] = useState(false);
-    const handleClickOpen = () => { setOpen(true); fields.push({}); };
-    const handleClose = () => { setOpen(false) };
-    return <span>
-        {(operation !== FromActions.VI)&&<Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>}
-        <Dialog open={open} onClose={handleClose} classes={{ paper: classes.dialogPaper }} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title">
-            <DialogTitle id="responsive-dialog-title-2">{"Adding Rate Card"}</DialogTitle>
-            <DialogContent >
-                <DialogContentText>
-                    {fields.map((member, index) => (
-                        <Grid container spacing={5}>
-                            <Grid item >
-                                <Field name={`${member}.domainName`} component={renderAutocompleteByName} optionData={domains} validate={[Required]} label="Domain" />
-                            </Grid>
-                            <Grid item >
-                                <Field name={`${member}.skillCategory`} component={renderAutocompleteByName} optionData={skillCategory} validate={[Required]} label="Category" />
-                            </Grid>
-                            <Grid item >
-                                <Field name={`${member}.skillSet`} className={classes.selectTextField} component={renderAutocompleteByName} optionData={skillSet} validate={[Required]} label="Skills" />
-                            </Grid>
-                            <Grid item >
-                                <Field name={`${member}.fromYearOfExp`} style={{ marginTop: "17px" }} component={renderSelectField} validate={[Required]} label="From" >
-                                    {[...Array(10)].map((item, key) => <option key={key} value={key}>{key}</option>)}
-                                </Field>
-                            </Grid>
-                            <Grid item >
-                                <Field name={`${member}.toYearOfExp`} style={{ marginTop: "17px" }} component={renderSelectField} validate={[Required]} label="To" >
-                                    {[...Array(10)].map((item, key) => <option key={key} value={key}>{key}</option>)}
-                                </Field>
-                            </Grid>
-                            <Grid item >
-                                <Field name={`${member}.rate`} type="text"  style={{ marginTop: "17px" }} component={renderTextField} label="Rate" />
-                            </Grid>
-                            <Grid item >
-                                <DeleteOutlineIcon variant="contained" color="secondary" style={{ marginTop: "17px"}} onClick={() => fields.remove(index)} />
-                            </Grid>
-                        </Grid>
-                    ))}
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleClose} color="primary" autoFocus>Cancel</Button>
-                <Button onClick={handleClose} color="secondary" autoFocus>Save</Button>
-            </DialogActions>
-        </Dialog>
-    </span>
-}
-
 // rate card
 const RateCard = (data) => {
-    const { rateCardDtos, Domains, SkillCategory, SkillSet, classes } = data
+    const { Domains, SkillCategory, SkillSet, rateCardDtos,setRateCardDtos} = data
     const { operation }=(data.mainProps && data.mainProps.stateData) ? data.mainProps.stateData : ""
-    return <span>
-        <FieldArray name="rateCardDtos"
-            classes={classes} 
-            domains={Domains} 
-            skillCategory={SkillCategory} 
-            skillSet={SkillSet} 
-            component={RenderRateCard} 
-            validate={[Required]}
-            operation={operation}/>
-        <RateCardTable data={rateCardDtos} />
-    </span>
+    return <RateCardTable operation={operation} data={data} SkillCategory={SkillCategory} Domains={Domains} SkillSet={SkillSet} rateCardDtos={rateCardDtos} setRateCardDtos={setRateCardDtos} />
 }
 
 // contact address
@@ -311,9 +260,9 @@ const validate=(values)=>{
 const selector = formValueSelector('ClientForm')
 ClientForm = connect(state => {
     // can select values individually
-    const rateCardDtos = selector(state, 'rateCardDtos')
+    const rateCardDtosProps = selector(state, 'rateCardDtos')
     const contactPersonDtos = selector(state, 'contactPersonDtos')
-    return { rateCardDtos, contactPersonDtos, ...state }
+    return { rateCardDtosProps, contactPersonDtos, ...state }
 }, FileActions)(ClientForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ClientForm'));
