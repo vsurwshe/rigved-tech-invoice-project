@@ -1,24 +1,9 @@
-import React, { useState } from 'react';
-import { useTheme } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableFooter from '@material-ui/core/TableFooter';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
-import FirstPageIcon from '@material-ui/icons/FirstPage';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import LastPageIcon from '@material-ui/icons/LastPage';
-import { TableHead, TextField, Button, FormControl, Select, InputLabel } from '@material-ui/core';
-import useStyles from "../client/Styles";
+import React from 'react';
+import { TextField, Button, FormControl, Select, InputLabel } from '@material-ui/core';
 import MaterialTable from 'material-table';
 import { API_EXE_TIME } from '../../assets/config/Config';
 import CreateIcon from '@material-ui/icons/Create';
-import { Alert, Autocomplete } from '@material-ui/lab';
+import { Autocomplete } from '@material-ui/lab';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 const RateCardTable = (propsData) => {
@@ -84,10 +69,19 @@ const RateCardTable = (propsData) => {
         isDeleteHidden: rowData => true,
         onRowAdd: newData =>{
             return new Promise(async(resolve, reject) => {
-                await setRateCardDtos([...rateCardDtos,newData]);
-                setTimeout(async()=>{
-                    resolve();
-                },API_EXE_TIME)
+              if(newData){
+                if(newData.fromYearOfExp < newData.toYearOfExp){
+                  await setRateCardDtos([...rateCardDtos,newData]);
+                  setTimeout(async()=>{
+                      resolve();
+                  },API_EXE_TIME)
+                }else{
+                  alert("Form year value should be less than compare to year value");
+                  reject();
+                }
+              }else{
+                reject();
+              }
             })
         },
         onRowUpdate: (newData, oldData) =>{ return new Promise(async(resolve, reject) => { reject() })},
@@ -112,7 +106,7 @@ const LoadAutoComplete=(propsData)=>{
 
 const LoadSelect=(propsData)=>{
   const { props }=propsData
-  return <FormControl error={props.touched && props.error}>
+  return <FormControl error={props.touched && props.error} style={{width:"100%"}}>
   <InputLabel htmlFor="age-native-simple">Form Year</InputLabel>
   <Select  native onChange={(event) => props.onChange(event.target.value)} >
       {[...Array(10)].map((item, key) => <option key={key} value={key}>{key}</option>)}

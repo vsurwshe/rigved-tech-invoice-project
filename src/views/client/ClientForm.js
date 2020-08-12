@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
-import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormLabel, CircularProgress, TextField, FormControl, InputLabel, Select } from '@material-ui/core';
+import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormLabel, CircularProgress } from '@material-ui/core';
 import { reset, reduxForm, Field, FieldArray, formValueSelector } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
-import { renderTextField, renderTextHiddenField, renderFileInput, renderSelectField, renderTextAreaField, renderAutocompleteByName } from '../utilites/FromUtilites';
+import { renderTextField, renderTextHiddenField, renderFileInput, renderTextAreaField } from '../utilites/FromUtilites';
 import useStyles from "../client/Styles";
 import { connect } from 'react-redux';
 import RateCardTable from '../rateCard/RateCardTable';
 import ContactTable from '../contact/ContactTable';
-import { Alert, Autocomplete } from '@material-ui/lab';
+import { Alert } from '@material-ui/lab';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import { Required, PhoneNumber, GSTIN, TAN, IFSCCode, BankAccount, Email } from '../utilites/FormValidation';
 import * as FileActions from "../../redux/actions/FileAction";
-import { FromActions, API_EXE_TIME } from '../../assets/config/Config';
-import MaterialTable from 'material-table';
-import CreateIcon from '@material-ui/icons/Create';
+import { FromActions } from '../../assets/config/Config';
 
 
 let ClientForm = (props) => {
@@ -43,7 +41,8 @@ let ClientForm = (props) => {
 
 const LoadGird = (propsData) => {
     var classes = useStyles();
-    const { contactPersonDtos, initialValues, rateCardDtos,setRateCardDtos } = propsData
+    const { rateCardDtos,setRateCardDtos } = propsData
+    const { contactPersonDtos, initialValues } = propsData.mainProps
     const { Domains, SkillCategory, SkillSet } = propsData.mainProps.MasterDataSet
     return <><Grid container spacing={5}>
         <Grid item style={{ paddingLeft: 30 }}>
@@ -101,8 +100,8 @@ const EditSectionOne = (data) => {
 
 // section two
 const SectionTwo = (data) => {
-    const { operation }=data.mainProps.stateData
-    return (operation != FromActions.VI) ? AddressDto(data) : AddressTextArea();
+    const { operation } = data.mainProps.stateData
+    return (operation !== FromActions.VI) ? AddressDto(data) : AddressTextArea();
 }
 
 // this method used for the load the address into text area
