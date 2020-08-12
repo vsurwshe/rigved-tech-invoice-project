@@ -158,7 +158,6 @@ class ClientManagment extends Component {
         const { authorization } = this.props.LoginState
         const { gstFileUrl, tanFileUrl} =this.state
         const { values,rateCardDtos }=propsData
-        console.log("propsData",propsData)
         const newUserData = {
             ...values,
             "gstUrl": (gstFileUrl === "" || gstFileUrl === undefined) ? values.gstUrl  :gstFileUrl,
@@ -168,7 +167,6 @@ class ClientManagment extends Component {
             "active": true,
             "bankDetailsDtoList": [values.bankDetailsDtoList]
         }
-        console.log("New Client data ",newUserData)
         await SaveClientData(newUserData, authorization)
         setTimeout(async () => {
             await loadMessage()
