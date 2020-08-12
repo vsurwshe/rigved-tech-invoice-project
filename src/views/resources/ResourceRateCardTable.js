@@ -1,6 +1,7 @@
 import React from 'react';
 import MaterialTable from 'material-table';
 import { Radio } from '@material-ui/core';
+import { TableHeaderText } from '../../assets/config/TextConfig';
 
 const ResourceRateCardTable=(props)=>{
     const {tableData, selectedRateCard, setSelectedRateCard}=props
@@ -24,7 +25,7 @@ const ResourceRateCardTable=(props)=>{
     return <div style={{ maxWidth: "100%" }}>
         {selectedRateCard.domainName && <h4>You have Selected : {selectedRateCard.domainName} </h4>}
         <MaterialTable
-          title="Rate Cards"
+          title={TableHeaderText.RATECARDTABLE}
           columns={columns}
           data={(data && data.length > 0) ? data : []}
           options={{ headerStyle: { backgroundColor: '#01579b', color: '#FFF' } }}

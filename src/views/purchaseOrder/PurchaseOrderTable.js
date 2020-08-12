@@ -6,7 +6,7 @@ import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import { Button } from '@material-ui/core';
 import { FromActions } from '../../assets/config/Config';
-
+import { TableHeaderText } from '../../assets/config/TextConfig'
 
 const PurchaseOrderTable=(props)=>{
     const { purchaseOrderList}=props.PurchaseOrderState
@@ -15,9 +15,9 @@ const PurchaseOrderTable=(props)=>{
       // creating columns
     const columns = [
         { title: 'Sr.\u00a0No.', field:'key', width: 20 },
-        { title: 'Name',field:'clientName'},
+        { title: 'PO\u00a0Number', field:'poNum', width: 60},
         { title: 'Amount',field:'poAmount', width :30},
-        { title: 'Number', field:'poNum', width: 60},
+        { title: 'For Client',field:'clientName'},
         {
           title: "",
           width:8,
@@ -48,7 +48,7 @@ const PurchaseOrderTable=(props)=>{
 
     return <div style={{ maxWidth: "100%" }}>
     <MaterialTable
-      title="Purchase Order Managment"
+      title={TableHeaderText.POTABLE}
       columns={columns}
       data={data.length > 0 ? data :[]}
       options={{

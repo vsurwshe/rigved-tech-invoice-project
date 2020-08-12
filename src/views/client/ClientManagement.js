@@ -153,17 +153,19 @@ class ClientManagment extends Component {
     viewClientDetails = (data,operation) => {  this.handleCreateClient(data,operation)  }
 
     // this method used for the save the client details
-    SaveClientDetails = async (sendUserValues) => {
+    SaveClientDetails = async (propsData) => {
         const { SaveClientData, loadMessage, GetClientList } = this.props.ClientAction;
         const { authorization } = this.props.LoginState
         const { gstFileUrl, tanFileUrl} =this.state
+        const { values,rateCardDtos }=propsData
         const newUserData = {
-            ...sendUserValues,
-            "gstUrl": (gstFileUrl === "" || gstFileUrl === undefined) ? sendUserValues.gstUrl  :gstFileUrl,
-            "tanUrl": (tanFileUrl === "" || tanFileUrl === undefined) ? sendUserValues.tanUrl : tanFileUrl,
-            "addressDtos": [sendUserValues.addressDtos],
+            ...values,
+            "gstUrl": (gstFileUrl === "" || gstFileUrl === undefined) ? values.gstUrl  :gstFileUrl,
+            "tanUrl": (tanFileUrl === "" || tanFileUrl === undefined) ? values.tanUrl : tanFileUrl,
+            "addressDtos": [values.addressDtos],
+            rateCardDtos,
             "active": true,
-            "bankDetailsDtoList": [sendUserValues.bankDetailsDtoList]
+            "bankDetailsDtoList": [values.bankDetailsDtoList]
         }
         await SaveClientData(newUserData, authorization)
         setTimeout(async () => {

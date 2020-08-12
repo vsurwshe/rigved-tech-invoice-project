@@ -6,6 +6,7 @@ import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import MaterialTable from 'material-table';
 import { FromActions } from '../../assets/config/Config';
+import { TableHeaderText } from '../../assets/config/TextConfig';
 
 const  ClientTable=(props)=>{
   const {listOfClient}= props.ClientState
@@ -46,7 +47,7 @@ const  ClientTable=(props)=>{
  
   return <div style={{ maxWidth: "100%" }}>
     <MaterialTable
-      title="Client Managment"
+      title={TableHeaderText.CLIENTTABLE}
       columns={columns}
       data={data.length >0 ? data :[]}
       options={{

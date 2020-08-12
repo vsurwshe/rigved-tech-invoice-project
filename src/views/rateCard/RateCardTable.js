@@ -1,114 +1,118 @@
-import React, { useState } from 'react';
-import { useTheme } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableFooter from '@material-ui/core/TableFooter';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
-import FirstPageIcon from '@material-ui/icons/FirstPage';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import LastPageIcon from '@material-ui/icons/LastPage';
-import { TableHead } from '@material-ui/core';
-import useStyles from "../client/Styles";
+import React from 'react';
+import { TextField, Button, FormControl, Select, InputLabel } from '@material-ui/core';
+import MaterialTable from 'material-table';
+import { API_EXE_TIME } from '../../assets/config/Config';
+import CreateIcon from '@material-ui/icons/Create';
+import { Autocomplete } from '@material-ui/lab';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
-const columns = [
-  { id: 'key', label: 'Sr. No.', minWidth: 30 },
-  { id: 'domain', label: 'Domain' },
-  { id: 'category', label: 'Category' },
-  { id: 'skills', label: 'Skills' },
-  { id: 'experience', label: 'Experience' },
-  { id: 'rate', label: 'Rate' },
-];
-
-function TablePaginationActions(props) {
-  const classes = useStyles();
-  const theme = useTheme();
-  const { count, page, rowsPerPage, onChangePage } = props;
-  const handleFirstPageButtonClick = (event) => { onChangePage(event, 0); };
-  const handleBackButtonClick = (event) => { onChangePage(event, page - 1); };
-  const handleNextButtonClick = (event) => { onChangePage(event, page + 1); };
-  const handleLastPageButtonClick = (event) => { onChangePage(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1)); };
-
-  return (
-    <div className={classes.clientTableRoot}>
-      <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0} aria-label="first page" >
-        {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
-      </IconButton>
-      <IconButton onClick={handleBackButtonClick} disabled={page === 0} aria-label="previous page">
-        {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-      </IconButton>
-      <IconButton onClick={handleNextButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1} aria-label="next page" >
-        {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-      </IconButton>
-      <IconButton onClick={handleLastPageButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1} aria-label="last page" >
-        {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
-      </IconButton>
-    </div>
-  );
+const RateCardTable = (propsData) => {
+  const { rateCardDtos,setRateCardDtos, Domains, SkillCategory, SkillSet }=propsData
+    const columns =[
+        {   title: "Domain", 
+            field: "domainName",
+            editComponent :props =>{
+                return LoadAutoComplete({ id:"domainName", lable:"Domain", props, optionData:Domains })
+            }
+        },
+        {   title: "Category", 
+            field: "skillCategory",
+            editComponent :props =>{
+                return LoadAutoComplete({ id:"skillCategory", lable:"Category", props, optionData:SkillCategory })
+            }
+        },
+        {   title: "Skill", 
+            field: "skillSet",
+            editComponent :props =>{
+                return LoadAutoComplete({ id:"skillSet", lable:"Skill", props, optionData:SkillSet }) 
+            }
+        },
+        {   title: "Form\u00a0Year", 
+            field: "fromYearOfExp",
+            editComponent :props =>{ return LoadSelect({props}) }
+        },
+        {   title: "To\u00a0Year", 
+            field: "toYearOfExp",
+            editComponent :props =>{ return LoadSelect({props})}
+        },
+        {   title: "Rate", 
+            field: "rate",
+            editComponent :props =>{
+                return  <TextField
+                id="rate"
+                label="rate"
+                onChange={(event) => props.onChange(event.target.value)}
+                error={props.touched && props.invalid}
+                helperText={(props.touched && props.error) && props.error}
+              />
+            }
+        }
+    ]
+    return  <div style={{ maxWidth: "100%" }}>
+    <MaterialTable
+      title=""
+      columns={columns}
+      data={(rateCardDtos && rateCardDtos.length > 0) ? rateCardDtos : []}
+      options={{
+        headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
+        search: false
+      }}
+      icons={{
+        Add: () => <Button variant="contained" color="primary">Add Rate Card</Button>,
+        Edit:() => { return <CreateIcon variant="contained" color="primary" /> },
+        Delete: () => {return <DeleteOutlineIcon variant="contained" color="secondary" />}
+      }}
+      editable={{
+        isEditable: rowData => false, 
+        isEditHidden: rowData => true,
+        isDeletable: rowData => false,
+        isDeleteHidden: rowData => true,
+        onRowAdd: newData =>{
+            return new Promise(async(resolve, reject) => {
+              if(newData){
+                if(newData.fromYearOfExp < newData.toYearOfExp){
+                  await setRateCardDtos([...rateCardDtos,newData]);
+                  setTimeout(async()=>{
+                      resolve();
+                  },API_EXE_TIME)
+                }else{
+                  alert("Form year value should be less than compare to year value");
+                  reject();
+                }
+              }else{
+                reject();
+              }
+            })
+        },
+        onRowUpdate: (newData, oldData) =>{ return new Promise(async(resolve, reject) => { reject() })},
+        onRowDelete: oldData =>{ return new Promise(async(resolve, reject) => { resolve() }) }
+      }}
+    />
+</div>
 }
 
-// this function is used for the create the row data
-function createData(key, domainName, skillCategory, skillSet, yearOfExp, rate) { return { key, domainName, skillCategory, skillSet, yearOfExp, rate }; }
-
-const RateCardTable = (props) => {
-  const { data } = props
-  // Creating rows
-  const rows = (data && data.length > 0) && data.map((item, key) => { return createData((key + 1), item.domainName, item.skillCategory, item.skillSet, item.fromYearOfExp ? (item.fromYearOfExp + "-" + item.toYearOfExp) : "", item.rate) });
-  (rows && rows.length > 0) && rows.sort((a, b) => (a.key < b.key ? -1 : 1));
-  const classes = useStyles();
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const emptyRows = rows && rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
-  const handleChangePage = (event, newPage) => { setPage(newPage); };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-  return <TableContainer component={Paper}>
-    <Table className={classes.clientTableTable} aria-label="custom pagination table">
-      <TableHead>
-        <TableRow>
-          {columns.map((column) => (<TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }}>{column.label}</TableCell>))}
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {/* this condition checking wheter rows is avilable or not */}
-        {(rows && rows.length > 0) && (rowsPerPage > 0 ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : rows)
-          .map((row, key) => (
-            <TableRow key={key}>
-              <TableCell component="th" scope="row">{row.key}</TableCell>
-              <TableCell>{row.domainName}</TableCell>
-              <TableCell>{row.skillCategory}</TableCell>
-              <TableCell>{row.skillSet}</TableCell>
-              <TableCell>{row.yearOfExp}</TableCell>
-              <TableCell>{row.rate}</TableCell>
-            </TableRow>
-          ))}
-        {emptyRows > 0 && (<TableRow style={{ height: 53 * emptyRows }}><TableCell colSpan={6} /></TableRow>)}
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-            colSpan={3}
-            count={rows ? rows.length : 0}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            SelectProps={{ inputProps: { 'aria-label': 'rows per page' }, native: true }}
-            onChangePage={handleChangePage}
-            onChangeRowsPerPage={handleChangeRowsPerPage}
-            ActionsComponent={TablePaginationActions}
-          />
-        </TableRow>
-      </TableFooter>
-    </Table>
-  </TableContainer>
+const LoadAutoComplete=(propsData)=>{
+  const { id, optionData, props, lable }= propsData
+  return <Autocomplete
+  id={id}
+  autoHighlight
+  options={(optionData && optionData.length >0) ? optionData: []}
+  getOptionLabel={optionData => (optionData && optionData.name) && optionData.name}
+  getOptionSelected={(option, value) => option.id === value.id}
+  onChange={(event, value) => value && props.onChange(value.name)}
+  renderInput={(params) => ( <TextField {...params} error={(props.touched && props.invalid) || props.error} helperText={props.error && props.error} label={lable} margin="normal"  /> )}
+/>
 }
+
+const LoadSelect=(propsData)=>{
+  const { props }=propsData
+  return <FormControl error={props.touched && props.error} style={{width:"100%"}}>
+  <InputLabel htmlFor="age-native-simple">Form Year</InputLabel>
+  <Select  native onChange={(event) => props.onChange(event.target.value)} >
+      {[...Array(10)].map((item, key) => <option key={key} value={key}>{key}</option>)}
+  </Select>
+</FormControl>
+}
+
 
 export default RateCardTable;

@@ -161,18 +161,25 @@ return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
             return new Promise(async(resolve, reject) => {
               const { id }=(clientDataById && clientDataById.rateCardDtos && clientDataById.rateCardDtos.length >0) ? clientDataById.rateCardDtos[0]: ""
               if(newData){
-                let resourceData={
-                  "emploeeMappedId":newData && newData.emploeeMappedId, 
-                  "accountId":newData && newData.accountId,
-                  "rateCardId": id && id,
-                  "onbordaingDate": newData && newData.onbordaingDate,
-                  "exitDate": newData && newData.exitDate
+                var onbordaingDate = new Date(newData.onbordaingDate);
+                var exitDate = new Date(newData.exitDate);
+                if(onbordaingDate < exitDate){
+                  let resourceData={
+                    "emploeeMappedId":newData && newData.emploeeMappedId, 
+                    "accountId":newData && newData.accountId,
+                    "rateCardId": id && id,
+                    "onbordaingDate": newData && newData.onbordaingDate,
+                    "exitDate": newData && newData.exitDate
+                  }
+                  await EditEmployeeRecord(resourceData,authorization);
+                  setTimeout(async()=>{
+                    await GetEmployeeListByProjectId(0,20,newData.projectId,authorization);
+                    resolve();
+                  },API_EXE_TIME)
+                }else{
+                  alert("onborading date should be less than exit date");
+                  reject();
                 }
-                await EditEmployeeRecord(resourceData,authorization);
-                setTimeout(async()=>{
-                  await GetEmployeeListByProjectId(0,20,newData.projectId,authorization);
-                  resolve();
-                },API_EXE_TIME)
               }else{
                 reject();
               }
