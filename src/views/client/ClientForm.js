@@ -301,6 +301,12 @@ const ContactAddress = (data) => {
     </span>
 }
 
+const validate=(values)=>{
+    const errors={}
+    console.log("Validate ",values)
+    return errors;
+}
+
 // make the selector 
 const selector = formValueSelector('ClientForm')
 ClientForm = connect(state => {
@@ -311,4 +317,4 @@ ClientForm = connect(state => {
 }, FileActions)(ClientForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ClientForm'));
-export default reduxForm({ form: 'ClientForm', onSubmitSuccess: afterSubmit })(ClientForm);
+export default reduxForm({ form: 'ClientForm',validate, onSubmitSuccess: afterSubmit })(ClientForm);

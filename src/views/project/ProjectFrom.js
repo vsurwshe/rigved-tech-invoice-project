@@ -87,7 +87,7 @@ const LoadFields = (parameter) => {
         return { title: item.name ? item.name : "", id: item.id }
     })
     return <>
-        <Field name="projectName" component={renderTextField} fullWidth label="Project Name" helperText="Ex. PRMS" validate={[Required]} />
+        <Field name="projectName" component={renderTextField} fullWidth label="Project Name" helperText="Ex. PRMS" />
         <Field name="projectType" component={renderAutocomplete} optionData={projectTypeOptions} label="Project Type" validate={[Required]} />
         <Field name="clientName" component={renderAutocompleteWithProps}
             onChange={(value) => {
@@ -123,8 +123,8 @@ const SectionTwo = (data) => {
     const { uploadFile } = data.props
     const { operation, projectContractFileUrl, projectContractFileUpload } = data.props.stateData
     return <>
-        <Field name="projectStartDate" component={renderDateTimePicker} className={classes.textField} label="Start Date" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} disabled={operation === FromActions.VI} validate={[Required]} />
-        <Field name="projectEndDate" component={renderDateTimePicker} className={classes.textField} label="End Date" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} disabled={operation === FromActions.VI} validate={[Required]} />
+        <Field name="projectStartDate" component={renderDateTimePicker} className={classes.textField} label="Start Date" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} disabled={operation === FromActions.VI}  />
+        <Field name="projectEndDate" component={renderDateTimePicker} className={classes.textField} label="End Date" helperText={(initialValues === undefined) && "Ex. 01/01/2000"} disabled={operation === FromActions.VI} />
         <Field name="projectCost" component={renderNumberField} className={classes.textField} label="Project Cost" helperText={(initialValues === undefined) && "Ex. 20000"} disabled={operation === FromActions.VI} validate={[Required]} />
         <Field name="projectDesc" component={renderTextAreaField} fullWidth maxRows={2} label="Project Description" disabled={operation === FromActions.VI} />
         {operation === FromActions.CR &&
@@ -178,6 +178,27 @@ const Expenses = (data) => {
     return <ExpensesTable projectId={projectId} stateData={data.mainProps.stateData} />
 }
 
+const validate=(values)=>{
+    const errors={}
+    // this condtions check the project name
+    if(!values.projectName) {
+        errors.projectName = 'Project Name is Required'
+    }
+    // this condtions check whtere start date and end date
+    if((values.projectEndDate && values.projectStartDate)&&(!values.projectEndDate || !values.projectStartDate)){
+        errors.projectStartDate="Project start date is required";
+        errors.projectEndDate="Project end date is required";
+    }else{
+        var startDate = new Date(values.projectStartDate);
+        var endDate = new Date(values.projectEndDate);
+        if(startDate > endDate){
+            errors.projectStartDate="Project start date should be less than end date";
+            errors.projectEndDate="Project end date should be grater than start date";
+        }
+    }
+    return errors;
+}
+
 // make the selector 
 const selector = formValueSelector('ProjectForm')
 const mapDispatchToProps = (dispatch) => ({
@@ -190,5 +211,5 @@ ProjectForm = connect(state => {
     const purchaseOrder = selector(state, 'purchaseOrder')
     return { ...state, purchaseOrder }
 }, mapDispatchToProps)(ProjectForm)
-export default reduxForm({ form: 'ProjectForm' })(ProjectForm);
+export default reduxForm({ form: 'ProjectForm', validate })(ProjectForm);
 

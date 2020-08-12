@@ -9,7 +9,8 @@ import * as MasterDataAction from '../../redux/actions/MasterDataAction';
 
 let RegisterFrom = (props) => {
     var classes = useStyles();
-    const { RegisterUser, pristine, reset, submitting, handleSubmit, clearFile, cancle } = props
+    const { RegisterUser, pristine, reset, submitting, handleSubmit, clearFile, cancle, synchronousError } = props
+    console.log("Error ",synchronousError)
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(RegisterUser)}>
             {LoadGird({ classes, props })}

@@ -3,13 +3,13 @@ import { TextField, FormControlLabel, Checkbox, FormControl, RadioGroup, Radio, 
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 // this is render text filed
-const renderTextField = ({ label, name, input,helperText, meta: { touched, invalid, error }, ...custom }) => (
+const renderTextField = ({ label, name, input, helperText, meta: { touched, invalid, error }, ...custom }) => (
     <TextField
       id={name}
       label={label}
       placeholder={label}
       error={touched && invalid}
-      helperText={error ? error : helperText}
+      helperText={(touched && error) ? error : helperText}
       {...input}
       {...custom}
     />
@@ -66,7 +66,7 @@ const renderNumberField = ({ label, name,input,helperText, meta: { touched, inva
     label={label}
     placeholder={label}
     error={touched && invalid}
-    helperText={error ? error: helperText}
+    helperText={(error && touched) ? error: helperText}
     {...input}
     {...custom}
   />
@@ -129,14 +129,14 @@ const renderSelectField = ({ input, label, style, meta: { touched, error }, chil
 )
 
 // this render date time picker filed
-const renderDateTimePicker = ({ label,name, input, meta: { touched, invalid, error }, ...custom }) => 
+const renderDateTimePicker = ({ label,name,helperText, input, meta: { touched, invalid, error }, ...custom }) => 
   <TextField
     id={name}
     label={label}
     type="date"
     defaultValue=""
-    error={touched && invalid}
-    helperText={touched && error}
+    error={(touched && invalid) || error}
+    helperText={error ? error : helperText }
     {...input}
     {...custom}
     InputLabelProps={{ shrink: true }}
