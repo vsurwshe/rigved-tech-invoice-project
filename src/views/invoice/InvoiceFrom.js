@@ -83,7 +83,6 @@ const DwonloadInvoice = () => {
 const PostInvoiceData = async (propsData) => {
     const { values, setViewSectionThree, projectIdList, setLoading } = propsData
     const { authorization } = propsData.mainProps.LoginState
-    const { invoiceEmployeeData } = propsData.mainProps.InvoiceState
     const { GenerateInvoice, SaveInvoiceEmployeeData } = propsData.mainProps.InvoiceAction
     const { loadMessage } = propsData.mainProps.ClientAction
     let newInvoiceData = {
@@ -97,7 +96,6 @@ const PostInvoiceData = async (propsData) => {
     setTimeout(async () => {
         await loadMessage();
         await setLoading(false);
-        console.log("INVD ",invoiceEmployeeData);
         await setViewSectionThree(true);
     }, API_EXE_TIME)
 }
@@ -193,9 +191,9 @@ var months = ['', 'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY'
 
 // this sections will used for the showing structure
 const SectionThree = (propsData) => {
-    const { viewSectionThree, setViewSectionThree }=propsData
+    const { setViewSectionThree }=propsData
     const { invoiceEmployeeData } = propsData.mainProps.InvoiceState
-    console.log("INVD- 2",invoiceEmployeeData)
+    // this condition checks the invoice employee data is there or not
     if(invoiceEmployeeData.length >0 ){
         let columns = [
             { title: "EMP\u00a0ID", field: "employeeId" },

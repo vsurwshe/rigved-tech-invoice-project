@@ -21,7 +21,6 @@ const GenerateInvoice = (invoiceData, authroizationKey) => {
                 Authorization: authroizationKey 
             }})
             .then(response => { 
-                console.log("Response", response)
                 switch (response && response.data && response.data.Status) {
                     case "NO_CONTENT":
                         return dispatch(loadMessage(AlertColor.danger, InvoiceError.NO_CONTENT));  
@@ -30,7 +29,6 @@ const GenerateInvoice = (invoiceData, authroizationKey) => {
                     default:
                         return SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) 
                 }
-                
             })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
