@@ -28,13 +28,6 @@ const GetClientDetailsById=(clientId, authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
             .get('/client/read/'+clientId,HeaderConfig(authroizationKey))
-            // .then(response => {
-            //     if(response.status !== STATUS200){
-            //         dispatch(loadMessage(AlertColor.danger ,response.headers.message));
-            //     }else{
-            //         dispatch(SaveClientDetailsById(response.data))
-            //     }
-            // })
             .then(response => { SuccessFunction({ dispatch , "successMethod": SaveClientDetailsById, "loadMessage":loadMessage, response}) })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }

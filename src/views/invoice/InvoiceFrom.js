@@ -83,16 +83,21 @@ const DwonloadInvoice = () => {
 const PostInvoiceData = async (propsData) => {
     const { values, setViewSectionThree, projectIdList, setLoading } = propsData
     const { authorization } = propsData.mainProps.LoginState
-    const { GenerateInvoice } = propsData.mainProps.InvoiceAction
+    const { invoiceEmployeeData } = propsData.mainProps.InvoiceState
+    const { GenerateInvoice, SaveInvoiceEmployeeData } = propsData.mainProps.InvoiceAction
+    const { loadMessage } = propsData.mainProps.ClientAction
     let newInvoiceData = {
         "fromDate": (values && values.fromDate) && values.fromDate,
         "toDate": (values && values.toDate) && values.toDate,
         "projectId": (projectIdList && projectIdList.length > 0) && projectIdList[0].id
     }
     await setLoading(true);
+    await SaveInvoiceEmployeeData([]);
     await GenerateInvoice(newInvoiceData, authorization);
     setTimeout(async () => {
+        await loadMessage();
         await setLoading(false);
+        console.log("INVD ",invoiceEmployeeData);
         await setViewSectionThree(true);
     }, API_EXE_TIME)
 }
@@ -100,11 +105,14 @@ const PostInvoiceData = async (propsData) => {
 // this method will used for the loading gird structure of invoice form component
 const LoadGird = (props) => {
     var classes = useStyles();
-    const { projectIdList, setProjectIdList, viewSectionThree, loading } = props
+    const { projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, loading } = props
     const { color, common_message } = props.mainProps.ClientState
-    return <><Grid container spacing={5}>
-        {(common_message) && <center><Alert color={color}>{common_message}</Alert></center>}
-    </Grid>
+    return <>
+        <Grid container spacing={5}>
+            <Grid item xs={12} style={{ padding: 30 }}>
+                {(common_message) && <center><Alert color={color}>{common_message}</Alert></center>}
+            </Grid>
+        </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 30 }}>
                 {SectionOne({ classes, "mainProps": props.mainProps, projectIdList, setProjectIdList })}
@@ -116,7 +124,7 @@ const LoadGird = (props) => {
         <center>{loading && LoadingCircle("Saving")}</center>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
-                {viewSectionThree && SectionThree({ "mainProps": props.mainProps })}
+                {viewSectionThree && SectionThree({ "mainProps": props.mainProps , viewSectionThree, setViewSectionThree})}
             </Grid>
         </Grid>
 
@@ -185,46 +193,52 @@ var months = ['', 'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY'
 
 // this sections will used for the showing structure
 const SectionThree = (propsData) => {
+    const { viewSectionThree, setViewSectionThree }=propsData
     const { invoiceEmployeeData } = propsData.mainProps.InvoiceState
-    let columns = [
-        { title: "EMP\u00a0ID", field: "employeeId" },
-        { title: "EMP\u00a0NAME", field: "employeeName" },
-        { title: "PER\u00a0DAY\u00a0RATE", field: "perDayRate" },
-        { title: "TOTAL\u00a0DAYS", field: "totalDays" },
-        { title: "TOTAL\u00a0AMOUNT", field: "totalAmt" }
-    ];
-    let data = [];
-    (invoiceEmployeeData && invoiceEmployeeData.length > 0) && invoiceEmployeeData.map((item, key) => {
-        let monthString = item.attendancepermonth ? item.attendancepermonth : "";
-        let firstArray = monthString && monthString.split(',');
-        let tempColunmsData = [];
-        data.push({
-            "employeeId": item.employeeId,
-            "employeeName": item.employeeName,
-            "perDayRate": item.perDayRate,
-            "totalDays": item.totalDays,
-            "totalAmt": item.totalAmt
+    console.log("INVD- 2",invoiceEmployeeData)
+    if(invoiceEmployeeData.length >0 ){
+        let columns = [
+            { title: "EMP\u00a0ID", field: "employeeId" },
+            { title: "EMP\u00a0NAME", field: "employeeName" },
+            { title: "PER\u00a0DAY\u00a0RATE", field: "perDayRate" },
+            { title: "TOTAL\u00a0DAYS", field: "totalDays" },
+            { title: "TOTAL\u00a0AMOUNT", field: "totalAmt" }
+        ];
+        let data = [];
+        (invoiceEmployeeData && invoiceEmployeeData.length > 0) && invoiceEmployeeData.map((item, key) => {
+            let monthString = item.attendancepermonth ? item.attendancepermonth : "";
+            let firstArray = monthString && monthString.split(',');
+            let tempColunmsData = [];
+            data.push({
+                "employeeId": item.employeeId,
+                "employeeName": item.employeeName,
+                "perDayRate": item.perDayRate,
+                "totalDays": item.totalDays,
+                "totalAmt": item.totalAmt
+            })
+            firstArray.forEach(element => {
+                let monthNumber;
+                let filterEqualArray;
+                if (element.includes("{")) {
+                    let tempArray = element.split('{')
+                    filterEqualArray = tempArray[1].split("=");
+                } else if (element.includes("}")) {
+                    let tempArray = element.split('}')
+                    filterEqualArray = tempArray[0].split("=");
+                } else {
+                    filterEqualArray = element.split("=");
+                }
+                monthNumber = filterEqualArray && filterEqualArray[0].replace(/ /g, "");
+                key === 0 && tempColunmsData.push({ title: months[monthNumber], field: months[monthNumber] })
+                data[key][months[monthNumber]] = (filterEqualArray[1] && filterEqualArray[1].includes("}")) ? (filterEqualArray[1].split('}')[0]) : filterEqualArray[1]
+            });
+            columns.splice(5, 0, ...tempColunmsData)
+            return "";
         })
-        firstArray.forEach(element => {
-            let monthNumber;
-            let filterEqualArray;
-            if (element.includes("{")) {
-                let tempArray = element.split('{')
-                filterEqualArray = tempArray[1].split("=");
-            } else if (element.includes("}")) {
-                let tempArray = element.split('}')
-                filterEqualArray = tempArray[0].split("=");
-            } else {
-                filterEqualArray = element.split("=");
-            }
-            monthNumber = filterEqualArray && filterEqualArray[0].replace(/ /g, "");
-            key === 0 && tempColunmsData.push({ title: months[monthNumber], field: months[monthNumber] })
-            data[key][months[monthNumber]] = (filterEqualArray[1] && filterEqualArray[1].includes("}")) ? (filterEqualArray[1].split('}')[0]) : filterEqualArray[1]
-        });
-        columns.splice(5, 0, ...tempColunmsData)
-        return "";
-    })
-    return LoadInvoiceResourceTable({ columns, data });
+        return LoadInvoiceResourceTable({ columns, data });
+    }else{
+        return setViewSectionThree(false);
+    }
 }
 
 // this method will used for the loading resource table
