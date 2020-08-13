@@ -28,9 +28,9 @@ class UserManagement extends Component {
     }
 
     componentDidMount = async () => {
-        const { SkillSet, RoleList, Domains } = this.props.MasterDataSet
+        const { SkillSet, RoleList, Domains, EmployeeList } = this.props.MasterDataSet
         const { authorization } = this.props.LoginState
-        const { GetDomains, GetSkillSet, GetRoleList } = this.props.MasterDataAction
+        const { GetDomains, GetSkillSet, GetRoleList, GetEmployeeList } = this.props.MasterDataAction
         await this.handleLoadValue();
         if (Domains && Domains.length <= 0) {
             await GetDomains(0, 20, authorization)
@@ -40,6 +40,9 @@ class UserManagement extends Component {
         }
         if (RoleList && RoleList.length <= 0) {
             await GetRoleList(0, 20, authorization)
+        }
+        if (EmployeeList && EmployeeList.length <= 0) {
+            await GetEmployeeList(0, 20, authorization)
         }
         await this.handleLoadValue();
     }

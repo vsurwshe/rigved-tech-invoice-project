@@ -10,15 +10,17 @@ import { TableHeaderText } from '../../assets/config/TextConfig';
 
 
 const RegsiterTable=(props)=>{
-    const { userData } = props.LoginState
-    const { fromAction, deleteMethod, handleAttendance } = props
+    const { EmployeeList } = props.MasterDataSet
+    const { fromAction, handleAttendance } = props
 
     // creating columns
     const columns = [
-        { title: 'Sr.\u00a0No.', field: 'key', width: 20 },
-        { title: 'Empolyee\u00a0Name', field: 'projectName' },
-        { title: 'Employee\u00a0Code', field: 'clientName' },
-        { title: 'Resources', field: 'resource', width: 30 },
+        { title: 'Sr.\u00a0No.', field: 'key', width: 1 },
+        { title: 'Name', field: 'name' },
+        { title: 'Code', field: 'employeeNumber' },
+        { title: 'Email', field: 'emailId' },
+        { title: 'Designation', field: 'designation' },
+        { title: 'Mobile\u00a0Number', field: 'mobileNumber', width: 10 },
         {
           title: "",
           width:8,
@@ -37,14 +39,14 @@ const RegsiterTable=(props)=>{
           title: "",
           width:8,
           render: (rowData)=> {
-              return <DeleteOutlineIcon variant="contained" color="secondary" onClick={()=>deleteMethod(rowData.data)} />
+              return <DeleteOutlineIcon variant="contained" color="secondary" onClick={()=>console.log("Delete method called ",rowData)} />
           }
         }  
   ];
 
   // Creating rows
-  const data = (userData && userData.length > 0) && userData.map((item, key) => {
-    return { "key": (key + 1), "data": item, "projectName": item.projectName, "clientName": item.clientName }
+  const data = (EmployeeList && EmployeeList.length > 0) && EmployeeList.map((item, key) => {
+    return { "key": (key + 1), "data": item,"employeeNumber":item.employeeNumber,"designation":item.designation, "emailId": item.emailId,"mobileNumber": item.mobileNumber, "name": item.firstName+" "+item.lastName  }
   });
 
   return <div style={{ maxWidth: "100%" }}>
@@ -56,15 +58,15 @@ const RegsiterTable=(props)=>{
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' }
       }}
       actions={[
-        { icon: () => <div><Button variant="contained" color="primary">Create Employee</Button></div>,
-          onClick: (event, rowData) => { fromAction(null, FromActions.CR); },
-          isFreeAction: true,
-          tooltip: 'Create Employee'
-        },
         { icon: () => <div><Button variant="contained" color="primary">Upload Attendance</Button></div>,
           onClick: (event, rowData) => { handleAttendance()},
           isFreeAction: true,
           tooltip: 'Upload Attendance'
+        },
+        { icon: () => <div><Button variant="contained" color="primary">Create Employee</Button></div>,
+          onClick: (event, rowData) => { fromAction(null, FromActions.CR); },
+          isFreeAction: true,
+          tooltip: 'Create Employee'
         }
       ]}
     />
