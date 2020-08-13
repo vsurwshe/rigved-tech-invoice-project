@@ -12,7 +12,7 @@ return <>
     <div className={classes.formButtons}>
         {props.data.isLoading ? ( <CircularProgress size={26}/>)
         :(<Button disabled={ loginValue.length === 0 || passwordValue.length === 0} onClick={() => loginUserActions(props)} variant="contained" color="primary" size="large"> Login </Button>)}
-        <Button color="primary" size="large" className={classes.forgetButton} > Forget Password </Button>
+        <Button color="primary" size="large" className={classes.forgetButton} > Forgot Password </Button>
     </div></>
 }
 
