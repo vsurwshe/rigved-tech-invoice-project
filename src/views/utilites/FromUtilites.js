@@ -135,8 +135,8 @@ const renderDateTimePicker = ({ label,name,helperText, input, meta: { touched, i
     label={label}
     type="date"
     defaultValue=""
-    error={(touched && invalid) || error}
-    helperText={error ? error : helperText }
+    error={touched && invalid}
+    helperText={(touched && error) ? error : helperText }
     {...input}
     {...custom}
     InputLabelProps={{ shrink: true }}
@@ -172,6 +172,7 @@ const renderAutocompleteByName=({label,name,optionData,className, input, meta: {
 const renderAutocompleteWithProps=({label,name,optionData,className, input, meta: { touched, invalid, error }, ...custom})=>
   <Autocomplete
     id={name}
+    key={name}
     autoHighlight
     options={(optionData && optionData.length >0) ? optionData: []}
     getOptionLabel={optionData => (optionData && optionData.title) && optionData.title}

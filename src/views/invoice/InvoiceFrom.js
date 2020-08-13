@@ -36,7 +36,7 @@ let InvoiceFrom = (props) => {
             <div className={classes.buttonStyle}>
                 <center>
                     <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}>SUBMIT</Button> &nbsp;&nbsp;
-                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={async () => { await reset(); await SaveInvoiceEmployeeData([]) }}> Clear Values</Button>&nbsp;&nbsp;
+                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={async () => { await reset(); await SaveInvoiceEmployeeData([]); await setViewSectionThree(false); }}> Clear Values</Button>&nbsp;&nbsp;
                     {/* <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button> &nbsp;&nbsp; */}
                     <Button type="button" variant="outlined" color="primary" onClick={() => setViewInvoice(true)}>View Invoice</Button>
                 </center>
@@ -259,7 +259,7 @@ const validate = (values) => {
     } else {
         var startDate = new Date(values.fromDate);
         var endDate = new Date(values.toDate);
-        if (startDate > endDate) {
+        if (startDate > endDate || endDate < startDate) {
             errors.fromDate = "From date should be less than end date";
             errors.toDate = "To date should be grater than start date";
         }
