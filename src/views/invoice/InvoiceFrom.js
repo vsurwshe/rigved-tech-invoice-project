@@ -10,6 +10,7 @@ import { Required } from '../utilites/FormValidation';
 import * as ClientAction from "../../redux/actions/ClientAction";
 import * as ProjectAction from "../../redux/actions/ProjectAction"
 import * as InvoiceAction from "../../redux/actions/InvoiceAction"
+import * as PurchaseOrderAction from "../../redux/actions/PurchaseOrderAction"
 import Invoice from './Invoice';
 import CloseIcon from '@material-ui/icons/Close';
 import jsPDF from 'jspdf';
@@ -138,9 +139,15 @@ const SectionOne = (data) => {
     const { listOfClient } = data.mainProps.ClientState
     const { authorization } = data.mainProps.LoginState
     const { projectListByClient } = data.mainProps.ProjectState
+    const { purchaseOrderListByName } = data.mainProps.PurchaseOrderState
     const { GetClientList } = data.mainProps.ClientAction
     const { GetProjectListByClient } = data.mainProps.ProjectAction
+    const { GetPurchaseOrderListByName,SavePurchaseOrderListByName }=data.mainProps.PurchaseOrderAction
     const [clientCall, setClientCall] = useState(0);
+
+    let purchaseOrderOptions = purchaseOrderListByName.length > 0 && purchaseOrderListByName.map((item, key) => {
+        return { title: item.poNum ? item.poNum : "", id: item.id }
+    })
 
     if (listOfClient.length <= 0 && clientCall === 0) {
         GetClientList(0, 20, authorization);
@@ -161,9 +168,16 @@ const SectionOne = (data) => {
         <Field name="clientName" component={renderAutocompleteWithProps}
             onChange={(value) => {
                 change('ProjectForm', 'clientName', value.title);
-                GetProjectListByClient(0, 20, value.id, authorization)
+                SavePurchaseOrderListByName([]);
+                GetPurchaseOrderListByName(0, 20, value.id, authorization)
             }}
             optionData={clientOptions} label="Client Name" validate={[Required]} />
+        <Field name="poNum" component={renderAutocompleteWithProps}
+            onChange={(value) => {
+                change('ProjectForm', 'poNum', value.title);
+                // GetProjectListByClient(0, 20, value.id, authorization)
+            }}
+            optionData={purchaseOrderOptions} label="Purchase Order Number" validate={[Required]} />
         <Autocomplete
             id="projectList"
             autoHighlight
@@ -283,6 +297,7 @@ const mapDispatchToProps = (dispatch) => ({
     ClientAction: bindActionCreators(ClientAction, dispatch),
     InvoiceAction: bindActionCreators(InvoiceAction, dispatch),
     ProjectAction: bindActionCreators(ProjectAction, dispatch),
+    PurchaseOrderAction: bindActionCreators(PurchaseOrderAction,dispatch),
     change: bindActionCreators(change, dispatch)
 })
 InvoiceFrom = connect(state => { return { ...state } }, mapDispatchToProps)(InvoiceFrom)
