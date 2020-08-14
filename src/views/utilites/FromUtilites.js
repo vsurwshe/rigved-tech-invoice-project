@@ -173,6 +173,7 @@ const renderAutocompleteWithProps=({label,name,optionData,className, input, meta
   <Autocomplete
     id={name}
     key={name}
+    value={input.value}
     autoHighlight
     options={(optionData && optionData.length >0) ? optionData: []}
     getOptionLabel={optionData => (optionData && optionData.title) && optionData.title}
