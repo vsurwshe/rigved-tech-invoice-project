@@ -94,18 +94,18 @@ const LoadFields = (parameter) => {
         return { title: item.clientName ? item.clientName : "", id: item.id }
     })
     return <>
-        <Field name="poNum" component={renderTextField} fullWidth label="Purchase Order Number" helperText="Ex. po121-20/21" validate={[Required]} />    
+        <Field name="poNum" component={renderTextField} fullWidth label="Purchase Order Number" helperText="Ex. po121-20/21" validate={[Required]} style={{marginTop:30}} />    
         <Grid container spacing={5}>
-            <Grid item xs={12} sm={6}>
-            <Field name="clientName" component={renderAutocompleteWithProps}
-                onChange={(value) => {
-                    change('PurchaseOrderForm', 'clientName', value.title);
-                    change('PurchaseOrderForm', 'clientId', value.id);
-                }}
-            optionData={clientOptions} label="Client Name" validate={[Required]} />
-            <Field name="clientId" component={renderTextHiddenField} />
+            <Grid item xs={12} sm={6} >
+                <Field name="clientName" component={renderAutocompleteWithProps}
+                    onChange={(value) => {
+                        change('PurchaseOrderForm', 'clientName', value.title);
+                        change('PurchaseOrderForm', 'clientId', value.id);
+                    }}
+                    optionData={clientOptions} label="Client Name" validate={[Required]} />
+                <Field name="clientId" component={renderTextHiddenField} />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} style={{marginTop:15}}>
                 <Field name="poAmount" component={renderTextField} className={classes.textField} label="Puchase Order Amount" helperText={(initialValues === undefined) && "Ex. 10000"} validate={[Required]} />
             </Grid>
         </Grid>

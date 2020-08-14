@@ -3,9 +3,6 @@ import { connect } from "react-redux";
 import MaterialTable from "material-table";
 import { Button } from '@material-ui/core';
 import { FromActions } from '../../assets/config/Config';
-import CreateIcon from '@material-ui/icons/Create';
-import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
-import VisibilityIcon from '@material-ui/icons/Visibility';
 import { TableHeaderText } from '../../assets/config/TextConfig';
 
 
@@ -21,27 +18,27 @@ const RegsiterTable=(props)=>{
         { title: 'Email', field: 'emailId' },
         { title: 'Designation', field: 'designation' },
         { title: 'Mobile\u00a0Number', field: 'mobileNumber', width: 10 },
-        {
-          title: "",
-          width:8,
-          render: (rowData)=> {
-              return<VisibilityIcon variant="contained" color="primary" onClick={()=>fromAction(rowData.data,FromActions.VI,true)} />
-          }
-        },
-        {
-          title: "",
-          width:8,
-          render: (rowData)=> {
-              return<CreateIcon variant="contained" color="primary" onClick={()=>fromAction(rowData.data,FromActions.ED,true)} />
-          }
-        },
-        {
-          title: "",
-          width:8,
-          render: (rowData)=> {
-              return <DeleteOutlineIcon variant="contained" color="secondary" onClick={()=>console.log("Delete method called ",rowData)} />
-          }
-        }  
+        // {
+        //   title: "",
+        //   width:8,
+        //   render: (rowData)=> {
+        //       return<VisibilityIcon variant="contained" color="primary" onClick={()=>fromAction(rowData.data,FromActions.VI,true)} />
+        //   }
+        // },
+        // {
+        //   title: "",
+        //   width:8,
+        //   render: (rowData)=> {
+        //       return<CreateIcon variant="contained" color="primary" onClick={()=>fromAction(rowData.data,FromActions.ED,true)} />
+        //   }
+        // },
+        // {
+        //   title: "",
+        //   width:8,
+        //   render: (rowData)=> {
+        //       return <DeleteOutlineIcon variant="contained" color="secondary" onClick={()=>console.log("Delete method called ",rowData)} />
+        //   }
+        // }  
   ];
 
   // Creating rows

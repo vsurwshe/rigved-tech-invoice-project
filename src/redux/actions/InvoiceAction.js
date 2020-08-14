@@ -1,6 +1,8 @@
+import {AlertColor} from '../../assets/config/Config';
 import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
 import { loadMessage } from "../actions/ClientAction";
 import { SuccessFunction, ErrorFunction } from "./CommonAction"
+import { InvoiceError } from '../../assets/config/ErrorStringFile';
 
 const GetInvoiceList = (firstIndex, lastIndex, authroizationKey) => {
     return (dispatch) => {
@@ -18,7 +20,16 @@ const GenerateInvoice = (invoiceData, authroizationKey) => {
                 'Content-Type': 'application/json',
                 Authorization: authroizationKey 
             }})
-            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) })
+            .then(response => { 
+                switch (response && response.data && response.data.Status) {
+                    case "NO_CONTENT":
+                        return dispatch(loadMessage(AlertColor.danger, InvoiceError.NO_CONTENT));  
+                    case "CONFLICT":
+                        return dispatch(loadMessage(AlertColor.danger, InvoiceError.CONFLICT + response.data.fromDate +" to "+response.data.toDate)); 
+                    default:
+                        return SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) 
+                }
+            })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
