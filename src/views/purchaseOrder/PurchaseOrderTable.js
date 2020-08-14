@@ -15,8 +15,8 @@ const PurchaseOrderTable=(props)=>{
       // creating columns
     const columns = [
         { title: 'Sr.\u00a0No.', field:'key', width: 20 },
-        { title: 'PO\u00a0Number', field:'poNum', width: 60},
-        { title: 'Amount',field:'poAmount', width :30},
+        { title: 'PO\u00a0Number', field:'poNum' },
+        { title: 'Amount',field:'poAmount'},
         { title: 'For Client',field:'clientName'},
         {
           title: "",

@@ -139,15 +139,15 @@ const SectionOne = (data) => {
     const { listOfClient } = data.mainProps.ClientState
     const { authorization } = data.mainProps.LoginState
     const { projectListByClient } = data.mainProps.ProjectState
-    const { purchaseOrderListByName } = data.mainProps.PurchaseOrderState
+    // const { purchaseOrderListByName } = data.mainProps.PurchaseOrderState
     const { GetClientList } = data.mainProps.ClientAction
     const { GetProjectListByClient } = data.mainProps.ProjectAction
-    const { GetPurchaseOrderListByName,SavePurchaseOrderListByName }=data.mainProps.PurchaseOrderAction
+    // const { GetPurchaseOrderListByName,SavePurchaseOrderListByName }=data.mainProps.PurchaseOrderAction
     const [clientCall, setClientCall] = useState(0);
 
-    let purchaseOrderOptions = purchaseOrderListByName.length > 0 && purchaseOrderListByName.map((item, key) => {
-        return { title: item.poNum ? item.poNum : "", id: item.id }
-    })
+    // let purchaseOrderOptions = purchaseOrderListByName.length > 0 && purchaseOrderListByName.map((item, key) => {
+    //     return { title: item.poNum ? item.poNum : "", id: item.id }
+    // })
 
     if (listOfClient.length <= 0 && clientCall === 0) {
         GetClientList(0, 20, authorization);
@@ -168,16 +168,17 @@ const SectionOne = (data) => {
         <Field name="clientName" component={renderAutocompleteWithProps}
             onChange={(value) => {
                 change('ProjectForm', 'clientName', value.title);
-                SavePurchaseOrderListByName([]);
-                GetPurchaseOrderListByName(0, 20, value.id, authorization)
+                // SavePurchaseOrderListByName([]);
+                GetProjectListByClient(0, 20, value.id, authorization)
+                // GetPurchaseOrderListByName(0, 20, value.id, authorization)
             }}
             optionData={clientOptions} label="Client Name" validate={[Required]} />
-        <Field name="poNum" component={renderAutocompleteWithProps}
+        {/* <Field name="poNum" component={renderAutocompleteWithProps}
             onChange={(value) => {
                 change('ProjectForm', 'poNum', value.title);
                 // GetProjectListByClient(0, 20, value.id, authorization)
             }}
-            optionData={purchaseOrderOptions} label="Purchase Order Number" validate={[Required]} />
+            optionData={purchaseOrderOptions} label="Purchase Order Number" validate={[Required]} /> */}
         <Autocomplete
             id="projectList"
             autoHighlight
