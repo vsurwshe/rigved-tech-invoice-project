@@ -232,7 +232,8 @@ const RenderContact = ({ classes, fields,operation, meta: { error, submitFailed 
 const RateCard = (data) => {
     const { Domains, SkillCategory, SkillSet, rateCardDtos,setRateCardDtos} = data
     const { operation }=(data.mainProps && data.mainProps.stateData) ? data.mainProps.stateData : ""
-    return <RateCardTable operation={operation} data={data} SkillCategory={SkillCategory} Domains={Domains} SkillSet={SkillSet} rateCardDtos={rateCardDtos} setRateCardDtos={setRateCardDtos} />
+    let rateOptions=[{id: 1, name: "Monthly"},{id:1, name:"Daily"},{ id: 3, name:"Hourly"}]
+    return <RateCardTable operation={operation} data={data} rateOptions={rateOptions} SkillCategory={SkillCategory} Domains={Domains} SkillSet={SkillSet} rateCardDtos={rateCardDtos} setRateCardDtos={setRateCardDtos} />
 }
 
 // contact address
