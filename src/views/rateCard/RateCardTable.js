@@ -7,7 +7,7 @@ import { Autocomplete } from '@material-ui/lab';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 const RateCardTable = (propsData) => {
-  const { rateCardDtos,setRateCardDtos, Domains, SkillCategory, SkillSet }=propsData
+  const { rateCardDtos,setRateCardDtos, Domains, SkillCategory, SkillSet, rateOptions }=propsData
     const columns =[
         {   title: "Domain", 
             field: "domainName",
@@ -27,6 +27,12 @@ const RateCardTable = (propsData) => {
                 return LoadAutoComplete({ id:"skillSet", lable:"Skill", props, optionData:SkillSet }) 
             }
         },
+        {   title: "Rate\u00a0Options", 
+            field: "rateOptions",
+            editComponent :props =>{
+                return LoadAutoComplete({ id:"rateOptions", lable:"Rate Options", props, optionData:rateOptions }) 
+            }
+        },
         {   title: "Form\u00a0Year", 
             field: "fromYearOfExp",
             editComponent :props =>{ return LoadSelect({props}) }
@@ -40,7 +46,7 @@ const RateCardTable = (propsData) => {
             editComponent :props =>{
                 return  <TextField
                 id="rate"
-                label="rate"
+                label="Rate"
                 onChange={(event) => props.onChange(event.target.value)}
                 error={props.touched && props.invalid}
                 helperText={(props.touched && props.error) && props.error}
@@ -95,6 +101,7 @@ const LoadAutoComplete=(propsData)=>{
   const { id, optionData, props, lable }= propsData
   return <Autocomplete
   id={id}
+  style={{marginTop:"-10px"}}
   autoHighlight
   options={(optionData && optionData.length >0) ? optionData: []}
   getOptionLabel={optionData => (optionData && optionData.name) && optionData.name}
