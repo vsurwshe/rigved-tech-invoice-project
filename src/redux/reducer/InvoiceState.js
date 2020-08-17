@@ -11,6 +11,8 @@ const InvoiceState=(state=initialState,action)=>{
             return {...state,invoiceList:action.invoiceList}
         case "SAVE_INVOICE_EMPLOYEE_DATA":
             return {...state,invoiceEmployeeData:action.invoiceData}
+        case "SAVE_INVOICE_CREATE_PDF":
+            return {...state,genratedInvoiceData:action.invoiceData}
         default:
             return state;
     }

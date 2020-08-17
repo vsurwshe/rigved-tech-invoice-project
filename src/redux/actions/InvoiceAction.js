@@ -34,6 +34,27 @@ const GenerateInvoice = (invoiceData, authroizationKey) => {
     }
 }
 
+const GenerateInvoicePDF = (invoiceData, authroizationKey) => {
+    return (dispatch) => {
+        return CreateInstance()
+            .post('/innvoice/createPDF/',invoiceData,{headers: { 
+                'Content-Type': 'application/json',
+                Authorization: authroizationKey 
+            }})
+            .then(response => { 
+                switch (response && response.data && response.data.Status) {
+                    case "NO_CONTENT":
+                        return dispatch(loadMessage(AlertColor.danger, InvoiceError.NO_CONTENT));  
+                    case "CONFLICT":
+                        return dispatch(loadMessage(AlertColor.danger, InvoiceError.CONFLICT + response.data.fromDate +" to "+response.data.toDate)); 
+                    default:
+                        return SuccessFunction({ dispatch , "successMethod": SaveGenratedInvoiceData, "loadMessage":loadMessage, response}) 
+                }
+            })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
 //-------------------------------------
 
 export function SaveInvoiceList(invoiceList) {
@@ -50,8 +71,15 @@ export function SaveInvoiceEmployeeData(invoiceData) {
     }
 }
 
+export function SaveGenratedInvoiceData(invoiceData) {
+    return {
+        type: "SAVE_INVOICE_CREATE_PDF",
+        invoiceData
+    }
+}
 
 export{
     GetInvoiceList,
-    GenerateInvoice
+    GenerateInvoice,
+    GenerateInvoicePDF
 }

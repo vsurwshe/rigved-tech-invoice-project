@@ -2,7 +2,8 @@ import React from 'react';
 import "../../scss/invoiceTemplate.css"
 
 let Invoice=(props)=>{
-    return LoadInvoiceTable(props);
+    const {inoiceData }=props
+    return LoadInvoiceTable(inoiceData);
 }
 
 const LoadInvoiceTable=(props)=>{
@@ -39,16 +40,15 @@ const MainTableSectionTwo=(propsData)=>{
 
 // this will load the from Section row
 const FormSection=(propsData)=>{
-    return<table>
+    const { mainProps }=propsData
+    return<table style={{width: "50%"}}>
         <tbody>
             <tr>
                 <td>
                     <p style={{fontSize:12 , lineHeight:"normal"}}>
-                        <b>Name: Rigved Technologies Pvt Ltd</b><br/>
+                    <b>Name: {mainProps && mainProps.fromCompanyName}</b><br/>
                         <b>Registered Address:</b> <br/>
-                        04th Floor, 408, Plot no A-1, Rupa Solitaire,<br/>
-                        Millennium Business Park, Mahape,<br/>
-                        Mumbai, Maharashtra, 400710, India.
+                        {mainProps && mainProps.fromcompanyAddress}<br/>
                     </p>
                 </td>
             </tr>
@@ -58,23 +58,24 @@ const FormSection=(propsData)=>{
 
 // this will load the Conact info and Details Row
 const ContactAndInvoiceDetailsRow=(propsData)=>{
+    const { mainProps }=propsData
     return<table style={{marginTop:"-20px"}}>
         <tbody>
             <tr>
                 <td>
                     <p style={{fontSize:12 , lineHeight:"normal"}}>
-                           Contact No : 9004353333<br/>
-                           Email Id: deepika.singh@rigvedtech.com <br/>
-                           CIN No.: U74900MH2008PTC186830<br/>
-                        <b>Pan No.: AAECR1228G</b><br/>
-                        <b>GSTIN No.: 27AAECR1228G1ZL</b><br/>
-                        <b>SAC CODE : 998313</b>
+                           Contact No : {mainProps && mainProps.contactNo}<br/>
+                           Email Id: {mainProps && mainProps.emailId} <br/>
+                           CIN No.: {mainProps && mainProps.CIN}<br/>
+                        <b>Pan No.: {mainProps && mainProps.fromPANNo}</b><br/>
+                        <b>GSTIN No.: {mainProps && mainProps.fromGstNo}</b><br/>
+                        <b>SAC CODE : {mainProps && mainProps.fromSACCode}</b>
                     </p>
                 </td>
                 <td>
                     <p style={{fontSize:12 , lineHeight:"normal"}}>
-                        Invoice #: <br />
-                        Date:
+                        Invoice #: <b>{mainProps && mainProps.invoiceNo}</b> <br />
+                        Date:<b>{mainProps && mainProps.invoiceDate}</b>
                     </p>  
                 </td>
             </tr>
@@ -84,19 +85,18 @@ const ContactAndInvoiceDetailsRow=(propsData)=>{
 
 // this will load the to info details row
 const ToSection=(propsData)=>{
+    const { mainProps }=propsData
     return <table style={{marginTop:"-25px"}}>
             <tbody>
                 <tr>
                     <td>
                         <p style={{fontSize:12 ,fontWeight:"bold", lineHeight:"normal"}}>
                             To,<br/>
-                            Hurix Systems Pvt. Ltd,<br/>
-                            5th Floor, Central Wing, Unit No - 9 & 10,<br/>
-                            Sai Trinity Pashan-SUS Road, Pashan, Pune - 411021
+                            {mainProps && mainProps.toCompanyAddress}
                         </p>
                         <p style={{fontSize:12 , fontWeight:"bold", lineHeight:"normal"}}>
-                            Pan No.: AAECR1228G<br/>
-                            GSTIN No.: 27AAECR1228G1ZL<br/>
+                            Pan No.: {mainProps && mainProps.toPanNo}<br/>
+                            GSTIN No.: {mainProps && mainProps.toGstNo}<br/>
                         </p>
                     </td>
                 </tr>
@@ -105,35 +105,71 @@ const ToSection=(propsData)=>{
 }
 
 const MainTableSectionThree=(propsData)=>{
-    return <table cellPadding="0" border="1" cellSpacing="0">
+    const {mainProps }=propsData
+    return <table style={{fontSize:"12px" , borderCollapse:"collapse", lineHeight:"initial"}} cellPadding="0" border="1" cellSpacing="0">
+        <thead style={{fontWeight:"bold"}}>
+            <tr>
+                <td>Description</td>
+                <td>{'Qty.\u00a0/\u00a0No.\u00a0of\u00a0Resources'}</td>
+                <td>Rate</td>
+                <td>Amount</td>
+            </tr>
+        </thead>
+        <colgroup>
+            <col span="1" style={{width: "60%"}} />
+            <col span="1" style={{width: "10%"}} />
+            <col span="1" style={{width: "10%"}} />
+            <col span="1" style={{width: "10%"}} />
+        </colgroup>
         <tbody>
-            <tr className="heading">
-                <td>Payment Method</td>
+            <tr style={{paddingTop:"1em"}}>
+                <td></td>
+                <td></td>
+                <td>{mainProps && mainProps.billWitoutGST}</td>
+                <td>{mainProps && mainProps.billWitoutGST}</td>
+            </tr>
+            <tr>
+                <td>Consultant name :{mainProps && mainProps.consultantName}</td>
+                <td></td>
                 <td></td>
                 <td></td>
             </tr>
-            <tr className="details">
-                <td> {/* {props.payments && props.payments.mode} */}</td>
-                <td> {/* {props.payments && props.payments.transctionsId} */}</td>
+            <tr>
+                <td><b>Total Amount Before Tax</b></td>
+                <td></td>
+                <td></td>
                 <td></td>
             </tr>
-            <tr className="heading">
-                <td>Item</td>
-                <td>Qty</td>
-                <td>Price</td>
-            </tr>
-            {/* {props.invoiceItem && props.invoiceItem.map((item, key) => {
-                return <tr key={key} className="item" >
-                    <td>{item.itemName}</td>
-                    <td>{item.itemQty}</td>
-                    <td>{item.itemPrice}</td></tr>
-            })
-            } */}
-            <tr className="total">
+            { 
+                (mainProps && mainProps.cgst) && <tr>
+                    <td>Add :CGST @ 9.0%</td>
+                    <td></td>
+                    <td></td>
+                    <td>{mainProps.cgst}</td>
+                </tr>
+            }
+            { 
+                (mainProps && mainProps.igst) && <tr>
+                    <td>Add :IGST @ 18%</td>
+                    <td></td>
+                    <td></td>
+                    <td>{mainProps.igst}</td>
+                </tr>
+            }
+            <tr>
+                <td><b>Total Amount After Tax</b></td>
                 <td></td>
-                <td>Total:</td>
-                <td>$1200</td>
+                <td><b>RS. /-</b></td>
+                <td>{mainProps && mainProps.billWitGST}</td>
             </tr>
+            {
+                (mainProps && mainProps.totalBillingInWords) &&<tr>
+                    <td><b>{mainProps && mainProps.totalBillingInWords}</b></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            }
         </tbody>
     </table>
 }

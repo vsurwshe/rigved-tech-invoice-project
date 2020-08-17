@@ -1,5 +1,5 @@
 import React, { useState, forwardRef } from 'react';
-import { reduxForm, change, Field } from 'redux-form';
+import { reduxForm, change, Field, formValueSelector } from 'redux-form';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Grid, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Slide, AppBar, Toolbar, IconButton, CircularProgress } from '@material-ui/core';
@@ -32,14 +32,14 @@ let InvoiceFrom = (props) => {
     const [loading, setLoading] = useState(false)
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit((values) => PostInvoiceData({ "mainProps": props, values, projectIdList, viewSectionThree, setViewSectionThree, setLoading }))}>
-            {LoadGird({ "mainProps": props, projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, loading, setLoading })}
+            {LoadGird({ "mainProps": props, projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, loading, setLoading, setViewInvoice })}
             {ShowViewInvoice({ "mainProps": props, classes, viewInvoice, setViewInvoice })}
             <div className={classes.buttonStyle}>
                 <center>
                     <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}>SUBMIT</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={async () => { await reset(); await SaveInvoiceEmployeeData([]); await setViewSectionThree(false); }}> Clear Values</Button>&nbsp;&nbsp;
                     {/* <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button> &nbsp;&nbsp; */}
-                    <Button type="button" variant="outlined" color="primary" onClick={() => setViewInvoice(true)}>View Invoice</Button>
+                    {/* <Button type="button" variant="outlined" color="primary" onClick={() => setViewInvoice(true)}>View Invoice</Button> */}
                 </center>
             </div>
         </form>
@@ -49,6 +49,7 @@ let InvoiceFrom = (props) => {
 // this method will used for the showing invoice after posting successfully resource table
 const ShowViewInvoice = (propsData) => {
     const { viewInvoice, setViewInvoice, classes } = propsData
+    const { genratedInvoiceData }=propsData.mainProps.InvoiceState 
     return <Dialog fullScreen open={viewInvoice} onClose={() => setViewInvoice(false)} TransitionComponent={Transition}>
         <AppBar className={classes.dialogAppBar} style={{ float: "right" }} >
             <Toolbar >
@@ -57,7 +58,7 @@ const ShowViewInvoice = (propsData) => {
             </Toolbar>
         </AppBar>
         <DialogContent>
-            <Invoice />
+            { genratedInvoiceData ? <Invoice inoiceData={genratedInvoiceData}/>: <h3>Sorry there is no invoice created</h3>}
         </DialogContent>
         <DialogActions>
             <Button onClick={() => setViewInvoice(false)} color="primary">Cancel</Button>
@@ -104,7 +105,7 @@ const PostInvoiceData = async (propsData) => {
 // this method will used for the loading gird structure of invoice form component
 const LoadGird = (props) => {
     var classes = useStyles();
-    const { projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, loading } = props
+    const { projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, loading, setLoading, setViewInvoice } = props
     const { color, common_message } = props.mainProps.ClientState
     return <>
         <Grid container spacing={5}>
@@ -123,7 +124,7 @@ const LoadGird = (props) => {
         <center>{loading && LoadingCircle("Saving")}</center>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
-                {viewSectionThree && SectionThree({ "mainProps": props.mainProps , viewSectionThree, setViewSectionThree})}
+                {viewSectionThree && SectionThree({ "mainProps": props.mainProps , viewSectionThree, setViewSectionThree, projectIdList, setLoading, setViewInvoice})}
             </Grid>
         </Grid>
 
@@ -206,7 +207,7 @@ var months = ['', 'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY'
 
 // this sections will used for the showing structure
 const SectionThree = (propsData) => {
-    const { setViewSectionThree }=propsData
+    const { setViewSectionThree, setLoading, setViewInvoice }=propsData
     const { invoiceEmployeeData } = propsData.mainProps.InvoiceState
     // this condition checks the invoice employee data is there or not
     if(invoiceEmployeeData.length >0 ){
@@ -223,6 +224,7 @@ const SectionThree = (propsData) => {
             let firstArray = monthString && monthString.split(',');
             let tempColunmsData = [];
             data.push({
+                "data":item,
                 "employeeId": item.employeeId,
                 "employeeName": item.employeeName,
                 "perDayRate": item.perDayRate,
@@ -248,7 +250,7 @@ const SectionThree = (propsData) => {
             columns.splice(5, 0, ...tempColunmsData)
             return "";
         })
-        return LoadInvoiceResourceTable({ columns, data });
+        return LoadInvoiceResourceTable({ columns, data, "mainProps": propsData.mainProps, projectIdList: propsData.projectIdList, setLoading, setViewInvoice });
     }else{
         return setViewSectionThree(false);
     }
@@ -256,7 +258,7 @@ const SectionThree = (propsData) => {
 
 // this method will used for the loading resource table
 const LoadInvoiceResourceTable = (propsData) => {
-    const { columns, data } = propsData
+    const { columns, data, projectIdList, setLoading, setViewInvoice } = propsData
     return <div style={{ maxWidth: "100%" }}>
         <MaterialTable
             title=""
@@ -269,11 +271,38 @@ const LoadInvoiceResourceTable = (propsData) => {
             }}
             actions={[{   
                 icon: () => <div><Button variant="contained" color="primary">Generate Invoice</Button></div>,
-                onClick: (event, rowData) => { console.log(rowData) },
+                onClick: (event, rowData) =>{
+                    let tempInvoiceDetails= (rowData && rowData.length >0) && rowData.map((item,key)=>item.data);
+                    if(tempInvoiceDetails){
+                        GenratePDFInvoice({invoiceDetailDtos: tempInvoiceDetails, "mainProps":propsData.mainProps, projectIdList, setLoading, setViewInvoice })
+                    } 
+                },
                 tooltip: 'Generate Invoice'
             }]}
         />
     </div>
+}
+
+const GenratePDFInvoice=async (propsData)=>{
+    const { projectIdList, invoiceDetailDtos, setLoading, setViewInvoice }=propsData
+    const { fromDateProps, toDateProps }=propsData.mainProps
+    const { authorization }=propsData.mainProps.LoginState
+    const { loadMessage } = propsData.mainProps.ClientAction
+    const { GenerateInvoicePDF, SaveGenratedInvoiceData}=propsData.mainProps.InvoiceAction
+    let newInvoiceGenratePDFData={
+        "fromDate":fromDateProps && fromDateProps ,
+        "toDate": toDateProps && toDateProps ,
+        "projectId": (projectIdList.length>0) && projectIdList[0].id,
+        "invoiceDetailDtos": (invoiceDetailDtos.length>0 )&& invoiceDetailDtos
+    }
+    await setLoading(true);
+    await SaveGenratedInvoiceData([]);
+    await GenerateInvoicePDF(newInvoiceGenratePDFData, authorization);
+    setTimeout(async () => {
+        await loadMessage();
+        await setLoading(false);
+        await setViewInvoice(true);
+    }, API_EXE_TIME)
 }
 
 // this function will used for validate 
@@ -301,5 +330,12 @@ const mapDispatchToProps = (dispatch) => ({
     PurchaseOrderAction: bindActionCreators(PurchaseOrderAction,dispatch),
     change: bindActionCreators(change, dispatch)
 })
-InvoiceFrom = connect(state => { return { ...state } }, mapDispatchToProps)(InvoiceFrom)
+// make the selector 
+const selector = formValueSelector('InvoiceFrom')
+InvoiceFrom = connect(state => { 
+    // can select values individually
+    const fromDateProps = selector(state, 'fromDate')
+    const toDateProps = selector(state, 'toDate')
+    return { ...state,fromDateProps,toDateProps } 
+}, mapDispatchToProps)(InvoiceFrom)
 export default reduxForm({ form: 'InvoiceFrom', validate })(InvoiceFrom);
