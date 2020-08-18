@@ -134,14 +134,16 @@ const ContactInfo = (props) => {
     </Accordion>
 }
 
-const OtherInfo = (props) => {
+const OtherInfo = (propsData) => {
+    const { classes }=propsData
     return <Accordion>
         <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content" id="additional-actions1-header" > OTHER INFORMATION</AccordionSummary>
         <AccordionDetails>
             <div>
-                <Field name="employeeNumber" component={renderTextField} label="Employee Code" style={{ margin: 8 }} fullWidth helperText="Ex. RV0001 " margin="normal" InputLabelProps={{ shrink: true }} />
-                <Field name="dob" component={renderDateTimePicker} label="Date of Birth" style={{ margin: 8 }} fullWidth helperText="Ex. 15/02/2020" margin="normal" InputLabelProps={{ shrink: true }} />
-                <Field name="ctc" component={renderTextField} label="CTC" style={{ margin: 8 }} fullWidth helperText="Ex. 5000" margin="normal" InputLabelProps={{ shrink: true }} />
+                <Field name="employeeNumber" component={renderTextField} label="Employee Code" style={{ margin: 8 }} helperText="Ex. RV0001 " margin="normal" InputLabelProps={{ shrink: true }} />
+                <Field name="ctc" component={renderTextField} className={classes.textField} style={{ margin: 8 }} label="CTC" helperText="Ex. 5000" margin="normal" InputLabelProps={{ shrink: true }} />
+                <Field name="joiningDate" component={renderDateTimePicker} className={classes.textField} style={{ margin: 8 }} label="Joining Date" helperText="Ex. 01/01/2000"  margin="normal" />
+                <Field name="dob" component={renderDateTimePicker} className={classes.textField} style={{ margin: 8 }} label="Date of Birth" helperText="Ex. 15/02/2020" margin="normal" />
             </div>
         </AccordionDetails>
     </Accordion>
