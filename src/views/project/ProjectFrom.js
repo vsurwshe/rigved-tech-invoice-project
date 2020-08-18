@@ -98,7 +98,12 @@ const LoadFields = (parameter) => {
             optionData={clientOptions} label="Client Name" validate={[Required]} />
         <Field name="clientId" component={renderTextHiddenField} />
         <Field name="projectManager" component={renderAutocomplete} optionData={projectManagerOptions} label="Project Manager Name" validate={[Required]} />
-        <Field name="purchaseOrder" component={renderAutocomplete} optionData={purchaseOrderOptions} label="Purchase Order Number (Current)" />
+        <Field name="purchaseOrder" component={renderAutocompleteWithProps} 
+            onChange={(value) => {
+                change('ProjectForm', 'purchaseOrder', value.title);
+                change('ProjectForm', 'purchaseOrderId', value.id);
+            }}
+        optionData={purchaseOrderOptions} label="Purchase Order Number (Current)" />
     </>
 }
 
