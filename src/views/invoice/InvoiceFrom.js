@@ -76,7 +76,7 @@ const DwonloadInvoice = () => {
     }).then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'pt', 'a4');
-        pdf.addImage(imgData, 'PNG', 25, 100);
+        pdf.addImage(imgData, 'PNG', 25, 70);
         pdf.save("downloadInvoice.pdf");
     });
 }
