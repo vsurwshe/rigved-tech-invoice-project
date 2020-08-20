@@ -25,16 +25,10 @@ export default function BigStat(props) {
       header={
         <div className={classes.title}>
           <Typography variant="h5">{product}</Typography>
-
           <Select
             value={value}
             onChange={e => setValue(e.target.value)}
-            input={
-              <Input
-                disableUnderline
-                classes={{ input: classes.selectInput }}
-              />
-            }
+            input={ <Input disableUnderline classes={{ input: classes.selectInput }} /> }
             className={classes.select}
           >
             <MenuItem value="daily">Daily</MenuItem>
@@ -47,21 +41,14 @@ export default function BigStat(props) {
     >
       <div className={classes.totalValueContainer}>
         <div className={classes.totalValue}>
-          <Typography size="xxl" color="text" colorBrightness="secondary">
-            {total[value]}
-          </Typography>
+          <Typography size="xxl" color="text" colorBrightness="secondary"> {total[value]} </Typography>
           <Typography color={total.percent.profit ? "success" : "secondary"}>
             &nbsp;{total.percent.profit ? "+" : "-"}
             {total.percent.value}%
           </Typography>
         </div>
         <BarChart width={150} height={70} data={getRandomData()}>
-          <Bar
-            dataKey="value"
-            fill={theme.palette[color].main}
-            radius={10}
-            barSize={10}
-          />
+          <Bar dataKey="value" fill={theme.palette[color].main} radius={10} barSize={10} />
         </BarChart>
       </div>
       <div className={classes.bottomStatsContainer}>
@@ -102,16 +89,13 @@ export default function BigStat(props) {
               })}
             />
           </Grid>
-          <Typography size="sm" color="text" colorBrightness="secondary">
-            Views
-          </Typography>
+          <Typography size="sm" color="text" colorBrightness="secondary"> Views </Typography>
         </div>
       </div>
     </Widget>
   );
 }
 
-// #######################################################################
 
 function getRandomData() {
   return Array(7)
