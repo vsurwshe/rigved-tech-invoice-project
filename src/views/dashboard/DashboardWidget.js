@@ -43,6 +43,34 @@ const PieChartDataRevenue=(propsData)=>{
 }
 
 
+const LineChartRevenue=(propsData)=>{
+    const { data , title }=propsData 
+    var classes = useStyles();
+
+    return <Grid item lg={4} md={4} sm={6} xs={12}>
+      <Widget title={title} upperTitle bodyClass={classes.fullHeightBody} className={classes.card} >
+        <div className={classes.visitsNumberContainer}>
+          <Typography size="xl" weight="medium">{data.total} </Typography>
+        </div>
+        <Grid container direction="row" justify="space-between" alignItems="center" >
+          <Grid item>
+            <Typography color="text" colorBrightness="secondary"> Complete </Typography>
+            <Typography size="md">{data.totalReceived}</Typography>
+          </Grid>
+          <Grid item>
+            <Typography color="text" colorBrightness="secondary"> In-Process </Typography>
+            <Typography size="md">{data.totalInProcess}</Typography>
+          </Grid>
+          <Grid item>
+            <Typography color="text" colorBrightness="secondary"> Pending </Typography>
+            <Typography size="md">{data.totalPending}</Typography>
+          </Grid>
+        </Grid>
+      </Widget>
+    </Grid>
+}
+
 export {
-    PieChartDataRevenue
+    PieChartDataRevenue,
+    LineChartRevenue
 }
