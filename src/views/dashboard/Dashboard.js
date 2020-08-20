@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Grid } from "@material-ui/core";
-import PageTitle from '../PageTitle/PageTitle'
 import { PieChartDataRevenue, LineChartRevenue } from './DashboardWidget';
 import BigStat from "./widget/BigStat";
 class Dashboard extends Component {
@@ -12,21 +11,27 @@ class Dashboard extends Component {
             { name: "Unbilled", value: 300, color: "secondary" },
         ];
         const EmployeeData ={
+            "total": 120,
+            "totalReceived":20,
+            "totalPending":50,
+            "totalInProcess":50
+        }
+        const PurchaseOrderData ={
             "total": 12,
             "totalReceived":20000,
-            "totalPending":30000,
-            "totalInProcess":40000
+            "totalPending":50000,
+            "totalInProcess":50000
         }
         const bigStat = [
             {
               product: "Client revenue",
+              color: "primary",
               total: {
                 monthly: 4232,
                 weekly: 1465,
                 daily: 199,
                 percent: { value: 3.7, profit: false }
               },
-              color: "primary",
               registrations: {
                 monthly: { value: 830, profit: false },
                 weekly: { value: 215, profit: true },
@@ -40,13 +45,13 @@ class Dashboard extends Component {
             },
             {
                 product: "Project revenue",
+                color: "success",
                 total: {
                   monthly: 4232,
                   weekly: 1465,
                   daily: 199,
                   percent: { value: 3.7, profit: false }
                 },
-                color: "success",
                 registrations: {
                   monthly: { value: 830, profit: false },
                   weekly: { value: 215, profit: true },
@@ -60,17 +65,17 @@ class Dashboard extends Component {
               }
         ]
         return <>
-            <PageTitle title="Dashboard"/>
             <Grid container spacing={6}>
                 {bigStat.map(stat => (
                     <Grid item md={4} sm={6} xs={12} key={stat.product}>
                         <BigStat {...stat} />
                     </Grid>
                 ))}
-               <PieChartDataRevenue title="Bill breakdown" PieChartData={BillData} />
+               <PieChartDataRevenue title="Bill status" PieChartData={BillData} />
             </Grid>
             <Grid container spacing={6}>
-                <LineChartRevenue title="Billable Employees" data={EmployeeData}/>
+                <LineChartRevenue title="Billable employees" data={EmployeeData}/>
+                <LineChartRevenue title="Purchase order" data={PurchaseOrderData}/>
             </Grid>
         </>
     }
