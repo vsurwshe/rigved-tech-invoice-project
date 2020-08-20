@@ -24,6 +24,9 @@ class UserManagement extends Component {
             attendanceUpload: false,
             attendanceUrl: "",
             attendanceModel: false,
+            bulkEmployeeModel:false,
+            bulkEmployeeUrl:"",
+            bulkEmployeeUpload:false
         }
     }
 
@@ -62,6 +65,13 @@ class UserManagement extends Component {
     //this method will used for the handling attendance upload
     handleAttendanceUpload = () => { this.setState({ attendanceUpload: !this.state.attendanceUpload }) }
 
+    // this handleing the upload attendance model
+    handleBulkEmployeeModel = () => { this.setState({ bulkEmployeeModel: !this.state.bulkEmployeeModel }) }
+
+    //this method will used for the handling attendance upload
+    handleBulkEmployeeUpload = () => { this.setState({ bulkEmployeeUpload: !this.state.bulkEmployeeUpload }) }
+
+
     render() {
         const { fromAction } = this.state
         return fromAction ? this.loadRegisterForm() : this.loadRegisterTable();
@@ -73,8 +83,14 @@ class UserManagement extends Component {
         const { profileImageUpload, profileImageUrl } = this.state
         const data = { profileImageUpload, profileImageUrl }
         return <Card>
-            <center><h1>Register User</h1></center>
+            <div>
+               <span style={{ float:"left", marginLeft:10}}><h1>Register User</h1></span> 
+               <span style={{ float:"right", marginRight:30, marginTop:20}}>
+                   <Button variant="contained" color="primary" onClick={this.handleBulkEmployeeModel} >Upload Bulk Employee</Button>
+                </span> 
+            </div>
             {common_message && <Alert severity={color} >{common_message}</Alert>}
+            {this.loadBulkEmployeeModel()}
             <RegsiterForm
                 stateData={data}
                 loadMethod={this.handleLoadValue}
@@ -103,9 +119,31 @@ class UserManagement extends Component {
         </Dialog>
     }
 
+    // this method will used for the loading attendance model
+    loadBulkEmployeeModel = () => {
+        const { bulkEmployeeModel, bulkEmployeeUrl, bulkEmployeeUpload } = this.state
+        return <Dialog open={bulkEmployeeModel} keepMounted onClose={this.handleBulkEmployeeModel} aria-labelledby="alert-dialog-slide-title" aria-describedby="alert-dialog-slide-description"   >
+            <DialogTitle id="alert-dialog-slide-title">{'Upload bulk of employees excel file'}</DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-slide-description">
+                    {(bulkEmployeeUrl === "" || bulkEmployeeUrl === undefined) ? (bulkEmployeeUpload ? this.loadingCircle("Uploading") : this.loadBulkEmployeeUrl())
+                        : <h5>{this.loadFileUrlName(bulkEmployeeUrl)}</h5>}
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={this.handleBulkEmployeeModel} color="primary">Cancel</Button>
+            </DialogActions>
+        </Dialog>
+    }
+
     // this method will used for th show input for attendance file
     loadAttendanceUrl = () => <label htmlFor="attendanceFile">
-        <input name="attendanceFile" type="file" onChange={event => this.handleAttendanceFileChange(event)} />
+        <input name="attendanceFile" type="file" onChange={event => this.handleFileChange(event, "attendance")} />
+    </label>
+
+    // this method will used for th show input for attendance file
+    loadBulkEmployeeUrl = () => <label htmlFor="bulkEmployeeFile">
+        <input name="bulkEmployeeFile" type="file" onChange={event => this.handleFileChange(event,"bulkEmployee")} />
     </label>
 
     // this method will used for the showing attendance file name
@@ -115,14 +153,15 @@ class UserManagement extends Component {
     }
 
     // this method will used for the handling the attendance file upload
-    handleAttendanceFileChange = async (event) => {
+    handleFileChange = async (event,fileType) => {
         event.preventDefault();
         let imageFile = event.target.files[0];
         if (imageFile) {
             var reader = new FileReader();
             reader.onload = async () => {
                 let byteArray = reader.result.split(",")
-                this.uploadAttendanceFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type)
+                fileType  === "attendance" ? this.uploadAttendanceFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type)
+                    :this.uploadBulkEmployeeFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type)
             };
             reader.onerror = function (error) { console.log('Error: ', error); };
             await reader.readAsDataURL(imageFile);
@@ -145,13 +184,33 @@ class UserManagement extends Component {
     // this method will used for the reseting the value of file state variable
     clearFileUrl = () => { this.setState({ profileImageUrl: "" }) }
 
+    uploadBulkEmployeeFile = async (fileData, name, type) => {
+        const { SaveFileDetails, SaveFileData } = this.props.FileAction
+        const { authorization } = this.props.LoginState
+        let newFileData = [{
+            "fileName": name,
+            "description": "registration",
+            "contentType":  type === "application/vnd.ms-excel" ? 'xls':'xlsx',
+            "content": `${fileData}`
+        }]
+        await this.handleBulkEmployeeUpload();
+        await SaveFileDetails(newFileData, authorization)
+        setTimeout(async () => {
+            await loadMessage()
+            await SaveFileData();
+            await this.handleBulkEmployeeUpload();
+            await this.handleBulkEmployeeModel();
+        }, API_EXE_TIME)
+        this.setState({ attendanceUrl: (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && this.props.FileState.fileUrl[0] })
+    }
+
     uploadAttendanceFile = async (fileData, name, type) => {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
         const { authorization } = this.props.LoginState
         let newFileData = [{
             "fileName": name,
             "description": "attendance",
-            "contentType": 'xls',
+            "contentType": type === "application/vnd.ms-excel" ? 'xls':'xlsx',
             "content": `${fileData}`
         }]
         await this.handleAttendanceUpload();
