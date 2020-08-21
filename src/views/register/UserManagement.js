@@ -88,6 +88,9 @@ class UserManagement extends Component {
                <span style={{ float:"right", marginRight:30, marginTop:20}}>
                    <Button variant="contained" color="primary" onClick={this.handleBulkEmployeeModel} >Upload Bulk Employee</Button>
                 </span> 
+               <span style={{ float:"right", marginRight:30, marginTop:20}}>
+                   <Button variant="contained" color="primary" onClick={this.handleDownloadExcel} >Download Employee Excel Template </Button>
+                </span>
             </div>
             {common_message && <Alert severity={color} >{common_message}</Alert>}
             {this.loadBulkEmployeeModel()}
@@ -150,6 +153,13 @@ class UserManagement extends Component {
     loadFileUrlName = (fileUrl) => {
         let fileArray = fileUrl.split("\\");
         return fileArray.length > 0 ? fileArray[5] : "";
+    }
+
+    // this method will help to download the excle
+    handleDownloadExcel=async()=>{
+        const { DownloadExcel } = this.props.FileAction
+        const { authorization } = this.props.LoginState
+        await DownloadExcel(authorization);
     }
 
     // this method will used for the handling the attendance file upload
