@@ -1,5 +1,5 @@
 import { API_URL } from '../../assets/config/Config';
-import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
+import { CreateInstance } from '../../assets/config/APIConfig';
 import { loadMessage } from "../actions/ClientAction";
 import { SuccessFunction, ErrorFunction } from "./CommonAction"
 
