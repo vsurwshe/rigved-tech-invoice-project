@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Grid } from "@material-ui/core";
 import { PieChartDataRevenue, LineChartRevenue } from './DashboardWidget';
-import BigStat from "./widget/BigStat";
+import SimplePieChart from "./chart/SimplePieChart";
 import StackedBarChart from "./chart/StackedBarChart";
 import SimpleLineChart from "./chart/SimpleLineChart";
 class Dashboard extends Component {
@@ -55,6 +55,14 @@ class Dashboard extends Component {
           { xaxis: 'May', hired: 15,  left: 11 }, 
           { xaxis: 'Jun', hired: 6.1,  left: 12 }
         ]
+
+        const ClientRevenue=[
+          { field:"Client 1", value:20},
+          { field:"Client 2", value:30},
+          { field:"Client 3", value:43},
+          { field:"Client 4", value:17}
+        ]
+
         return <>
             <Grid container spacing={6}>
               <Grid item xs={12} sm={6}>
@@ -66,7 +74,10 @@ class Dashboard extends Component {
             </Grid>
             <Grid container spacing={6}>
               <Grid item xs={12} sm={6}>
-                <SimpleLineChart chartData={ResourceData} series={ResourceSerise} title="Resource Data"/>
+                <SimpleLineChart dataSource={ResourceData} architectureSources={ResourceSerise} title="Resource Data"/>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <SimplePieChart dataSource={ClientRevenue} title="Client revenue share"/>
               </Grid>
             </Grid>
         </>
