@@ -197,6 +197,7 @@ class UserManagement extends Component {
     uploadBulkEmployeeFile = async (fileData, name, type) => {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
         const { authorization } = this.props.LoginState
+        const { GetEmployeeList }=this.props.MasterDataAction
         let newFileData = [{
             "fileName": name,
             "description": "registration",
@@ -207,9 +208,11 @@ class UserManagement extends Component {
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
             await loadMessage()
+            await GetEmployeeList(0,100,authorization);
             await SaveFileData();
             await this.handleBulkEmployeeUpload();
             await this.handleBulkEmployeeModel();
+            await this.handleRegisterFromActions();
         }, API_EXE_TIME)
         this.setState({ attendanceUrl: (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && this.props.FileState.fileUrl[0] })
     }
@@ -274,8 +277,9 @@ class UserManagement extends Component {
             await GetEmployeeList(0,20,authorization)
             await loadMessage()
             alert("Your Employee Data Saved");
-            this.clearFileUrl();
-            this.handleLoadValue();
+            await this.clearFileUrl();
+            await this.handleLoadValue();
+            await this.handleRegisterFromActions();
         }, API_EXE_TIME)
     }
 }
