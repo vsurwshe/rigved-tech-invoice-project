@@ -3,6 +3,7 @@ import { Grid } from "@material-ui/core";
 import { PieChartDataRevenue, LineChartRevenue } from './DashboardWidget';
 import BigStat from "./widget/BigStat";
 import StackedBarChart from "./chart/StackedBarChart";
+import SimpleLineChart from "./chart/SimpleLineChart";
 class Dashboard extends Component {
     state = {  }
     
@@ -43,12 +44,30 @@ class Dashboard extends Component {
             { xaxis: 'May', client1: 15,  client2: 11,  client3: 28,  client4: 20}, 
             { xaxis: 'Jun', client1: 6.1,  client2: 12, client3: 20, client4: 15 }
         ];
+        const ResourceSerise=[
+          {name:"Hired", value:"hired"},
+          {name:"Left", value:"left"}
+        ]
+        const ResourceData=[
+          { xaxis: 'Feb', hired:10,  left: 30 },
+          { xaxis: 'March', hired: 20,   left: 12 },
+          { xaxis: 'April', hired: 22,  left: 24 }, 
+          { xaxis: 'May', hired: 15,  left: 11 }, 
+          { xaxis: 'Jun', hired: 6.1,  left: 12 }
+        ]
         return <>
             <Grid container spacing={6}>
-              <StackedBarChart chartData={BillingData} max={2000} series={BillingSerise} title="Billing Data" /> &nbsp;&nbsp;
-              <StackedBarChart chartData={EmployeeData} max={2000} series={EmployeeSerise} title="Employee Data" />
+              <Grid item xs={12} sm={6}>
+                <StackedBarChart chartData={BillingData} max={2000} series={BillingSerise} title="Billing Data" />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <StackedBarChart chartData={EmployeeData} max={2000} series={EmployeeSerise} title="Employee Data" />
+              </Grid>
             </Grid>
             <Grid container spacing={6}>
+              <Grid item xs={12} sm={6}>
+                <SimpleLineChart chartData={ResourceData} series={ResourceSerise} title="Resource Data"/>
+              </Grid>
             </Grid>
         </>
     }
