@@ -1,23 +1,11 @@
 import React, { Component } from 'react';
 import { Grid } from "@material-ui/core";
-import { PieChartDataRevenue, LineChartRevenue } from './DashboardWidget';
 import SimplePieChart from "./chart/SimplePieChart";
 import StackedBarChart from "./chart/StackedBarChart";
 import SimpleLineChart from "./chart/SimpleLineChart";
 class Dashboard extends Component {
     state = {  }
-    
     render() { 
-        const BillData = [
-            { name: "Billed", value: 400, color: "success" },
-            { name: "Unbilled", value: 300, color: "secondary" },
-        ];
-        const PurchaseOrderData ={
-            "total": 12,
-            "totalReceived":20000,
-            "totalPending":50000,
-            "totalInProcess":50000
-        }
         const BillingSerise=[
           {name:"Client 1", value:"client1"},
           {name:"Client 2", value:"client2"},
@@ -88,7 +76,7 @@ class Dashboard extends Component {
         </Grid>
         <Grid container spacing={6}>
           <Grid item xs={12} sm={6}>
-            <SimpleLineChart dataSource={ResourceData} xAxisText="Employees" title="Resource Data" architectureSources={ResourceSerise} title="Resource Data"/>
+            <SimpleLineChart dataSource={ResourceData} xAxisText="Employees" title="Resource Data" architectureSources={ResourceSerise} />
           </Grid>
           <Grid item xs={12} sm={6}>
             <SimplePieChart dataSource={ClientRevenue} title="Client revenue share"/>

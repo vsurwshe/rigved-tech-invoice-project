@@ -1,6 +1,5 @@
 import React from 'react';
 import Paper from '@material-ui/core/Paper';
-import SelectBox from 'devextreme-react/select-box';
 import { Chart, ValueAxis, Title, Series, ArgumentAxis, CommonSeriesSettings, CommonAxisSettings, Grid, Export, Legend, Margin, Tooltip, Label, Format } from 'devextreme-react/chart';
 
 const SimpleLineChart=(propsData)=>{
