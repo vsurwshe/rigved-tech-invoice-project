@@ -5,7 +5,7 @@ import { Chart, Series, CommonSeriesSettings, Legend, ValueAxis, Title, Export, 
 const StackedBarChart=(propsData)=>{
   const {dataSource,title, xAxisText, series }=propsData
   return <Paper>
-    <Chart id={title} title={title} dataSource={dataSource} >
+    <Chart palette="Material" paletteExtensionMode="Blend" id={title} title={title} dataSource={dataSource} >
         <CommonSeriesSettings argumentField="xaxis" type="stackedBar" />
         {(series && series.length  >0)&& series.map((item,key)=><Series valueField={item.value} name={item.name} />)}
         <ValueAxis position="left"> <Title text={xAxisText}/></ValueAxis>
