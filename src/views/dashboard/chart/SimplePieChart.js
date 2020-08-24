@@ -5,7 +5,7 @@ import PieChart, { Legend, Export, Series, Label, Font, Connector } from 'devext
 const SimplePieChart=(propsData)=>{
     const { dataSource, title }=propsData
     return <Paper> 
-        <PieChart id="pie" palette="Bright" dataSource={dataSource} title={title} >
+        <PieChart id="pie" palette="Material" paletteExtensionMode="Blend" dataSource={dataSource} title={title} >
             <Legend orientation="horizontal" itemTextPosition="right" horizontalAlignment="center" verticalAlignment="bottom" columnCount={4} />
             <Export enabled={true} />
             <Series argumentField="field" valueField="value">
