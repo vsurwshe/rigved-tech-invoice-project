@@ -18,5 +18,5 @@ const SimplePieChart=(propsData)=>{
   </Paper>
 }
 
-function customizeText(arg) { return `${arg.argumentText} (${arg.percentText})`; }
+function customizeText(arg) { return `${arg.argumentText} (${arg.value}%)`; }
 export default SimplePieChart;

@@ -47,10 +47,10 @@ const ClientRevenue=[
 ]
 
 const ProjectRevenue=[
-  { field:"Project 1", value:20},
-  { field:"Project 2", value:30},
-  { field:"Project 3", value:43},
-  { field:"Project 4", value:17}
+  { field:"Project 1", value:20, name:"Project 1"},
+  { field:"Project 2", value:30, name:"Project 2"},
+  { field:"Project 3", value:43, name:"Project 3"},
+  { field:"Project 4", value:17, name:"Project 4"}
 ]
 
 const PurchaseOrderRevenue=[
@@ -61,57 +61,76 @@ const PurchaseOrderRevenue=[
 ]
 
 class Dashboard extends Component {
-    state = { 
-      BillingData : TempBillingData, 
-      EmployeeData : TempEmployeeData
-    }
+  state = { 
+    BillingData : TempBillingData, 
+    EmployeeData : TempEmployeeData,
+    ProjectData : ProjectRevenue
+  }
 
-    handelBillingData=(BillingData)=>{this.setState({BillingData})}
-
-    handelEmployeeData=(EmployeeData)=>{this.setState({EmployeeData})}
-
-    render() { 
-      const { BillingData, EmployeeData } =this.state
-        return <>
-        <PageTitle title="Dashboard" clientSerise={ClientSerise} filterByClient={this.filterByClient}/>
-        <Grid container spacing={6}>
-          <Grid item xs={12} sm={6}>
-            <StackedBarChart dataSource={BillingData} xAxisText="Billing" title="Billing Data" series={ClientSerise}  />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <StackedBarChart dataSource={EmployeeData} xAxisText="Employees" title="Employee Data" series={ClientSerise}  />
-          </Grid>
+  handelBillingData=(BillingData)=>{this.setState({BillingData})}
+  
+  handelEmployeeData=(EmployeeData)=>{this.setState({EmployeeData})}
+  
+  handelProjectData=(ProjectData)=>{this.setState({ProjectData})}
+  render() { 
+    const { BillingData, EmployeeData, ProjectData } =this.state
+      return <>
+      <PageTitle title="Dashboard" 
+      clientSerise={ClientSerise} 
+      projectSerise={ProjectRevenue} 
+      filterByClient={this.filterByClient}
+      filterByProject={this.filterByProject}
+      />
+      <Grid container spacing={6}>
+        <Grid item xs={12} sm={6}>
+          <StackedBarChart dataSource={BillingData} xAxisText="Billing" title="Billing Data" series={ClientSerise}  />
         </Grid>
-        <Grid container spacing={6}>
-          <Grid item xs={12} sm={6}>
-            <SimpleLineChart dataSource={ResourceData} xAxisText="Employees" title="Resource Data" architectureSources={ResourceSerise} />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <SimplePieChart dataSource={ClientRevenue} title="Client revenue share"/>
-          </Grid>
+        <Grid item xs={12} sm={6}>
+          <StackedBarChart dataSource={EmployeeData} xAxisText="Employees" title="Employee Data" series={ClientSerise}  />
         </Grid>
-        <Grid container spacing={6}>
-          <Grid item xs={12} sm={6}>
-          <SimplePieChart dataSource={ProjectRevenue} title="Project revenue share"/>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <SimplePieChart dataSource={PurchaseOrderRevenue} title="Purchase order share"/>
-          </Grid>
+      </Grid>
+      <Grid container spacing={6}>
+        <Grid item xs={12} sm={6}>
+          <SimpleLineChart dataSource={ResourceData} xAxisText="Employees" title="Resource Data" architectureSources={ResourceSerise} />
         </Grid>
-      </>
-    }
+        <Grid item xs={12} sm={6}>
+          <SimplePieChart dataSource={ClientRevenue} title="Client revenue share"/>
+        </Grid>
+      </Grid>
+      <Grid container spacing={6}>
+        <Grid item xs={12} sm={6}>
+        <SimplePieChart dataSource={ProjectData} title="Project revenue share"/>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <SimplePieChart dataSource={PurchaseOrderRevenue} title="Purchase order share"/>
+        </Grid>
+      </Grid>
+    </>
+  }
 
-    filterByClient=(propsData)=>{
-      if(propsData){
-        let keyValue=propsData.value;
-        let tempBillingFilter = (TempBillingData.length >0) && TempBillingData.filter((item)=>item.hasOwnProperty(propsData.value))
-        .map((item)=> {return {"xaxis":item.xaxis , [keyValue] : item.[keyValue]}});
-        let tempEmployeeFilter = (TempEmployeeData.length >0) && TempEmployeeData.filter((item)=>item.hasOwnProperty(propsData.value))
-        .map((item)=> {return {"xaxis":item.xaxis , [keyValue] : item.[keyValue]}});
-        this.handelBillingData(tempBillingFilter);
-        this.handelEmployeeData(tempEmployeeFilter);
-      }
+  filterByClient=(propsData)=>{
+    if(propsData){
+      let keyValue=propsData.value;
+      let tempBillingFilter = (TempBillingData.length >0) && TempBillingData.filter((item)=>item.hasOwnProperty(propsData.value))
+      .map((item)=> {return {"xaxis":item.xaxis , [keyValue] : item.[keyValue]}});
+      let tempEmployeeFilter = (TempEmployeeData.length >0) && TempEmployeeData.filter((item)=>item.hasOwnProperty(propsData.value))
+      .map((item)=> {return {"xaxis":item.xaxis , [keyValue] : item.[keyValue]}});
+      this.handelBillingData(tempBillingFilter);
+      this.handelEmployeeData(tempEmployeeFilter);
+    }else{
+      this.handelBillingData(TempBillingData);
+      this.handelEmployeeData(TempEmployeeData);
     }
+  }
+
+  filterByProject=(propsData)=>{
+    if(propsData){
+      let tempProjectFilter = (ProjectRevenue.length >0) && ProjectRevenue.filter((item)=>item.field === propsData.field);
+      this.handelProjectData(tempProjectFilter);
+    }else{
+      this.handelProjectData(ProjectRevenue);
+    }
+  }
 }
 
 export default Dashboard;
