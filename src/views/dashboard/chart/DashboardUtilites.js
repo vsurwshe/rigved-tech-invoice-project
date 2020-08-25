@@ -7,7 +7,7 @@ import { TextField } from "@material-ui/core"
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const PageTitle=(props)=>{
-  const { title, clientSerise, filterByClient, projectSerise }=props
+  const { title, clientSerise, filterByClient, projectSerise, filterByProject }=props
   const classes = useStyles();
    return <div className={classes.pageTitleContainer}>
             <Typography className={classes.typo} variant="h3" size="sm"> {title} </Typography>
@@ -27,7 +27,7 @@ const PageTitle=(props)=>{
                     options={(projectSerise && projectSerise.length >0) ? projectSerise: []}
                     getOptionLabel={projectSerise => (projectSerise && projectSerise.name) && projectSerise.name}
                     getOptionSelected={(option, value) => option.name === value.name}
-                    onChange={(event, value) =>console.log("Value ", value)}
+                    onChange={(event, value) =>filterByProject(value)}
                     className={classes.autocomplete}
                     renderInput={(params) => ( <TextField {...params} label="Serach By project" /> )}
                 />
