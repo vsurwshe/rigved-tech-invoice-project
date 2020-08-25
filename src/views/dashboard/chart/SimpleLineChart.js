@@ -5,7 +5,7 @@ import { Chart, ValueAxis, Title, Series, ArgumentAxis, CommonSeriesSettings, Co
 const SimpleLineChart=(propsData)=>{
   const { dataSource,architectureSources, title, xAxisText}=propsData
   return <Paper>
-      <Chart palette="Material" paletteExtensionMode="Blend" dataSource={dataSource} title={title} >
+      <Chart palette="material" paletteExtensionMode="blend" dataSource={dataSource} title={title} >
           <CommonSeriesSettings argumentField="xaxis" type="spline" />
           <CommonAxisSettings> <Grid visible={true} /> </CommonAxisSettings>
           { architectureSources.map((item,key)=>{ return <Series key={key} valueField={item.value} name={item.name} /> })}
