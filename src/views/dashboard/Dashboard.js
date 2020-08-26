@@ -4,6 +4,7 @@ import SimplePieChart from "./chart/SimplePieChart";
 import StackedBarChart from "./chart/StackedBarChart";
 import SimpleLineChart from "./chart/SimpleLineChart";
 import { PageTitle } from './chart/DashboardUtilites';
+import SideBySideBarChart from './chart/SideBySideBarChart';
 
 
 const ClientSerise=[
@@ -37,6 +38,18 @@ const ResourceData=[
   { xaxis: 'April', hired: 22,  left: 24 }, 
   { xaxis: 'May', hired: 15,  left: 11 }, 
   { xaxis: 'Jun', hired: 6.1,  left: 12 }
+]
+
+const BillSerise=[
+  {name:"Billed", value:"billed"},
+  {name:"Un-Billed", value:"unbilled"}
+]
+const BilledData=[
+  { xaxis: 'Feb', billed:1000,  unbilled: 3000 },
+  { xaxis: 'March', billed: 2000, unbilled: 1200 },
+  { xaxis: 'April', billed: 2200, unbilled: 2400 }, 
+  { xaxis: 'May', billed: 1500, unbilled: 1100 }, 
+  { xaxis: 'Jun', billed: 6300, unbilled: 1200 }
 ]
 
 const ClientRevenue=[
@@ -83,26 +96,58 @@ class Dashboard extends Component {
       />
       <Grid container spacing={6}>
         <Grid item xs={12} sm={6}>
-          <StackedBarChart dataSource={BillingData} xAxisText="Billing" title="Billing Data" series={ClientSerise}  />
+          <StackedBarChart 
+            dataSource={BillingData} 
+            architectureSources={ClientSerise} 
+            xAxisText="Billing" 
+            title="Client Billing Data"   
+          />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <StackedBarChart dataSource={EmployeeData} xAxisText="Employees" title="Employee Data" series={ClientSerise}  />
+          <SideBySideBarChart 
+            dataSource={BilledData} 
+            architectureSources={BillSerise}
+            xAxisText="Billing"  
+            title="Billed Data"
+          />
         </Grid>
       </Grid>
       <Grid container spacing={6}>
         <Grid item xs={12} sm={6}>
-          <SimpleLineChart dataSource={ResourceData} xAxisText="Employees" title="Resource Data" architectureSources={ResourceSerise} />
+          <StackedBarChart 
+            dataSource={EmployeeData} 
+            architectureSources={ClientSerise}  
+            xAxisText="Employees" 
+            title="Employee Data" 
+          />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <SimplePieChart dataSource={ClientRevenue} title="Client revenue share"/>
+          <SimpleLineChart 
+            dataSource={ResourceData} 
+            architectureSources={ResourceSerise} 
+            xAxisText="Employees" 
+            title="Resource Data"  
+          />
         </Grid>
       </Grid>
       <Grid container spacing={6}>
         <Grid item xs={12} sm={6}>
-        <SimplePieChart dataSource={ProjectData} title="Project revenue share"/>
+          <SimplePieChart 
+            dataSource={ClientRevenue} 
+            title="Client revenue share"
+          />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <SimplePieChart dataSource={PurchaseOrderRevenue} title="Purchase order share"/>
+          <SimplePieChart 
+            dataSource={ProjectData} 
+            title="Project revenue share"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <SimplePieChart 
+            dataSource={PurchaseOrderRevenue} 
+            title="Purchase order share"
+          />
         </Grid>
       </Grid>
     </>
