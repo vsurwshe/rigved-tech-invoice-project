@@ -13,7 +13,7 @@ import * as InvoiceAction from "../../redux/actions/InvoiceAction"
 import * as PurchaseOrderAction from "../../redux/actions/PurchaseOrderAction"
 import Invoice from './Invoice';
 import CloseIcon from '@material-ui/icons/Close';
-import jsPDF from 'jspdf';
+import * as jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import MaterialTable from 'material-table';
 import { API_EXE_TIME } from '../../assets/config/Config';
