@@ -11,6 +11,16 @@ const GetBillingData=(authroizationKey)=>{
     }
 }
 
+const GetResourceData=(authroizationKey)=>{
+    return (dispatch) => {
+        return CreateInstance()
+        .get('/invoice/invoiceList/', HeaderConfig(authroizationKey))
+        .then(response => { SuccessFunction({ dispatch , "successMethod": SaveResourceData, "loadMessage":loadMessage, response}) })
+        .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
+
 //-------------------------------
 
 export function SaveBillingData(BillingData){
@@ -20,6 +30,14 @@ export function SaveBillingData(BillingData){
     }
 }
 
+export function SaveResourceData(ResourceData){
+    return{
+        type:"SAVE_DASHBOARD_RESOURCE_DATA",
+        ResourceData
+    }
+}
+
 export {
-    GetBillingData
+    GetBillingData,
+    GetResourceData
 }

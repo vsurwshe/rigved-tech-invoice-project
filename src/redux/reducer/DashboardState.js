@@ -68,6 +68,8 @@ const DashboardState=(state = initialState, action)=>{
             let tempClientSerise = (action.BillingData) && action.BillingData.clientId
             let tempClientBillingData = (action.BillingData) && action.BillingData.clientData
             return {...state, clientSerise: tempClientSerise, clientEmployeeData : tempClientBillingData }
+        case "SAVE_DASHBOARD_RESOURCE_DATA":
+            return {...state, resourceData: action.ResourceData }
         default:
             return state;
     }
