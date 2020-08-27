@@ -13,6 +13,7 @@ const ClientSerise=[
   {name:"Client 3", value:"client3"},
   {name:"Client 4", value:"client4"}
 ]
+
 const TempBillingData=[
     { xaxis: 'Feb', client1:74.2,  client2: 308.6,  client3: 35.1,  client4: 956.9},
     { xaxis: 'March', client1: 40,   client2: 128.5, client3: 361.8, client4: 105 },
@@ -28,10 +29,12 @@ const TempEmployeeData=[
     { xaxis: 'May', client1: 15,  client2: 11,  client3: 28,  client4: 20}, 
     { xaxis: 'Jun', client1: 6.1,  client2: 12, client3: 20, client4: 15 }
 ];
+
 const ResourceSerise=[
   {name:"Hired", value:"hired"},
   {name:"Left", value:"left"}
 ]
+
 const ResourceData=[
   { xaxis: 'Feb', hired:10,  left: 30 },
   { xaxis: 'March', hired: 20,   left: 12 },
@@ -42,8 +45,9 @@ const ResourceData=[
 
 const BillSerise=[
   {name:"Billed", value:"billed"},
-  {name:"Un-Billed", value:"unbilled"}
+  {name:"Revenue", value:"unbilled"}
 ]
+
 const BilledData=[
   { xaxis: 'Feb', billed:1000,  unbilled: 3000 },
   { xaxis: 'March', billed: 2000, unbilled: 1200 },
