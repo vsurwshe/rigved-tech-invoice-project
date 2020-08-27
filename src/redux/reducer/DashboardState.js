@@ -1,7 +1,15 @@
 const initialState = {
     clientSerise: [],
+    projectSerise: [],
+    billSerise:[],
+    resourceSerise:[],
     clientBillingData: [],
     clientEmployeeData:[],
+    billedData:[],
+    resourceData:[],
+    clientRevenueData:[],
+    projectRevenueData:[],
+    purchaseOrderRevenueData:[]
 }
 
 const DashboardState=(state = initialState, action)=>{

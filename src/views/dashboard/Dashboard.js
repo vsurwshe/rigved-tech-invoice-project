@@ -5,7 +5,9 @@ import StackedBarChart from "./chart/StackedBarChart";
 import SimpleLineChart from "./chart/SimpleLineChart";
 import { PageTitle } from './chart/DashboardUtilites';
 import SideBySideBarChart from './chart/SideBySideBarChart';
-
+import * as DashboardAction from "../../redux/actions/DashboardAction";
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
 const ClientSerise=[
   {name:"Client 1", value:"client1"},
@@ -79,9 +81,21 @@ const PurchaseOrderRevenue=[
 
 class Dashboard extends Component {
   state = { 
-    BillingData : TempBillingData, 
-    EmployeeData : TempEmployeeData,
-    ProjectData : ProjectRevenue
+    BillingData : [], 
+    EmployeeData : [],
+    ProjectData : []
+  }
+
+  componentDidMount=async()=>{
+    console.log("Props ",this.props)
+    const { clientBillingData, clientEmployeeData }=this.props.DashboardState
+    const { authorization }=this.props.LoginState
+    const {GetBillingData }=this.props.DashboardAction
+    if((clientBillingData && clientBillingData.length <=0) || (clientEmployeeData && clientEmployeeData.length <=0))
+    {
+      await GetBillingData(authorization);
+    }
+
   }
 
   handelBillingData=(BillingData)=>{this.setState({BillingData})}
@@ -89,72 +103,101 @@ class Dashboard extends Component {
   handelEmployeeData=(EmployeeData)=>{this.setState({EmployeeData})}
   
   handelProjectData=(ProjectData)=>{this.setState({ProjectData})}
+  
   render() { 
-    const { BillingData, EmployeeData, ProjectData } =this.state
-      return <>
-      <PageTitle title="Dashboard" 
-      clientSerise={ClientSerise} 
-      projectSerise={ProjectRevenue} 
-      filterByClient={this.filterByClient}
-      filterByProject={this.filterByProject}
-      />
-      <Grid container spacing={6}>
-        <Grid item xs={12} sm={6}>
-          <StackedBarChart 
-            dataSource={BillingData} 
-            architectureSources={ClientSerise} 
-            xAxisText="Billing" 
-            title="Client Billing Data"   
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <SideBySideBarChart 
-            dataSource={BilledData} 
-            architectureSources={BillSerise}
-            xAxisText="Billing"  
-            title="Billed Data"
-          />
-        </Grid>
-      </Grid>
-      <Grid container spacing={6}>
-        <Grid item xs={12} sm={6}>
-          <StackedBarChart 
-            dataSource={EmployeeData} 
-            architectureSources={ClientSerise}  
-            xAxisText="Employees" 
-            title="Employee Data" 
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <SimpleLineChart 
-            dataSource={ResourceData} 
-            architectureSources={ResourceSerise} 
-            xAxisText="Employees" 
-            title="Resource Data"  
-          />
-        </Grid>
-      </Grid>
-      <Grid container spacing={6}>
-        <Grid item xs={12} sm={6}>
-          <SimplePieChart 
-            dataSource={ClientRevenue} 
-            title="Client revenue share"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <SimplePieChart 
-            dataSource={ProjectData} 
-            title="Project revenue share"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <SimplePieChart 
-            dataSource={PurchaseOrderRevenue} 
-            title="Purchase order share"
-          />
-        </Grid>
-      </Grid>
+      return <> {this.loadGird()}</>
+  }
+
+  loadGird=()=>{
+    return <> {this.loadPageTitle()}
+    <Grid container spacing={6}>
+      <Grid item xs={12} sm={6}> {this.loadClientBillingChart()} </Grid>
+      <Grid item xs={12} sm={6}> {this.loadBillingChart()} </Grid>
+    </Grid>
+    <Grid container spacing={6}>
+      <Grid item xs={12} sm={6}> {this.loadEmployeeChart()} </Grid>
+      <Grid item xs={12} sm={6}> {this.loadResourceChart()} </Grid>
+    </Grid>
+    <Grid container spacing={6}>
+      <Grid item xs={12} sm={6}> {this.loadClientRevenueChart()} </Grid>
+      <Grid item xs={12} sm={6}> {this.loadProjectRevenueChart()} </Grid>
+      <Grid item xs={12} sm={6}> {this.loadPurchaseOrderRevenueChart()}</Grid>
+    </Grid>
     </>
+  }
+
+  loadPageTitle=()=>{
+    const { clientSerise, projectSerise }= this.props.DashboardState
+    return <PageTitle title="Dashboard" 
+        clientSerise={clientSerise} 
+        projectSerise={projectSerise} 
+        filterByClient={this.filterByClient}
+        filterByProject={this.filterByProject}
+    />
+  }
+
+  loadClientBillingChart=()=>{
+    const { clientBillingData, clientSerise }= this.props.DashboardState
+    return <StackedBarChart 
+        dataSource={clientBillingData} 
+        architectureSources={clientSerise} 
+        xAxisText="Billing" 
+        title="Client Billing Data"   
+    /> 
+  }
+
+  loadBillingChart=()=>{
+    const { billedData, billSerise }= this.props.DashboardState
+    return <SideBySideBarChart 
+        dataSource={billedData} 
+        architectureSources={billSerise}
+        xAxisText="Billing"  
+        title="Billed Data"
+    />
+  }
+
+  loadEmployeeChart=()=>{
+    const { clientEmployeeData, clientSerise }=this.props.DashboardState
+    return <StackedBarChart 
+        dataSource={clientEmployeeData} 
+        architectureSources={clientSerise}  
+        xAxisText="Employees" 
+        title="Employee Data" 
+    />
+  }
+
+  loadResourceChart=()=>{
+    const { resourceData, resourceSerise }=this.props.DashboardState
+    return <SimpleLineChart 
+      dataSource={resourceData} 
+      architectureSources={resourceSerise} 
+      xAxisText="Employees" 
+      title="Resource Data"  
+    />
+  }
+
+  loadClientRevenueChart=()=>{
+    const {clientRevenueData}=this.props.DashboardState
+    return <SimplePieChart 
+        dataSource={clientRevenueData} 
+        title="Client revenue share"
+    />
+  }
+
+  loadProjectRevenueChart=()=>{
+    const { projectRevenueData }=this.props.DashboardState
+    return <SimplePieChart 
+      dataSource={projectRevenueData} 
+      title="Project revenue share"
+    />
+  }
+
+  loadPurchaseOrderRevenueChart=()=>{
+    const { purchaseOrderRevenueData }= this.props.DashboardState
+    return <SimplePieChart 
+        dataSource={purchaseOrderRevenueData} 
+        title="Purchase order share"
+    />
   }
 
   filterByClient=(propsData)=>{
@@ -182,4 +225,9 @@ class Dashboard extends Component {
   }
 }
 
-export default Dashboard;
+const mapStateToProps = state => { return state; };
+const mapDispatchToProps = (dispatch) => ({
+    DashboardAction: bindActionCreators(DashboardAction, dispatch),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
