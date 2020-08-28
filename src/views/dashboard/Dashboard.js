@@ -18,11 +18,12 @@ class Dashboard extends Component {
   }
 
   componentDidMount=async()=>{
+    console.log("Props ", this.props);
     const { clientBillingData, clientEmployeeData, projectRevenueData }=this.props.DashboardState
     const { authorization }=this.props.LoginState
     const { GetBillingData, GetEmployeeData }=this.props.DashboardAction
     await this.handelLoadValue();
-    // (clientBillingData && clientBillingData.length <=0) && await GetBillingData(authorization); 
+    (clientBillingData && clientBillingData.length <=0) && await GetBillingData(authorization,{}); 
     (clientEmployeeData && clientEmployeeData.length <=0) && await GetEmployeeData(authorization,{});
     await this.handelBillingData(clientBillingData)
     await this.handelEmployeeData(clientEmployeeData)
@@ -85,9 +86,9 @@ class Dashboard extends Component {
   // this method will load the client billing chart 
   loadClientBillingChart=()=>{
     const { clientSerise }= this.props.DashboardState
-    const { EmployeeData }= this.state
+    const { BillingData }= this.state
     return <StackedBarChart 
-        dataSource={EmployeeData} 
+        dataSource={BillingData} 
         architectureSources={clientSerise} 
         xAxisText="Billing" 
         title="Client Billing Data"   
@@ -107,11 +108,11 @@ class Dashboard extends Component {
 
   // this method will load the employee chart
   loadEmployeeChart=()=>{
-    const { clientSerise }=this.props.DashboardState
+    const { employeeclientSerise }=this.props.DashboardState
     const { EmployeeData }=this.state
     return <StackedBarChart 
         dataSource={EmployeeData} 
-        architectureSources={clientSerise}  
+        architectureSources={employeeclientSerise}  
         xAxisText="Employees" 
         title="Employee Data" 
     />
