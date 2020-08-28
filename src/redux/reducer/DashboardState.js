@@ -5,6 +5,7 @@ const initialState = {
         {name:"Client 3", value:"client3"},
         {name:"Client 4", value:"client4"}
     ],
+    employeeclientSerise: [],
     projectSerise: [],
     billSerise:[
         {name:"Billed", value:"billed"},
@@ -21,13 +22,7 @@ const initialState = {
         { xaxis: 'May', client1: 19,  client2: 119.3,  client3: 28.9,  client4: 204.8}, 
         { xaxis: 'Jun', client1: 6.1,  client2: 123.6, client3: 77.3, client4: 85.7 }
     ],
-    clientEmployeeData:[
-        { xaxis: 'Feb', client1:10,  client2: 30,  client3: 20,  client4: 10},
-        { xaxis: 'March', client1: 20,   client2: 12, client3: 20, client4: 15 },
-        { xaxis: 'April', client1: 22,  client2: 24,  client3: 10,  client4: 12}, 
-        { xaxis: 'May', client1: 15,  client2: 11,  client3: 28,  client4: 20}, 
-        { xaxis: 'Jun', client1: 6.1,  client2: 12, client3: 20, client4: 15 }
-    ],
+    clientEmployeeData:[],
     billedData:[
         { xaxis: 'Feb', billed:1000,  unbilled: 3000 },
         { xaxis: 'March', billed: 2000, unbilled: 1200 },
@@ -68,6 +63,10 @@ const DashboardState=(state = initialState, action)=>{
             let tempClientSerise = (action.BillingData) && action.BillingData.clientId
             let tempClientBillingData = (action.BillingData) && action.BillingData.clientData
             return {...state, clientSerise: tempClientSerise, clientEmployeeData : tempClientBillingData }
+        case "SAVE_DASHBOARD_EMPLOYEE_DATA":
+            let tempClientEmployeeSerise = (action.EmployeeData) && action.EmployeeData.clientId
+            let tempClientEmployeeData = (action.EmployeeData) && action.EmployeeData.clientData
+            return {...state, employeeclientSerise: tempClientEmployeeSerise, clientEmployeeData : tempClientEmployeeData }
         case "SAVE_DASHBOARD_RESOURCE_DATA":
             return {...state, resourceData: action.ResourceData }
         default:

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid } from "@material-ui/core";
+import { Grid, CircularProgress } from "@material-ui/core";
 import SimplePieChart from "./chart/SimplePieChart";
 import StackedBarChart from "./chart/StackedBarChart";
 import SimpleLineChart from "./chart/SimpleLineChart";
@@ -11,6 +11,7 @@ import { bindActionCreators } from 'redux';
 
 class Dashboard extends Component {
   state = { 
+    load:false,
     BillingData : [], 
     EmployeeData : [],
     ProjectData : []
@@ -19,12 +20,14 @@ class Dashboard extends Component {
   componentDidMount=async()=>{
     const { clientBillingData, clientEmployeeData, projectRevenueData }=this.props.DashboardState
     const { authorization }=this.props.LoginState
-    const { GetBillingData }=this.props.DashboardAction
-    if((clientBillingData && clientBillingData.length <=0) || (clientEmployeeData && clientEmployeeData.length <=0))
-    { await GetBillingData(authorization); }
+    const { GetBillingData, GetEmployeeData }=this.props.DashboardAction
+    await this.handelLoadValue();
+    // (clientBillingData && clientBillingData.length <=0) && await GetBillingData(authorization); 
+    (clientEmployeeData && clientEmployeeData.length <=0) && await GetEmployeeData(authorization,{});
     await this.handelBillingData(clientBillingData)
     await this.handelEmployeeData(clientEmployeeData)
     await this.handelProjectData(projectRevenueData)
+    await this.handelLoadValue();
   }
 
   // this method will handel the state billing data
@@ -35,10 +38,20 @@ class Dashboard extends Component {
   
   // this method will handel the state project data
   handelProjectData=(ProjectData)=>{this.setState({ProjectData})}
+
+  // this method will handel the loading dashboard
+  handelLoadValue=()=>{this.setState({ load: !this.state.load})}
   
   render() { 
+    const { load }=this.state
+      if(!load){
+        this.loadingCircle("Loading Dashboard....");
+      }
       return <> {this.loadGird()}</>
   }
+
+  // this method used for the show circular progress bar 
+  loadingCircle = (message) => <center> <h3>{message}</h3> <CircularProgress size={80} /> </center>
 
   loadGird=()=>{
     return <> {this.loadPageTitle()}
