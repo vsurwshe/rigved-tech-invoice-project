@@ -62,10 +62,10 @@ const DashboardState=(state = initialState, action)=>{
         case "SAVE_DASHBOARD_BILLING_DATA":
             let tempClientSerise = (action.BillingData) && action.BillingData.clientId
             let tempClientBillingData = (action.BillingData) && action.BillingData.clientData
-            return {...state, clientSerise: tempClientSerise, clientEmployeeData : tempClientBillingData }
+            return {...state, clientSerise: tempClientSerise, clientBillingData : tempClientBillingData }
         case "SAVE_DASHBOARD_EMPLOYEE_DATA":
             let tempClientEmployeeSerise = (action.EmployeeData) && action.EmployeeData.clientId
-            let tempClientEmployeeData = (action.EmployeeData) && action.EmployeeData.clientData
+            let tempClientEmployeeData = (action.EmployeeData) && action.EmployeeData.clientData.map((item,key)=>{ return {...item, "xaxis": months[item.xaxis]} })
             return {...state, employeeclientSerise: tempClientEmployeeSerise, clientEmployeeData : tempClientEmployeeData }
         case "SAVE_DASHBOARD_RESOURCE_DATA":
             return {...state, resourceData: action.ResourceData }
@@ -73,5 +73,9 @@ const DashboardState=(state = initialState, action)=>{
             return state;
     }
 }
+
+// this is month name array
+var months = ['', 'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+
 
 export default DashboardState;

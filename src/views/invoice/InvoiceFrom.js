@@ -127,7 +127,6 @@ const LoadGird = (props) => {
                 {viewSectionThree && SectionThree({ "mainProps": props.mainProps , viewSectionThree, setViewSectionThree, projectIdList, setLoading, setViewInvoice})}
             </Grid>
         </Grid>
-
     </>
 }
 
