@@ -18,16 +18,16 @@ class Dashboard extends Component {
   }
 
   componentDidMount=async()=>{
-    console.log("Props ", this.props);
     const { clientBillingData, clientEmployeeData, projectRevenueData }=this.props.DashboardState
     const { authorization }=this.props.LoginState
     const { GetBillingData, GetEmployeeData }=this.props.DashboardAction
     await this.handelLoadValue();
-    (clientBillingData && clientBillingData.length <=0) && await GetBillingData(authorization,{}); 
     (clientEmployeeData && clientEmployeeData.length <=0) && await GetEmployeeData(authorization,{});
-    await this.handelBillingData(clientBillingData)
-    await this.handelEmployeeData(clientEmployeeData)
-    await this.handelProjectData(projectRevenueData)
+    (clientBillingData && clientBillingData.length <=0) && await GetBillingData(authorization,{}); 
+    (clientEmployeeData && clientEmployeeData.length > 0) && await this.handelEmployeeData(clientEmployeeData)  
+    console.log("EMP ",clientEmployeeData, this.props.DashboardState.clientEmployeeData) 
+     await this.handelBillingData(clientBillingData)
+     await this.handelProjectData(projectRevenueData)
     await this.handelLoadValue();
   }
 
@@ -35,7 +35,7 @@ class Dashboard extends Component {
   handelBillingData=(BillingData)=>{this.setState({BillingData})}
   
   // this method will handel the state employee data
-  handelEmployeeData=(EmployeeData)=>{this.setState({EmployeeData})}
+  handelEmployeeData=(EmployeeData)=>{ console.log("12", EmployeeData); this.setState({EmployeeData})}
   
   // this method will handel the state project data
   handelProjectData=(ProjectData)=>{this.setState({ProjectData})}
@@ -44,8 +44,9 @@ class Dashboard extends Component {
   handelLoadValue=()=>{this.setState({ load: !this.state.load})}
   
   render() { 
-    const { load }=this.state
-      if(!load){
+    const { load , BillingData, EmployeeData }=this.state
+    console.log("Data ", load,BillingData,EmployeeData)
+      if(load && BillingData.length <=0 && EmployeeData.length <=0){
         this.loadingCircle("Loading Dashboard....");
       }
       return <> {this.loadGird()}</>
@@ -108,11 +109,11 @@ class Dashboard extends Component {
 
   // this method will load the employee chart
   loadEmployeeChart=()=>{
-    const { employeeclientSerise }=this.props.DashboardState
+    const { employeeClientSerise }=this.props.DashboardState
     const { EmployeeData }=this.state
     return <StackedBarChart 
         dataSource={EmployeeData} 
-        architectureSources={employeeclientSerise}  
+        architectureSources={employeeClientSerise}  
         xAxisText="Employees" 
         title="Employee Data" 
     />

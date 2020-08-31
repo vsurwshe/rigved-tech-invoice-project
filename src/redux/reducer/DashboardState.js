@@ -5,7 +5,7 @@ const initialState = {
         {name:"Client 3", value:"client3"},
         {name:"Client 4", value:"client4"}
     ],
-    employeeclientSerise: [],
+    employeeClientSerise: [],
     projectSerise: [],
     billSerise:[
         {name:"Billed", value:"billed"},
@@ -66,7 +66,7 @@ const DashboardState=(state = initialState, action)=>{
         case "SAVE_DASHBOARD_EMPLOYEE_DATA":
             let tempClientEmployeeSerise = (action.EmployeeData) && action.EmployeeData.clientId
             let tempClientEmployeeData = (action.EmployeeData) && action.EmployeeData.clientData.map((item,key)=>{ return {...item, "xaxis": months[item.xaxis]} })
-            return {...state, employeeclientSerise: tempClientEmployeeSerise, clientEmployeeData : tempClientEmployeeData }
+            return {...state, employeeClientSerise: tempClientEmployeeSerise, clientEmployeeData : tempClientEmployeeData }
         case "SAVE_DASHBOARD_RESOURCE_DATA":
             return {...state, resourceData: action.ResourceData }
         default:
