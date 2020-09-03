@@ -5,7 +5,7 @@ import { SuccessFunction, ErrorFunction } from "./CommonAction"
 const GetBillingData=(authroizationKey, filterData)=>{
     return (dispatch) => {
         return CreateInstance()
-        .post('/dashboard/employeeDetail12/',filterData,{headers: { 
+        .post('/dashboard/billngDetailByClint/',filterData,{headers: { 
             'Content-Type': 'application/json',
             Authorization: authroizationKey 
         }})

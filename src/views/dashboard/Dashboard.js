@@ -23,12 +23,16 @@ class Dashboard extends Component {
     const { GetBillingData, GetEmployeeData }=this.props.DashboardAction
     await this.handelLoadValue();
     (clientEmployeeData && clientEmployeeData.length <=0) && await GetEmployeeData(authorization,{});
-    (clientBillingData && clientBillingData.length <=0) && await GetBillingData(authorization,{}); 
-    (clientEmployeeData && clientEmployeeData.length > 0) && await this.handelEmployeeData(clientEmployeeData)  
-    console.log("EMP ",clientEmployeeData, this.props.DashboardState.clientEmployeeData) 
-     await this.handelBillingData(clientBillingData)
-     await this.handelProjectData(projectRevenueData)
+    (clientBillingData && clientBillingData.length <=0) && await GetBillingData(authorization,{});
+    await this.loadStateArrayValue(); 
     await this.handelLoadValue();
+  }
+
+  loadStateArrayValue=async()=>{
+    const { clientBillingData, clientEmployeeData, projectRevenueData }=this.props.DashboardState
+    await this.handelEmployeeData(clientEmployeeData);  
+    await this.handelBillingData(clientBillingData);
+    await this.handelProjectData(projectRevenueData);
   }
 
   // this method will handel the state billing data
@@ -44,12 +48,8 @@ class Dashboard extends Component {
   handelLoadValue=()=>{this.setState({ load: !this.state.load})}
   
   render() { 
-    const { load , BillingData, EmployeeData }=this.state
-    console.log("Data ", load,BillingData,EmployeeData)
-      if(load && BillingData.length <=0 && EmployeeData.length <=0){
-        this.loadingCircle("Loading Dashboard....");
-      }
-      return <> {this.loadGird()}</>
+    const { load }=this.state
+    return load ? this.loadingCircle("Loading Dashboard....") : <>{this.loadGird()}</>
   }
 
   // this method used for the show circular progress bar 
