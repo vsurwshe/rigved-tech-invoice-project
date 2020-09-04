@@ -7,6 +7,7 @@ import useStyles from "../client/Styles";
 import { Alert, Autocomplete } from '@material-ui/lab';
 import { renderDateTimePicker, renderAutocompleteWithProps } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
+import { GetBillingData } from "../../redux/actions/DashboardAction"
 import * as ClientAction from "../../redux/actions/ClientAction";
 import * as ProjectAction from "../../redux/actions/ProjectAction"
 import * as InvoiceAction from "../../redux/actions/InvoiceAction"
@@ -303,6 +304,7 @@ const GenratePDFInvoice=async (propsData)=>{
     await GenerateInvoicePDF(newInvoiceGenratePDFData, authorization);
     setTimeout(async () => {
         await loadMessage();
+        await GetBillingData(authorization,{});
         await setLoading(false);
         (genratedInvoiceData && genratedInvoiceData.length >0) && await setViewInvoice(true);
     }, API_EXE_TIME)
