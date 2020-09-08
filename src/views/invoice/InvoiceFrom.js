@@ -145,19 +145,12 @@ const SectionOne = (data) => {
     const { authorization } = data.mainProps.LoginState
     const { projectListByClient } = data.mainProps.ProjectState
     // const { purchaseOrderListByName } = data.mainProps.PurchaseOrderState
-    const { GetClientList } = data.mainProps.ClientAction
     const { GetProjectListByClient } = data.mainProps.ProjectAction
     // const { GetPurchaseOrderListByName,SavePurchaseOrderListByName }=data.mainProps.PurchaseOrderAction
-    const [clientCall, setClientCall] = useState(0);
 
     // let purchaseOrderOptions = purchaseOrderListByName.length > 0 && purchaseOrderListByName.map((item, key) => {
     //     return { title: item.poNum ? item.poNum : "", id: item.id }
     // })
-
-    if (listOfClient.length <= 0 && clientCall === 0) {
-        GetClientList(0, 20, authorization);
-        setClientCall(clientCall + 1);
-    }
 
     // this is returning client option 
     let clientOptions = (listOfClient && listOfClient.length > 0) && listOfClient.map((item, key) => {
