@@ -26,7 +26,7 @@ const Transition = forwardRef(function Transition(props, ref) { return <Slide di
 
 let InvoiceFrom = (props) => {
     var classes = useStyles();
-    const { pristine, reset, submitting, handleSubmit } = props
+    const { pristine, reset, submitting, handleSubmit, cancle } = props
     const { SaveInvoiceEmployeeData } = props.InvoiceAction
     const [viewInvoice, setViewInvoice] = useState(false);
     const [projectIdList, setProjectIdList] = useState([])
@@ -41,8 +41,7 @@ let InvoiceFrom = (props) => {
                 <center>
                     <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting || submit}>SUBMIT</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={async () => { await reset(); await SaveInvoiceEmployeeData([]); await setViewSectionThree(false); }}> Clear Values</Button>&nbsp;&nbsp;
-                    {/* <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button> &nbsp;&nbsp; */}
-                    {/* <Button type="button" variant="outlined" color="primary" onClick={() => setViewInvoice(true)}>View Invoice</Button> */}
+                    <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button> &nbsp;&nbsp;
                 </center>
             </div>
         </form>
