@@ -50,6 +50,17 @@ const GetProjectRevenueData=(authroizationKey,filterData)=>{
     }
 }
 
+const GetClientRevenueData=(authroizationKey,filterData)=>{
+    return (dispatch) => {
+        return CreateInstance()
+        .post('/dashboard/billngDetailByClient/',filterData,{headers: { 
+            'Content-Type': 'application/json',
+            Authorization: authroizationKey 
+        }})
+        .then(response => { SuccessFunction({ dispatch , "successMethod": SaveClientRevenueData, "loadMessage":loadMessage, response}) })
+        .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
 //-------------------------------
 
 export function SaveBillingData(BillingData){
@@ -80,9 +91,17 @@ export function SaveProjectRevenueData(ProjectRevenueData){
     }
 }
 
+export function SaveClientRevenueData(ClientRevenueData){
+    return{
+        type:"SAVE_DASHBOARD_CLIENT_REVENUE_DATA",
+        ClientRevenueData
+    }
+}
+
 export {
     GetBillingData,
     GetResourceData,
     GetEmployeeData,
-    GetProjectRevenueData
+    GetProjectRevenueData,
+    GetClientRevenueData
 }

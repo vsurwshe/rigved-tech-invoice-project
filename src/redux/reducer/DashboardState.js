@@ -20,12 +20,7 @@ const initialState = {
         { xaxis: 'Jun', billed: 6300, unbilled: 1200 }
     ],
     resourceData:[],
-    clientRevenueData:[
-        { field:"Client 1", value:20},
-        { field:"Client 2", value:30},
-        { field:"Client 3", value:43},
-        { field:"Client 4", value:17}
-    ],
+    clientRevenueData:[],
     projectRevenueData:[],
     purchaseOrderRevenueData:[
         { field:"PO 1", value:20},
@@ -49,10 +44,15 @@ const DashboardState=(state = initialState, action)=>{
             let tempResourceData = (action.ResourceData) && action.ResourceData.map((item,key)=>{ return {...item, "xaxis": months[item.xaxis]} })
             return {...state, resourceData: tempResourceData }
         case "SAVE_DASHBOARD_PROJECT_REVENUE_DATA":
-            let tempProjectRevenueData = (action.ProjectRevenueData && action.ProjectRevenueData && action.ProjectRevenueData.clientData.length >0) && action.ProjectRevenueData.clientData.map((item,key)=>{ 
+            let tempProjectRevenueData = (action.ProjectRevenueData && action.ProjectRevenueData.clientData && action.ProjectRevenueData.clientData.length >0) && action.ProjectRevenueData.clientData.map((item,key)=>{ 
                 return {"field": action.ProjectRevenueData.clientId[key].name, value: item[action.ProjectRevenueData.clientId[key].value]} 
             })
             return {...state, projectRevenueData: tempProjectRevenueData }
+        case "SAVE_DASHBOARD_CLIENT_REVENUE_DATA":
+            let tempClientRevenueData = (action.ClientRevenueData && action.ClientRevenueData.clientData && action.ClientRevenueData.clientData.length >0) && action.ClientRevenueData.clientData.map((item,key)=>{ 
+                return {"field": action.ClientRevenueData.clientId[key].name, value: item[action.ClientRevenueData.clientId[key].value]} 
+            })
+            return {...state, clientRevenueData: tempClientRevenueData }
         default:
             return state;
     }

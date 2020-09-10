@@ -12,7 +12,13 @@ const SimplePieChart=(propsData)=>{
           dataSource={dataSource} 
           title={title} 
           resolveLabelOverlapping="shift">
-            <Legend orientation="horizontal" itemTextPosition="right" horizontalAlignment="center" verticalAlignment="bottom" columnCount={4}  />
+            <Legend 
+              orientation="horizontal" 
+              itemTextPosition="right" 
+              horizontalAlignment="left" 
+              verticalAlignment="bottom" 
+              columnCount={7}  
+              />
             <Export enabled={true} />
             <Series argumentField="field" valueField="value">
               <Label visible={true} position="columns" customizeText={customizeText}>

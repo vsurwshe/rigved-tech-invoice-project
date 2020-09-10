@@ -18,14 +18,15 @@ class Dashboard extends Component {
   }
 
   componentDidMount=async()=>{
-    const { clientBillingData, clientEmployeeData, projectRevenueData, resourceData }=this.props.DashboardState
+    const { clientBillingData, clientEmployeeData, projectRevenueData, resourceData, clientRevenueData }=this.props.DashboardState
     const { authorization }=this.props.LoginState
-    const { GetBillingData, GetEmployeeData, GetResourceData, GetProjectRevenueData }=this.props.DashboardAction
+    const { GetBillingData, GetEmployeeData, GetResourceData, GetProjectRevenueData, GetClientRevenueData }=this.props.DashboardAction
     await this.handelLoadValue();
     (clientEmployeeData && clientEmployeeData.length <=0) && await GetEmployeeData(authorization,{});
     (clientBillingData && clientBillingData.length <=0) && await GetBillingData(authorization,{});
     (resourceData && resourceData.length <=0) && await GetResourceData(authorization,{});
     (projectRevenueData && projectRevenueData.length <=0) && await GetProjectRevenueData(authorization,{});
+    (clientRevenueData && clientRevenueData.length <=0) && await GetClientRevenueData(authorization,{});
     await this.loadStateArrayValue(); 
     await this.handelLoadValue();
   }
