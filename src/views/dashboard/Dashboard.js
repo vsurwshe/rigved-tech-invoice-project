@@ -20,11 +20,12 @@ class Dashboard extends Component {
   componentDidMount=async()=>{
     const { clientBillingData, clientEmployeeData, projectRevenueData, resourceData }=this.props.DashboardState
     const { authorization }=this.props.LoginState
-    const { GetBillingData, GetEmployeeData, GetResourceData }=this.props.DashboardAction
+    const { GetBillingData, GetEmployeeData, GetResourceData, GetProjectRevenueData }=this.props.DashboardAction
     await this.handelLoadValue();
     (clientEmployeeData && clientEmployeeData.length <=0) && await GetEmployeeData(authorization,{});
     (clientBillingData && clientBillingData.length <=0) && await GetBillingData(authorization,{});
     (resourceData && resourceData.length <=0) && await GetResourceData(authorization,{});
+    (projectRevenueData && projectRevenueData.length <=0) && await GetProjectRevenueData(authorization,{});
     await this.loadStateArrayValue(); 
     await this.handelLoadValue();
   }
@@ -135,7 +136,7 @@ class Dashboard extends Component {
   loadClientRevenueChart=()=>{
     const {clientRevenueData}=this.props.DashboardState
     return <SimplePieChart 
-        dataSource={clientRevenueData} 
+        dataSource={clientRevenueData}
         title="Client revenue share"
     />
   }
@@ -144,7 +145,7 @@ class Dashboard extends Component {
   loadProjectRevenueChart=()=>{
     const { ProjectData }=this.state
     return <SimplePieChart 
-      dataSource={ProjectData} 
+      dataSource={ProjectData}
       title="Project revenue share"
     />
   }

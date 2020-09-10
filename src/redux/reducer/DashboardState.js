@@ -26,12 +26,7 @@ const initialState = {
         { field:"Client 3", value:43},
         { field:"Client 4", value:17}
     ],
-    projectRevenueData:[
-        { field:"Project 1", value:20, name:"Project 1"},
-        { field:"Project 2", value:30, name:"Project 2"},
-        { field:"Project 3", value:43, name:"Project 3"},
-        { field:"Project 4", value:17, name:"Project 4"}
-    ],
+    projectRevenueData:[],
     purchaseOrderRevenueData:[
         { field:"PO 1", value:20},
         { field:"PO 2", value:30},
@@ -53,6 +48,11 @@ const DashboardState=(state = initialState, action)=>{
         case "SAVE_DASHBOARD_RESOURCE_DATA":
             let tempResourceData = (action.ResourceData) && action.ResourceData.map((item,key)=>{ return {...item, "xaxis": months[item.xaxis]} })
             return {...state, resourceData: tempResourceData }
+        case "SAVE_DASHBOARD_PROJECT_REVENUE_DATA":
+            let tempProjectRevenueData = (action.ProjectRevenueData && action.ProjectRevenueData && action.ProjectRevenueData.clientData.length >0) && action.ProjectRevenueData.clientData.map((item,key)=>{ 
+                return {"field": action.ProjectRevenueData.clientId[key].name, value: item[action.ProjectRevenueData.clientId[key].value]} 
+            })
+            return {...state, projectRevenueData: tempProjectRevenueData }
         default:
             return state;
     }
