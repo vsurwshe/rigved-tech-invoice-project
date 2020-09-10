@@ -19,13 +19,7 @@ const initialState = {
         { xaxis: 'May', billed: 1500, unbilled: 1100 }, 
         { xaxis: 'Jun', billed: 6300, unbilled: 1200 }
     ],
-    resourceData:[
-        { xaxis: 'Feb', hired:10,  left: 30 },
-        { xaxis: 'March', hired: 20,   left: 12 },
-        { xaxis: 'April', hired: 22,  left: 24 }, 
-        { xaxis: 'May', hired: 15,  left: 11 }, 
-        { xaxis: 'Jun', hired: 6.1,  left: 12 }
-    ],
+    resourceData:[],
     clientRevenueData:[
         { field:"Client 1", value:20},
         { field:"Client 2", value:30},
@@ -57,7 +51,8 @@ const DashboardState=(state = initialState, action)=>{
             let tempClientEmployeeData = (action.EmployeeData) && action.EmployeeData.clientData.map((item,key)=>{ return {...item, "xaxis": months[item.xaxis]} })
             return {...state, employeeClientSerise: tempClientEmployeeSerise, clientEmployeeData : tempClientEmployeeData }
         case "SAVE_DASHBOARD_RESOURCE_DATA":
-            return {...state, resourceData: action.ResourceData }
+            let tempResourceData = (action.ResourceData) && action.ResourceData.map((item,key)=>{ return {...item, "xaxis": months[item.xaxis]} })
+            return {...state, resourceData: tempResourceData }
         default:
             return state;
     }

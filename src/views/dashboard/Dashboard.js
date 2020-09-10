@@ -18,12 +18,13 @@ class Dashboard extends Component {
   }
 
   componentDidMount=async()=>{
-    const { clientBillingData, clientEmployeeData, projectRevenueData }=this.props.DashboardState
+    const { clientBillingData, clientEmployeeData, projectRevenueData, resourceData }=this.props.DashboardState
     const { authorization }=this.props.LoginState
-    const { GetBillingData, GetEmployeeData }=this.props.DashboardAction
+    const { GetBillingData, GetEmployeeData, GetResourceData }=this.props.DashboardAction
     await this.handelLoadValue();
     (clientEmployeeData && clientEmployeeData.length <=0) && await GetEmployeeData(authorization,{});
     (clientBillingData && clientBillingData.length <=0) && await GetBillingData(authorization,{});
+    (resourceData && resourceData.length <=0) && await GetResourceData(authorization,{});
     await this.loadStateArrayValue(); 
     await this.handelLoadValue();
   }
@@ -39,7 +40,7 @@ class Dashboard extends Component {
   handelBillingData=(BillingData)=>{this.setState({BillingData})}
   
   // this method will handel the state employee data
-  handelEmployeeData=(EmployeeData)=>{ console.log("12", EmployeeData); this.setState({EmployeeData})}
+  handelEmployeeData=(EmployeeData)=>{ this.setState({EmployeeData})}
   
   // this method will handel the state project data
   handelProjectData=(ProjectData)=>{this.setState({ProjectData})}

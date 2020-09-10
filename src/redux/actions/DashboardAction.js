@@ -29,7 +29,7 @@ const GetEmployeeData=(authroizationKey, filterData)=>{
 const GetResourceData=(authroizationKey,filterData)=>{
     return (dispatch) => {
         return CreateInstance()
-        .post('/dashboard/employeeDetail123/',filterData,{headers: { 
+        .post('/dashboard/employeeCountByMonth/',filterData,{headers: { 
             'Content-Type': 'application/json',
             Authorization: authroizationKey 
         }})
