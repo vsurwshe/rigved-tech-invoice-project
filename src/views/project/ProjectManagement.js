@@ -7,6 +7,7 @@ import * as MasterDataAction from "../../redux/actions/MasterDataAction"
 import * as ClientAction from "../../redux/actions/ClientAction"
 import * as PurchaseOrderAction from "../../redux/actions/PurchaseOrderAction"
 import * as FileAction from "../../redux/actions/FileAction"
+import { GetProjectRevenueData } from "../../redux/actions/DashboardAction"
 import { loadMessage } from "../../redux/actions/ClientAction"
 import { bindActionCreators } from 'redux';
 import { API_EXE_TIME } from '../../assets/config/Config';
@@ -165,6 +166,7 @@ class ProjectManagement extends Component {
         await SaveProjectRecord(newProjectData, authorization)
         setTimeout(async () => {
             await loadMessage()
+            await GetProjectRevenueData(authorization,{});
             await GetProjectList(0, 20, authorization);
             this.handleShowTabs(FromActions.VIED);
         }, API_EXE_TIME)
@@ -177,6 +179,7 @@ class ProjectManagement extends Component {
         projectId && await DeleteProjectRecord(projectId, authorization);
         setTimeout(async () => {
             await loadMessage();
+            await GetProjectRevenueData(authorization,{});
             await GetProjectList(0, 20, authorization);
             await this.handleDeleteModel();
             await this.handleLoadProjectList();

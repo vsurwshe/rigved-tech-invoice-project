@@ -8,12 +8,13 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import * as EmployeeAction from "../../redux/actions/EmployeeAction";
 import * as ClientAction from "../../redux/actions/ClientAction"
+import { loadMessage } from "../../redux/actions/ClientAction";
+import { GetResourceData } from "../../redux/actions/DashboardAction";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { FromActions, API_EXE_TIME } from '../../assets/config/Config';
 import { bindActionCreators } from 'redux';
 import ResourceRateCardTable from "./ResourceRateCardTable";
-import { loadMessage } from "../../redux/actions/ClientAction";
 import moment from 'moment';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
@@ -164,6 +165,7 @@ return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
                   }
                   await EditEmployeeRecord(resourceData,authorization);
                   setTimeout(async()=>{
+                    await GetResourceData(authorization,{});
                     await GetEmployeeListByProjectId(0,20,newData.projectId,authorization);
                     resolve();
                   },API_EXE_TIME)
@@ -180,8 +182,9 @@ return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
             return new Promise(async(resolve, reject) => {
               (oldData && oldData.emploeeMappedId) && await DeleteEmployeeRecord(oldData.emploeeMappedId, authorization);
                setTimeout(async()=>{
-                 await GetEmployeeListByProjectId(0,20,projectId, authorization)
-                 resolve();
+                  await GetResourceData(authorization,{});
+                  await GetEmployeeListByProjectId(0,20,projectId, authorization)
+                  resolve();
                },API_EXE_TIME)
              })
           }
@@ -245,6 +248,7 @@ const saveAssignResource=async(propsData)=>{
   if(newResourceData){
     await SaveEmployeeRecord(newResourceData,authorization);
     await loadMessage();
+    await GetResourceData(authorization,{});
     await GetEmployeeListByProjectId(0,20,newResourceData.projectId,authorization);
     await setTableData([]);
     await setLoad(false);
