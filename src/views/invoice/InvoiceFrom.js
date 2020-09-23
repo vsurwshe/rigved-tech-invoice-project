@@ -85,7 +85,7 @@ const DwonloadInvoice = () => {
 const PostInvoiceData = async (propsData) => {
     const { values, setViewSectionThree, projectIdList, setLoading } = propsData
     const { authorization } = propsData.mainProps.LoginState
-    const { genratedInvoiceData } = propsData.mainProps.InvoiceState
+    const { invoiceEmployeeData } = propsData.mainProps.InvoiceState
     const { GenerateInvoice, SaveInvoiceEmployeeData } = propsData.mainProps.InvoiceAction
     const { loadMessage } = propsData.mainProps.ClientAction
     let newInvoiceData = {
@@ -99,7 +99,7 @@ const PostInvoiceData = async (propsData) => {
     setTimeout(async () => {
         await loadMessage();
         await setLoading(false);
-        (genratedInvoiceData && genratedInvoiceData.length >0) && await setViewSectionThree(true);
+        await setViewSectionThree(true);
     }, API_EXE_TIME)
 }
 
@@ -289,6 +289,7 @@ const GenratePDFInvoice=async (propsData)=>{
     const { fromDateProps, toDateProps }=propsData.mainProps
     const { authorization }=propsData.mainProps.LoginState
     const { loadMessage } = propsData.mainProps.ClientAction
+    const { genratedInvoiceData } = propsData.mainProps.InvoiceState
     const { GenerateInvoicePDF, SaveGenratedInvoiceData}=propsData.mainProps.InvoiceAction
     let newInvoiceGenratePDFData={
         "fromDate":fromDateProps && fromDateProps ,
@@ -302,7 +303,7 @@ const GenratePDFInvoice=async (propsData)=>{
     setTimeout(async () => {
         await loadMessage();
         await setLoading(false);
-        await setViewInvoice(true);
+        (genratedInvoiceData && genratedInvoiceData.length >0) && await setViewInvoice(true);
     }, API_EXE_TIME)
 }
 
