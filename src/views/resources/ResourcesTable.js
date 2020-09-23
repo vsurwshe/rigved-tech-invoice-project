@@ -311,7 +311,8 @@ const EmployeeTable=(propsData)=>{
       data={(tableData && tableData.length > 0) ? tableData : []}
       options={{
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
-        search: false
+        search: false,
+        actionsColumnIndex: -1
       }}
       icons={{Add: () => <Button variant="contained" color="primary">Add Member</Button> }}
       editable={{
