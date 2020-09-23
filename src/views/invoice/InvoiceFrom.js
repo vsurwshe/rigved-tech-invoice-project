@@ -85,6 +85,7 @@ const DwonloadInvoice = () => {
 const PostInvoiceData = async (propsData) => {
     const { values, setViewSectionThree, projectIdList, setLoading } = propsData
     const { authorization } = propsData.mainProps.LoginState
+    const { genratedInvoiceData } = propsData.mainProps.InvoiceState
     const { GenerateInvoice, SaveInvoiceEmployeeData } = propsData.mainProps.InvoiceAction
     const { loadMessage } = propsData.mainProps.ClientAction
     let newInvoiceData = {
@@ -98,7 +99,7 @@ const PostInvoiceData = async (propsData) => {
     setTimeout(async () => {
         await loadMessage();
         await setLoading(false);
-        await setViewSectionThree(true);
+        (genratedInvoiceData && genratedInvoiceData.length >0) && await setViewSectionThree(true);
     }, API_EXE_TIME)
 }
 

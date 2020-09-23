@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormLabel, CircularProgress } from '@material-ui/core';
-import { reset, reduxForm, Field, FieldArray, formValueSelector } from 'redux-form';
+import { Grid, Button, FormLabel, CircularProgress } from '@material-ui/core';
+import { reset, reduxForm, Field, FieldArray, formValueSelector, getFormSyncErrors } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
-import { renderTextField, renderTextHiddenField, renderFileInput, renderTextAreaField } from '../utilites/FromUtilites';
+import { renderTextField, renderContact, renderTextHiddenField, renderFileInput, renderTextAreaField } from '../utilites/FromUtilites';
 import useStyles from "../client/Styles";
 import { connect } from 'react-redux';
 import RateCardTable from '../rateCard/RateCardTable';
 import ContactTable from '../contact/ContactTable';
 import { Alert } from '@material-ui/lab';
-import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
-import { Required, PhoneNumber, GSTIN, TAN, IFSCCode, BankAccount, Email } from '../utilites/FormValidation';
+import { Required,  GSTIN, TAN, IFSCCode, BankAccount } from '../utilites/FormValidation';
 import * as FileActions from "../../redux/actions/FileAction";
 import { FromActions } from '../../assets/config/Config';
 
@@ -30,7 +29,8 @@ let ClientForm = (props) => {
             <div className={classes.buttonStyle}>
                 <center>
                     {(operation === FromActions.ED || operation === FromActions.CR) && <>
-                        <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> {(initialValues === undefined) ? "SUBMIT" : "EDIT"}</Button> &nbsp;&nbsp;
+                    {(initialValues === undefined) ? <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting }>SUBMIT</Button> 
+                        :<Button  type="submit" variant="outlined" color="primary">EDIT</Button> }&nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button></>}&nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await clearFile(); await reset(); cancle() }}> Cancel</Button>
                 </center>
@@ -76,12 +76,12 @@ const HeaderPart = (propsData) => {
 
 // section one
 const SectionOne = (data) => {
-    const { classes } = data
+    const { classes, initialValues } = data
     return <div>
         <Field name="id" component={renderTextHiddenField} />
-        <Field name="clientName" component={renderTextField} fullWidth label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." validate={[Required]} />
-        <Field name="tanNum" component={renderTextField} className={classes.textField} label="TAN No." helperText="Ex. PDES03028F" validate={[Required, TAN]} />
-        <Field name="gstNum" component={renderTextField} className={classes.textField} label="GST No." helperText="Ex. 24AAACC1206D1ZM" validate={[Required, GSTIN]} />
+        <Field name="clientName" component={renderTextField} fullWidth label="Client Name" helperText="Ex. Rigved Tech. Pvt. Ltd." validate={ (initialValues===undefined) && [Required]} />
+        <Field name="tanNum" component={renderTextField} className={classes.textField} label="TAN No." helperText="Ex. PDES03028F" validate={(initialValues===undefined) &&[Required, TAN]} />
+        <Field name="gstNum" component={renderTextField} className={classes.textField} label="GST No." helperText="Ex. 24AAACC1206D1ZM" validate={(initialValues===undefined) && [Required, GSTIN]} />
     </div>
 }
 
@@ -119,13 +119,13 @@ const AddressTextArea = () => {
 }
 // this method used for the show the address inputs 
 const AddressDto = (props) => {
-    const { classes } = props
+    const { classes, initialValues } = props
     return <>
-        <Field name="addressDtos.addressLine" component={renderTextField} validate={[Required]} fullWidth label="Address Line" helperText="Ex. Sector 1" />
-        <Field name="addressDtos.city" component={renderTextField} validate={[Required]} className={classes.textField} label="City" helperText="Ex. Navi Mumbai" />
+        <Field name="addressDtos.addressLine" component={renderTextField} validate={ (initialValues === undefined) && [Required]} fullWidth label="Address Line" helperText="Ex. Sector 1" />
+        <Field name="addressDtos.city" component={renderTextField} validate={(initialValues === undefined) &&[Required]} className={classes.textField} label="City" helperText="Ex. Navi Mumbai" />
         <Field name="addressDtos.area" component={renderTextField} className={classes.textField} label="Area" helperText="Ex. Mahape" />
-        <Field name="addressDtos.state" component={renderTextField} validate={[Required]} className={classes.textField} label="State" helperText="Ex. Maharashtra" />
-        <Field name="addressDtos.pincode" component={renderTextField} validate={[Required]} className={classes.textField} label="Pincode" helperText="Ex. 400001" />
+        <Field name="addressDtos.state" component={renderTextField} validate={(initialValues === undefined) &&[Required]} className={classes.textField} label="State" helperText="Ex. Maharashtra" />
+        <Field name="addressDtos.pincode" component={renderTextField} validate={(initialValues === undefined) &&[Required]} className={classes.textField} label="Pincode" helperText="Ex. 400001" />
     </>
 }
 
@@ -198,35 +198,7 @@ const BankDetailsDto = () => {
     </span>
 }
 
-// this will be render contact
-const RenderContact = ({ classes, fields,operation, meta: { error, submitFailed } }) => {
-    const [open, setOpen] = useState(false);
-    const handleClickOpen = () => { setOpen(true); fields.push({}) };
-    const handleClose = () => { setOpen(false) };
-    return <span>
-        { (operation !== FromActions.VI )&&<Button style={{ float: "Right" }} variant="contained" color="primary" onClick={handleClickOpen}>ADD</Button>}
-        <Dialog open={open} onClose={handleClose} classes={{ paper: classes.dialogPaper }} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
-            <DialogTitle id="responsive-dialog-title-1">{"Add Contact"}</DialogTitle>
-            <DialogContent>
-                <DialogContentText>
-                    {fields.map((member, index) => (
-                        <tr key={index}>
-                            <td><Field name={`${member}.name`} component={renderTextField} validate={[Required]} className={classes.textField} label="Name" helperText="Ex. admin" /></td>
-                            <td><Field name={`${member}.email`} component={renderTextField} validate={[Required, Email]} className={classes.textField1} label="Email" helperText="Ex. admin@rigvedtech.com" /></td>
-                            <td><Field name={`${member}.mobileNum`} component={renderTextField} validate={[Required, PhoneNumber]} className={classes.textField1} label="Mobile Number" helperText="Ex. 9130253456" /></td>
-                            <td><Field name={`${member}.role`} component={renderTextField} className={classes.textField1} label="Job Designation" helperText="Ex. Developer" /></td>
-                            <td><DeleteOutlineIcon variant="contained" color="secondary" onClick={() => fields.remove(index)} /></td>
-                        </tr>
-                    ))}
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleClose} color="primary" autoFocus>Cancel</Button>
-                <Button onClick={handleClose} color="secondary" autoFocus>Save</Button>
-            </DialogActions>
-        </Dialog>
-    </span>
-}
+
 
 // rate card
 const RateCard = (data) => {
@@ -238,13 +210,21 @@ const RateCard = (data) => {
 
 // contact address
 const ContactAddress = (data) => {
+    const [open, setOpen] = useState(false);
+    const handleClickOpen = (fields) => { setOpen(true); fields.push({}) };
+    const handleClose = () => { setOpen(false) };
     const { contactPersonDtos, classes } = data
+    const { initialValues}=data.mainProps
     const { operation }=(data.mainProps && data.mainProps.stateData) ? data.mainProps.stateData : ""
     return <span>
         <FieldArray name="contactPersonDtos" 
             classes={classes} 
-            component={RenderContact} 
-            validate={[Required]} 
+            open={open}
+            initialValues={initialValues}
+            handleClickOpen={handleClickOpen}
+            handleClose={handleClose}
+            component={renderContact} 
+            // validate={[Required]} 
             operation={operation}/>
         <ContactTable data={contactPersonDtos}  />
     </span>
@@ -256,8 +236,13 @@ ClientForm = connect(state => {
     // can select values individually
     const rateCardDtosProps = selector(state, 'rateCardDtos')
     const contactPersonDtos = selector(state, 'contactPersonDtos')
-    return { rateCardDtosProps, contactPersonDtos, ...state }
+    const ClientFromError= getFormSyncErrors('ClientForm')(state)
+    return { rateCardDtosProps, contactPersonDtos, ...state, ClientFromError }
 }, FileActions)(ClientForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ClientForm'));
-export default reduxForm({ form: 'ClientForm', onSubmitSuccess: afterSubmit })(ClientForm);
+export default reduxForm({ 
+    form: 'ClientForm', 
+    onSubmitSuccess: afterSubmit,
+    enableReinitialize: true  
+})(ClientForm);

@@ -61,7 +61,8 @@ const RateCardTable = (propsData) => {
       data={(rateCardDtos && rateCardDtos.length > 0) ? rateCardDtos : []}
       options={{
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
-        search: false
+        search: false,
+        actionsColumnIndex: -1
       }}
       icons={{
         Add: () => <Button variant="contained" color="primary">Add Rate Card</Button>,
