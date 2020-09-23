@@ -30,13 +30,14 @@ let InvoiceFrom = (props) => {
     const [projectIdList, setProjectIdList] = useState([])
     const [viewSectionThree, setViewSectionThree] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [submit, setSubmit] = useState(false)
     return <div className={classes.girdContainer}>
-        <form onSubmit={handleSubmit((values) => PostInvoiceData({ "mainProps": props, values, projectIdList, viewSectionThree, setViewSectionThree, setLoading }))}>
+        <form onSubmit={handleSubmit((values) => PostInvoiceData({ "mainProps": props, values, projectIdList, viewSectionThree, setSubmit, setViewSectionThree, setLoading }))}>
             {LoadGird({ "mainProps": props, projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, loading, setLoading, setViewInvoice })}
             {ShowViewInvoice({ "mainProps": props, classes, viewInvoice, setViewInvoice })}
             <div className={classes.buttonStyle}>
                 <center>
-                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}>SUBMIT</Button> &nbsp;&nbsp;
+                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting || submit}>SUBMIT</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={async () => { await reset(); await SaveInvoiceEmployeeData([]); await setViewSectionThree(false); }}> Clear Values</Button>&nbsp;&nbsp;
                     {/* <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button> &nbsp;&nbsp; */}
                     {/* <Button type="button" variant="outlined" color="primary" onClick={() => setViewInvoice(true)}>View Invoice</Button> */}
@@ -83,7 +84,7 @@ const DwonloadInvoice = () => {
 
 // this method will used for the saving the genrate invoice
 const PostInvoiceData = async (propsData) => {
-    const { values, setViewSectionThree, projectIdList, setLoading } = propsData
+    const { values, setViewSectionThree, projectIdList, setLoading, setSubmit } = propsData
     const { authorization } = propsData.mainProps.LoginState
     const { invoiceEmployeeData } = propsData.mainProps.InvoiceState
     const { GenerateInvoice, SaveInvoiceEmployeeData } = propsData.mainProps.InvoiceAction
@@ -100,6 +101,7 @@ const PostInvoiceData = async (propsData) => {
         await loadMessage();
         await setLoading(false);
         await setViewSectionThree(true);
+        (invoiceEmployeeData && invoiceEmployeeData.length >0)&&await setSubmit(true); 
     }, API_EXE_TIME)
 }
 
