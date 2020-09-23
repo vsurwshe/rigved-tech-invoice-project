@@ -162,16 +162,17 @@ class ClientManagment extends Component {
             ...values,
             "gstUrl": (gstFileUrl === "" || gstFileUrl === undefined) ? values.gstUrl  :gstFileUrl,
             "tanUrl": (tanFileUrl === "" || tanFileUrl === undefined) ? values.tanUrl : tanFileUrl,
-            "addressDtos": [values.addressDtos],
+            "addressDtos": values.addressDtos ? [values.addressDtos] : null,
             rateCardDtos,
             "active": true,
-            "bankDetailsDtoList": [values.bankDetailsDtoList]
+            "bankDetailsDtoList": values.bankDetailsDtoList ? [values.bankDetailsDtoList] : null
         }
         await SaveClientData(newUserData, authorization)
         setTimeout(async () => {
             await loadMessage()
             await GetClientList(0, 20, authorization);
             await this.setState({tanFileUrl : "", gstFileUrl:""})
+            await alert("Your client details are saved");
             this.handleCreateClient();
         }, API_EXE_TIME)
     }

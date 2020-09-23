@@ -1,7 +1,11 @@
 import React from 'react';
 import { TextField, FormControlLabel, Checkbox, FormControl, RadioGroup, Radio, FormHelperText, InputLabel, Select, FormLabel, Button } from "@material-ui/core"
 import Autocomplete from '@material-ui/lab/Autocomplete';
-
+import { Required, PhoneNumber, Email } from '../utilites/FormValidation';
+import { FromActions } from '../../assets/config/Config';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
+import { Field } from 'redux-form';
 // this is render text filed
 const renderTextField = ({ label, name, input, helperText, meta: { touched, invalid, error }, ...custom }) => (
     <TextField
@@ -182,6 +186,36 @@ const renderAutocompleteWithProps=({label,name,optionData,className, input, meta
     {...custom}
   />
 
+// this will be render contact
+const renderContact = ({ classes, open, handleClickOpen, handleClose, fields, initialValues, operation, meta: { error, submitFailed } }) => {
+  // const [open, setOpen] = useState(false);
+  // const handleClickOpen = () => { setOpen(true); fields.push({}) };
+  // const handleClose = () => { setOpen(false) };
+  return <span>
+      { (operation !== FromActions.VI )&&<Button style={{ float: "Right" }} variant="contained" color="primary" onClick={()=>handleClickOpen(fields)}>ADD</Button>}
+      <Dialog open={open} onClose={handleClose} classes={{ paper: classes.dialogPaper }} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
+          <DialogTitle id="responsive-dialog-title-1">{"Add Contact"}</DialogTitle>
+          <DialogContent>
+              <DialogContentText>
+                  {fields.map((member, index) => (
+                      <tr key={index}>
+                          <td><Field name={`${member}.name`} component={renderTextField} validate={(initialValues===undefined)&&[Required]} className={classes.textField} label="Name" helperText="Ex. admin" /></td>
+                          <td><Field name={`${member}.email`} component={renderTextField} validate={(initialValues===undefined)&&[Required, Email]} className={classes.textField1} label="Email" helperText="Ex. admin@rigvedtech.com" /></td>
+                          <td><Field name={`${member}.mobileNum`} component={renderTextField} validate={(initialValues===undefined)&&[Required, PhoneNumber]} className={classes.textField1} label="Mobile Number" helperText="Ex. 9130253456" /></td>
+                          <td><Field name={`${member}.role`} component={renderTextField} className={classes.textField1} label="Job Designation" helperText="Ex. Developer" /></td>
+                          <td><DeleteOutlineIcon variant="contained" color="secondary" onClick={() => fields.remove(index)} /></td>
+                      </tr>
+                  ))}
+              </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+              <Button onClick={handleClose} color="primary" autoFocus>Cancel</Button>
+              <Button onClick={handleClose} color="secondary" autoFocus>Save</Button>
+          </DialogActions>
+      </Dialog>
+  </span>
+}
+
 export{
     renderTextField,
     renderTextHiddenField,
@@ -195,5 +229,6 @@ export{
     renderAutocomplete,
     renderAutocompleteByName,
     renderAutocompleteWithProps,
-    renderPasswordTextField
+    renderPasswordTextField,
+    renderContact
 }
