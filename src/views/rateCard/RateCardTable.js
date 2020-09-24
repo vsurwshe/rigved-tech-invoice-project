@@ -36,7 +36,8 @@ const RateCardTable = (propsData) => {
       {   title: "Rate\u00a0Duration", 
           field: "rateCardDuration",
           editComponent :props =>{
-            return renderTextField({ name:"duration", label:"Rate Duration", action:{props}, errorText:"Rate duration is required"})
+            const { rateCardType }=props.rowData
+            return renderTextField({ name:"duration", label:"Rate Duration", action:{props}, errorText:"Rate duration is required", disabled:(rateCardType &&rateCardType ==="Daily") ? true: false })
           }
       },
       {   title: "Form\u00a0Year", 
@@ -157,13 +158,14 @@ const renderSelect=(propsData)=>{
 }
 
 // this is render text field
-const renderTextField=({name, label, action, errorText})=>(
+const renderTextField=({name, label, action, errorText,disabled})=>(
   <TextField
     id={name}
     label={label}
     onChange={(event) => action.props.onChange(event.target.value)}
-    error={!action.props.value}
-    helperText={!action.props.value ? errorText:""}
+    error={ disabled ? "": (!action.props.value)}
+    helperText={ disabled ? "": ((!action.props.value) ? errorText:"")}
+    disabled={disabled}
   />
 )
 
