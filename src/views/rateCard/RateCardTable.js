@@ -12,57 +12,45 @@ const RateCardTable = (propsData) => {
       {   title: "Domain", 
           field: "domainName",
           editComponent :props =>{
-              return LoadAutoComplete({ id:"domainName", lable:"Domain", props, optionData:Domains })
+              return renderAutoComplete({ id:"domainName", lable:"Domain", props, optionData:Domains })
           }
       },
       {   title: "Category", 
           field: "skillCategory",
           editComponent :props =>{
-              return LoadAutoComplete({ id:"skillCategory", lable:"Category", props, optionData:SkillCategory })
+              return renderAutoComplete({ id:"skillCategory", lable:"Category", props, optionData:SkillCategory })
           }
       },
       {   title: "Skill", 
           field: "skillSet",
           editComponent :props =>{
-              return LoadAutoComplete({ id:"skillSet", lable:"Skill", props, optionData:SkillSet }) 
+              return renderAutoComplete({ id:"skillSet", lable:"Skill", props, optionData:SkillSet }) 
           }
       },
       {   title: "Rate\u00a0Options", 
           field: "rateCardType",
           editComponent :props =>{
-              return LoadAutoComplete({ id:"rateCardType", lable:"Rate Options", props, optionData:rateOptions })
+              return renderAutoComplete({ id:"rateCardType", lable:"Rate Options", props, optionData:rateOptions ,helperText:"Rate optons is required" })
           }
       },
       {   title: "Rate\u00a0Duration", 
           field: "rateCardDuration",
           editComponent :props =>{
-            return  <TextField
-                id="Duration"
-                label="Rate Duration"
-                onChange={(event) => props.onChange(event.target.value)}
-                error={props.touched && props.invalid}
-                helperText={(props.touched && props.error) && props.error}
-            />
+            return renderTextField({ name:"duration", label:"Rate Duration", action:{props}, errorText:"Rate duration is required"})
           }
       },
       {   title: "Form\u00a0Year", 
           field: "fromYearOfExp",
-          editComponent :props =>{ return LoadSelect({props, label:"Form Year"}) }
+          editComponent :props =>{ return renderSelect({props, label:"Form Year"}) }
       },
       {   title: "To\u00a0Year", 
           field: "toYearOfExp",
-          editComponent :props =>{ return LoadSelect({props, label:"To Year"})}
+          editComponent :props =>{ return renderSelect({props, label:"To Year"})}
       },
       {   title: "Rate", 
           field: "rate",
           editComponent :props =>{
-              return  <TextField
-              id="rate"
-              label="Rate"
-              onChange={(event) => props.onChange(event.target.value)}
-              error={props.touched && props.invalid}
-              helperText={(props.touched && props.error) && props.error}
-            />
+            return renderTextField({ name:"rate", label:"Rate", action:{props}, errorText:" Rate is required"})
           }
       }
   ]
@@ -70,14 +58,12 @@ const RateCardTable = (propsData) => {
     <MaterialTable
       title=""
       columns={columns}
-      // onChangeColumnHidden={}
       data={(rateCardDtos && rateCardDtos.length > 0) ? rateCardDtos : []}
       options={{
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
         search: false,
         actionsColumnIndex: -1
       }}
-     
       icons={{
         Add: () => <Button variant="contained" color="primary">Add Rate Card</Button>,
         Edit:() => { return <CreateIcon variant="contained" color="primary" /> },
@@ -91,16 +77,20 @@ const RateCardTable = (propsData) => {
         onRowAdd: newData =>{
             return new Promise(async(resolve, reject) => {
               if(newData){
-                console.log("Data ",newData.fromYearOfExp,newData.toYearOfExp,newData.fromYearOfExp < newData.toYearOfExp)
                 if(!newData.fromYearOfExp || !newData.toYearOfExp){
                   !newData.fromYearOfExp && alert("Please select form year");
                   !newData.toYearOfExp && alert("Please select to year");
                   reject();
                 }else if(newData.fromYearOfExp < newData.toYearOfExp){
-                  await setRateCardDtos([...rateCardDtos,newData]);
-                  setTimeout(async()=>{
-                      resolve();
-                  },API_EXE_TIME)
+                  if(validate(newData)){
+                    alert("Please check below provided fileds");
+                    reject();
+                  }else{
+                    await setRateCardDtos([...rateCardDtos,newData]);
+                    setTimeout(async()=>{
+                        resolve();
+                    },API_EXE_TIME)
+                  }
                 }else{
                   alert("Form year value should be less than compare to year value");
                   reject();
@@ -113,16 +103,33 @@ const RateCardTable = (propsData) => {
         onRowUpdate: (newData, oldData) =>{ return new Promise(async(resolve, reject) => { reject() })},
         onRowDelete: oldData =>{ return new Promise(async(resolve, reject) => { resolve() }) }
       }}
-
-      onChangeColumnHidden={(column,hidden)=>{
-        console.log("DP", column,hidden)
-      }}
     />
 </div>
 }
 
-const LoadAutoComplete=(propsData)=>{
-  const { id, optionData, props, lable, setOpen }= propsData
+const validate=(rowData)=>{
+  if( rowData.domainName === undefined || 
+      rowData.domainName === '' ||
+      rowData.skillCategory === undefined || 
+      rowData.skillCategory === '' ||
+      rowData.skillSet === undefined || 
+      rowData.skillSet === '' ||
+      rowData.rateCardType === undefined ||
+      rowData.rateCardType === '' ||
+      rowData.rateCardDuration === undefined ||
+      rowData.rateCardDuration === '' ||
+      rowData.rate === undefined ||
+      rowData.rate === ''  
+    ){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+// this method will render auto complete
+const renderAutoComplete=(propsData)=>{
+  const { id, optionData, props, lable, setOpen, helperText }= propsData
   return <Autocomplete
   id={id}
   style={{marginTop:"-10px"}}
@@ -134,11 +141,12 @@ const LoadAutoComplete=(propsData)=>{
       setOpen && setOpen(true);
       value && props.onChange(value.name)
   }}
-  renderInput={(params) => ( <TextField {...params} error={(props.touched && props.invalid) || props.error} helperText={props.error && props.error} label={lable} margin="normal"  /> )}
+  renderInput={(params) => ( <TextField {...params} error={!props.value} helperText={!props.value ? helperText:""} label={lable} margin="normal"  /> )}
 />
 }
 
-const LoadSelect=(propsData)=>{
+// this method will render the select options
+const renderSelect=(propsData)=>{
   const { props ,label }=propsData
   return <FormControl error={props.touched && props.error} style={{width:"100%"}}>
   <InputLabel htmlFor="age-native-simple">{label}</InputLabel>
@@ -147,5 +155,16 @@ const LoadSelect=(propsData)=>{
   </Select>
 </FormControl>
 }
+
+// this is render text field
+const renderTextField=({name, label, action, errorText})=>(
+  <TextField
+    id={name}
+    label={label}
+    onChange={(event) => action.props.onChange(event.target.value)}
+    error={!action.props.value}
+    helperText={!action.props.value ? errorText:""}
+  />
+)
 
 export default RateCardTable;

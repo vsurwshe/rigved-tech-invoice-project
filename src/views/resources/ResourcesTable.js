@@ -51,14 +51,18 @@ let ResourcesTable=(props)=>{
     const handleClickOpen = () => { setOpen(true) };
     const handleClose = () => { setOpen(false) };
 
+    const getEmployeeListProjectId=async()=>{
+      await setCountCall(countCall + 1)
+      await GetEmployeeListByProjectId(0,20,projectId,authorization);
+      await loadMessage();
+      exitsEmployeeListByPojectId=await (employeeListByPojectId && employeeListByPojectId.length > 0)&& employeeListByPojectId.filter(item=> item.projectId ===projectId);
+    }
+
     let exitsEmployeeListByPojectId=(employeeListByPojectId && employeeListByPojectId.length > 0)&& employeeListByPojectId.filter(item=> item.projectId ===projectId);
     
     // this codition will check the passed project id realted employee is there or not
     if((exitsEmployeeListByPojectId === false || exitsEmployeeListByPojectId.length <=0) && countCall===0){
-      setCountCall(countCall + 1)
-      GetEmployeeListByProjectId(0,20,projectId,authorization);
-      loadMessage();
-      exitsEmployeeListByPojectId=(employeeListByPojectId && employeeListByPojectId.length > 0)&& employeeListByPojectId.filter(item=> item.projectId ===projectId);
+        getEmployeeListProjectId();
     }
 
     // this codition get the client details by client id
@@ -73,38 +77,24 @@ let ResourcesTable=(props)=>{
       { title: "",  field:"accountId", hidden:true},
       { title: "",  field:"emploeeMappedId", hidden:true},
       { title: "",  field:"projectId", hidden:true},
-      { title: 'Emp\u00a0Id', field: 'employeeNumber', width: 20, editable:"never" },
+      { title: 'Employee\u00a0Id', field: 'employeeNumber', width: 15, editable:"never" },
       { title: 'Name', field: 'name', editable:"never" },
       { title: 'Domain', field: 'domain', editable:"never" },
       { title: 'Category', field: 'category', editable:"never" },
-      { title: 'Experience', field: 'experience', editable:"never" },
-      { title: 'Skill', field: 'skill', editable:"never" },
-      { title: 'Onboarding\u00a0Date', 
+      { title: 'Experience', field: 'experience', editable:"never", width: 10 },
+      { title: 'Skill', field: 'skill', editable:"never",  width: 10 },
+      { title: 'Onboarding\u00a0Date',
+        width: 15, 
         field: 'onbordaingDate',
         editComponent: props=>{
-          return <TextField
-                id="onbordaingDate"
-                label="Onbordaing Date"
-                type="date"
-                value={props.value}
-                onChange={e => props.onChange(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                required={true}
-            />
+          return renderTextField({name:"onbordaingDate", label:"Onbordaing Date", type:"date", action:{props}})
         } 
       },
-      { title: 'Exit\u00a0Date', 
+      { title: 'Exit\u00a0Date',
+        width: 15, 
         field: 'exitDate',
         editComponent: props=>{
-          return <TextField
-                id="exitDate"
-                label="Exit Date"
-                type="date"
-                value={props.value}
-                onChange={e => props.onChange(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                required={true}
-            />
+          return renderTextField({name:"exitDate", label:"Exit Date", type:"date", action:{props}})
         } 
       }
     ];
@@ -139,7 +129,8 @@ return <> {LoadAddResourceModel({open,handleClose, "mainProps":props})}
         data={(data && data.length > 0) ? data[0] : []}
         options={{
           headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
-          search: false
+          search: false,
+          actionsColumnIndex: -1
         }}
         actions={[
           { icon: () => {return (operation && (operation === FromActions.ED || operation === FromActions.VIED)) ?  <div><Button variant="contained" color="primary">Assign Resource</Button></div> : ""},
@@ -261,6 +252,21 @@ const saveAssignResource=async(propsData)=>{
   }
 }
 
+// this is render the text fileds in tables
+const renderTextField=(props)=>{
+  const { name, label, type, action }=props
+  return <TextField
+      id={name}
+      label={label}
+      type={type}
+      value={action.props.value}
+      onChange={e => action.props.onChange(e.target.value)}
+      InputLabelProps={{ shrink: true }}
+      required={true}
+  />
+}
+
+
 // this method will used for the loading circule progress bar
 const loadingCircle = () => <center> Saving.... <CircularProgress size={40} /> </center>
 
@@ -294,13 +300,7 @@ const EmployeeTable=(propsData)=>{
     { title: 'Onbordaing Date', 
       field: 'onbordaingDate',
       editComponent: props=>{
-        return <TextField
-              id="onbordaingDate"
-              label="Onbordaing Date"
-              type="date"
-              onChange={e => props.onChange(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-          />
+        return renderTextField({name:"onbordaingDate", label:"Onbordaing Date", type:"date", action:{props} })
       }
     }
   ]
