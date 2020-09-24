@@ -44,7 +44,11 @@ const RegsiterTable=(props)=>{
 
   // Creating rows
   const data = (EmployeeList && EmployeeList.length > 0) && EmployeeList.map((item, key) => {
+<<<<<<< HEAD
     return { "key": (key + 1), "data": item,"employeeNumber":item.employeeNumber,"designation":item.designation, "emailId": item.emailId,"mobileNumber": item.mobileNumber, "name": item.firstName+" "+item.lastName, "lastUploadedAttendance":item.latestAttFromDate && moment(item.latestAttFromDate).format('DD-MM-YYYY') +" to "+moment(item.latestAttToDate).format('DD-MM-YYYY') }
+=======
+    return { "key": (key + 1), "data": item,"employeeNumber":item.employeeNumber,"designation":item.designation, "emailId": item.emailId,"mobileNumber": item.mobileNumber, "name": item.firstName+" "+item.lastName, "lastUploadedAttendance":item.latestAttFromDate && item.latestAttFromDate+"-"+item.latestAttToDate  }
+>>>>>>> 0.14.31: Modify the upload attendance and added last updated attendance
   });
 
   return <div style={{ maxWidth: "100%" }}>
