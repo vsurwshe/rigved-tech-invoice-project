@@ -10,6 +10,8 @@ import { loadMessage } from "../../redux/actions/ClientAction"
 import { API_EXE_TIME } from '../../assets/config/Config';
 import { bindActionCreators } from 'redux';
 import RegisterTable from './RegisterTable';
+import { Field, reduxForm, reset } from 'redux-form';
+import { renderDateTimePicker } from '../utilites/FromUtilites';
 
 class UserManagement extends Component {
     constructor(props) {
@@ -110,15 +112,12 @@ class UserManagement extends Component {
         const { attendanceModel, attendanceUrl, attendanceUpload } = this.state
         return <Dialog open={attendanceModel} keepMounted onClose={this.handleAttendanceModel} aria-labelledby="alert-dialog-slide-title" aria-describedby="alert-dialog-slide-description"   >
             <DialogTitle id="alert-dialog-slide-title">{'Upload excel attendance file'}</DialogTitle>
-            <DialogContent>
-                <DialogContentText id="alert-dialog-slide-description">
-                    {(attendanceUrl === "" || attendanceUrl === undefined) ? (attendanceUpload ? this.loadingCircle("Uploading") : this.loadAttendanceUrl())
-                        : <h5>{this.loadFileUrlName(attendanceUrl)}</h5>}
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={this.handleAttendanceModel} color="primary">Cancel</Button>
-            </DialogActions>
+                <AttendanceForm
+                    handleAttendanceModel={this.handleAttendanceModel}
+                    attendanceUrl={attendanceUrl}
+                    attendanceUpload={attendanceUpload}
+                    loadAttendanceUrl={this.loadAttendanceUrl}
+                 />
         </Dialog>
     }
 
@@ -151,7 +150,8 @@ class UserManagement extends Component {
 
     // this method will used for the showing attendance file name
     loadFileUrlName = (fileUrl) => {
-        let fileArray = fileUrl.split("\\");
+        console.log("File url",fileUrl);
+        let fileArray = fileUrl && fileUrl.split("\\");
         return fileArray.length > 0 ? fileArray[5] : "";
     }
 
@@ -180,7 +180,7 @@ class UserManagement extends Component {
 
     // this method will used for the loading Resgister table
     loadRegisterTable = () => {
-        const { load }=this.state
+        const { load } = this.state
         return <>
             {this.loadAttendanceModel()}
             {load ? this.loadingCircle("Loading...") 
@@ -283,6 +283,26 @@ class UserManagement extends Component {
         }, API_EXE_TIME)
     }
 }
+
+let AttendanceForm = (props) => {
+    const { pristine, reset, submitting, handleSubmit, attendanceModel, attendanceUrl, attendanceUpload, loadFileUrlName, handleAttendanceModel, loadingCircle,loadAttendanceUrl } = props
+    return  <form onSubmit={handleSubmit((values)=>{console.log("Data ", values)})}>
+        <DialogContent>
+            <Field name="latestAttFromDate" component={renderDateTimePicker} label="From Date" /> &nbsp;&nbsp;&nbsp;
+            <Field name="latestAttToDate" component={renderDateTimePicker} label="To Date" /> <br /> <br/>
+            {(attendanceUrl === "" || attendanceUrl === undefined) ? (attendanceUpload ? loadingCircle("Uploading") : loadAttendanceUrl())
+                : <h5>{loadFileUrlName(attendanceUrl)}</h5>}
+        </DialogContent>
+        <DialogActions>
+            <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;&nbsp;&nbsp;
+            <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button> &nbsp;&nbsp;&nbsp;&nbsp;
+            <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); await handleAttendanceModel()}}> Cancel</Button>
+        </DialogActions>
+    </form>
+}
+
+const afterSubmit = (result, dispatch) => {dispatch(reset('AttendanceUploadFrom'))};
+AttendanceForm=reduxForm({ form: 'AttendanceUploadFrom', onSubmitSuccess: afterSubmit })(AttendanceForm);
 
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({
