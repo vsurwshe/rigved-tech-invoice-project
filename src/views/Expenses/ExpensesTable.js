@@ -16,94 +16,75 @@ import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 const ExpensesTable = (props) => {
   const { projectId }=props 
   const { operation }=props.stateData
-  const [countCall,setCountCall]=useState(0)
+  const [ countCall,setCountCall ]=useState(0)
   const { expensesListByProjectId}=props.ExpenseState
-  const { SaveExpenseRecord, GetExpensesListByProjectId, DeleteExpenseRecord } = props.ExpenseAction
+  const { GetExpensesListByProjectId, DeleteExpenseRecord } = props.ExpenseAction
   const { ExpenseTypeList }=props.MasterDataSet
   const { authorization }=props.LoginState
   
+  const getExpenseListByProjectId=async(props)=>{
+    await setCountCall(countCall + 1)
+    await GetExpensesListByProjectId(0,20,projectId,authorization);
+    await loadMessage();   
+    exitsExpensesListByProjectId= await (expensesListByProjectId && expensesListByProjectId.length > 0)&& expensesListByProjectId.filter(item=> item.projectId ===projectId);
+  }
+
   let expenseTypeListOptions= ExpenseTypeList.length >0 && ExpenseTypeList.map((item,key)=>{return{title:item.name,id:item.id}})
   let exitsExpensesListByProjectId=(expensesListByProjectId && expensesListByProjectId.length > 0)&& expensesListByProjectId.filter(item=> item.projectId ===projectId);
 
   if((exitsExpensesListByProjectId === false || exitsExpensesListByProjectId.length <=0) && countCall===0){
-    setCountCall(countCall + 1)
-    GetExpensesListByProjectId(0,20,projectId,authorization);
-    exitsExpensesListByProjectId=(expensesListByProjectId && expensesListByProjectId.length > 0)&& expensesListByProjectId.filter(item=> item.projectId ===projectId);
+      getExpenseListByProjectId()
   }
 
   // creating columns
   const columns = [
     { title:"", field:"id", hidden:true},
     { title:"", field:"attachmentUrl1", hidden:true},
-    { title: "Attatchment",
-      field:'attachmentUrl',
-      editComponent: dataProps=>{
-      return (props.FileState && props.FileState.fileUrl && props.FileState.fileUrl.length > 0 ) ?<h5>{loadFileUrlName(props.FileState.fileUrl[0])}</h5> 
-            :<TextField 
-                type="file"
-                onChange={event => ExpenseFileUpload(event,dataProps)}
-                InputLabelProps={{ shrink: true }}
-            /> 
-      },
-      editable:"onAdd"
-    },
     { title: 'Expense\u00a0Type', 
       field: 'expType', 
       editComponent: props => {
         return <Autocomplete
-        id="exp-type"
-        autoHighlight
-        options={(expenseTypeListOptions && expenseTypeListOptions.length >0) ? expenseTypeListOptions: []}
-        value={props.value}
-        getOptionLabel={(expenseTypeListOptions) => expenseTypeListOptions.title ? expenseTypeListOptions.title : ""}
-        onChange={(event, value) => value && props.onChange(value.id)}
-        renderInput={(params) => ( <TextField {...params} label="Expense Type" margin="normal"  /> )}
-      /> 
+              id="exp-type"
+              autoHighlight
+              options={(expenseTypeListOptions && expenseTypeListOptions.length >0) ? expenseTypeListOptions: []}
+              getOptionLabel={(expenseTypeListOptions) => expenseTypeListOptions.title ? expenseTypeListOptions.title : ""}
+              getOptionSelected={(expenseTypeListOptions, value) => expenseTypeListOptions.id === value.id}
+              onChange={(event, value) => value && props.onChange(value.id)}
+              renderInput={(params) => ( <TextField {...params} error={!props.value} label="Expense Type" margin="normal"  /> )}
+        /> 
       },
-      editable:"onAdd"
+      editable:"onAdd",
     },
     { title: 'Description',
       field: 'description',
       editComponent: props=>{
-        return <TextField
-              id="description"
-              multiline
-              label="Description"
-              type="text"
-              value={props.value}
-              rows={1}
-              onChange={e => props.onChange(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-          />
-      } 
+        return renderTextFiled({ name:"description", label:"Description", type:"text", action:{props}, show:true})
+      },
     },
     { title: 'Amount', 
       field: 'amount',
       editComponent: props=>{
-        return <TextField
-              id="amount"
-              label="Amount"
-              type="number"
-              value={props.value}
-              onChange={e => props.onChange(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-          />
-      }
+        return renderTextFiled({ name:"amount", label:"Amount", type:"number", action:{props}, show:true})
+      },
     },
     { title: 'Date', 
       field: 'expDate',
       editComponent: props=>{
-        return <TextField
-              id="expDate"
-              label="Expense Date"
-              type="date"
-              value={props.value}
-              onChange={e => props.onChange(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              required={true}
-          />
+        return renderTextFiled({ name:"expDate", label:"Expense Date", type:"date", action:{props}, show:true})
       }
-    }
+    },
+    { title: "Attatchment",
+    field:'attachmentUrl',
+    editComponent: dataProps=>{
+    return (props.FileState && props.FileState.fileUrl && props.FileState.fileUrl.length > 0 ) ?<h5>{loadFileUrlName(props.FileState.fileUrl[0])}</h5> 
+          :<TextField 
+              type="file"
+              onChange={event => ExpenseFileUpload(event,dataProps)}
+              InputLabelProps={{ shrink: true }}
+          /> 
+    },
+    editable:"onAdd"
+  },
   ];
 
   const loadFileUrlName=(fileUrl)=>{
@@ -164,7 +145,8 @@ const ExpensesTable = (props) => {
       data={(data && data.length > 0) ? data[0] : []}
       options={{
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
-        search: false
+        search: false,
+        actionsColumnIndex: -1
       }}
       icons={{
         Add: () => { return (operation && (operation === FromActions.ED || operation === FromActions.VIED)) ? <Button variant="contained" color="primary">Add Expense</Button> : ""},
@@ -178,21 +160,21 @@ const ExpensesTable = (props) => {
         isDeleteHidden: rowData => false,
         onRowAdd: newData =>{
           return new Promise(async(resolve, reject) => {
-            const { SaveFileData }= props.FileAction
-            let newExpenseData={
-              ...newData,
-              "active":true,
-              "project":{ "id":projectId },
-              "expType":{ "id":newData.expType},
-              "attachmentUrl":  (props.FileState && props.FileState.fileUrl && props.FileState.fileUrl.length > 0 ) ? props.FileState.fileUrl[0] :""
+              if(validate(newData)){
+                alert("Please check your provided fields data");
+                reject();
+              }else{
+                let newExpenseData={
+                  ...newData,
+                  "active":true,
+                  "project":{ "id":projectId },
+                  "expType":{ "id":newData.expType},
+                  "attachmentUrl":  (props.FileState && props.FileState.fileUrl && props.FileState.fileUrl.length > 0 ) ? props.FileState.fileUrl[0] :""
+                }
+                callSaveExpenseRecord({ mainProps: props, resolve, projectId , newData:[newExpenseData]})
+              }
             }
-            await SaveExpenseRecord([newExpenseData],authorization);
-            setTimeout(async()=>{
-              await GetExpensesListByProjectId(0,20,projectId, authorization)
-              await SaveFileData();
-              resolve();
-            },API_EXE_TIME)
-        })},
+          )},
         onRowUpdate: (newData, oldData) =>{
           return new Promise(async(resolve, reject) => {
             let filterExpenseOptions=expenseTypeListOptions && expenseTypeListOptions.filter(item=>item.title === newData.expType);
@@ -206,11 +188,7 @@ const ExpensesTable = (props) => {
               "project": { "id": projectId},
               "expType": { "id": (filterExpenseOptions && filterExpenseOptions.length >0) && filterExpenseOptions[0].id }
             } 
-            await SaveExpenseRecord([newExpenseData],authorization);
-            setTimeout(async()=>{
-              await GetExpensesListByProjectId(0,20,projectId, authorization)
-              resolve();
-            },API_EXE_TIME)
+            callSaveExpenseRecord({ mainProps: props, resolve, projectId , newData:[newExpenseData],method:"update"})
           })
         },
         onRowDelete: oldData =>{
@@ -226,6 +204,49 @@ const ExpensesTable = (props) => {
     />
   </div>
 }
+
+const callSaveExpenseRecord=async(props)=>{
+  const { resolve, newData, projectId, method }=props
+  const { SaveFileData }= props.mainProps.FileAction
+  const { authorization }=props.mainProps.LoginState
+  const { SaveExpenseRecord, GetExpensesListByProjectId } = props.mainProps.ExpenseAction
+  await SaveExpenseRecord(newData,authorization);
+  setTimeout(async()=>{
+    (method === "" && method !=="update")&&await SaveFileData();
+    await GetExpensesListByProjectId(0,20,projectId, authorization)
+    resolve();
+  },API_EXE_TIME)
+}
+
+const validate=(rowData)=>{
+  if( rowData.expType === undefined || 
+      rowData.expType === '' ||
+      rowData.description === undefined || 
+      rowData.description === '' ||
+      rowData.description === undefined || 
+      rowData.amount === '' ||
+      rowData.expDate === undefined ||
+      rowData.expDate === ''  
+    ){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+// this is render the text fileds in tabel
+const renderTextFiled=({name, label, type, action, show })=>(
+  <TextField
+      id={name}
+      label={label}
+      type={type}
+      value={ show ? action.props.value : ""}
+      onChange={e => action.props.onChange(e.target.value)}
+      InputLabelProps={{ shrink: true }}
+      required={true}
+      error={!action.props.value}
+  />
+)
 
 
 const mapStateToProps = state => { return state; };
