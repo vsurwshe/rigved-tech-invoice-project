@@ -117,6 +117,8 @@ class UserManagement extends Component {
                     attendanceUrl={attendanceUrl}
                     attendanceUpload={attendanceUpload}
                     loadAttendanceUrl={this.loadAttendanceUrl}
+                    loadingCircle={this.loadingCircle}
+                    loadFileUrlName={this.loadFileUrlName}
                  />
         </Dialog>
     }
@@ -285,7 +287,7 @@ class UserManagement extends Component {
 }
 
 let AttendanceForm = (props) => {
-    const { pristine, reset, submitting, handleSubmit, attendanceModel, attendanceUrl, attendanceUpload, loadFileUrlName, handleAttendanceModel, loadingCircle,loadAttendanceUrl } = props
+    const { pristine, reset, submitting, handleSubmit, attendanceUrl, attendanceUpload, loadFileUrlName, handleAttendanceModel, loadingCircle,loadAttendanceUrl } = props
     return  <form onSubmit={handleSubmit((values)=>{console.log("Data ", values)})}>
         <DialogContent>
             <Field name="latestAttFromDate" component={renderDateTimePicker} label="From Date" /> &nbsp;&nbsp;&nbsp;

@@ -3,7 +3,7 @@ import { Grid, CircularProgress } from "@material-ui/core";
 import SimplePieChart from "./chart/SimplePieChart";
 import StackedBarChart from "./chart/StackedBarChart";
 import SimpleLineChart from "./chart/SimpleLineChart";
-import { PageTitle } from './chart/DashboardUtilites';
+import { DashboardFilter } from './chart/DashboardUtilites';
 import SideBySideBarChart from './chart/SideBySideBarChart';
 import * as DashboardAction from "../../redux/actions/DashboardAction";
 import { connect } from 'react-redux';
@@ -79,11 +79,13 @@ class Dashboard extends Component {
   // this method will load the page title
   loadPageTitle=()=>{
     const { clientSerise, projectSerise }= this.props.DashboardState
-    return <PageTitle title="Dashboard" 
+    return <DashboardFilter 
+        title="Filter Chart Data" 
         clientSerise={clientSerise} 
         projectSerise={projectSerise} 
         filterByClient={this.filterByClient}
         filterByProject={this.filterByProject}
+        callFilterChartAPI={this.callFilterChartApi}
     />
   }
 
@@ -158,6 +160,10 @@ class Dashboard extends Component {
         dataSource={purchaseOrderRevenueData} 
         title="Purchase order share"
     />
+  }
+
+  callFilterChartApi=(props)=>{
+    console.log("Calling Filter Chart Api", props)
   }
 
   // this method will filter by client
