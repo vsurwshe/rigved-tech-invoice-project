@@ -7,7 +7,7 @@ import { InvoiceError } from '../../assets/config/ErrorStringFile';
 const GetInvoiceList = (firstIndex, lastIndex, authroizationKey) => {
     return (dispatch) => {
         return CreateInstance()
-            .get('/invoice/invoiceList/' + firstIndex + '/' + lastIndex, HeaderConfig(authroizationKey))
+            .get('/innvoice/invoiceList/' + firstIndex + '/' + lastIndex, HeaderConfig(authroizationKey))
             .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceList, "loadMessage":loadMessage, response}) })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }

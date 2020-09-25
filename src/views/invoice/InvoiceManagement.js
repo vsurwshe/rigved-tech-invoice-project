@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Card, CircularProgress } from '@material-ui/core';
 import InvoiceTable from './InvoiceTable';
 import * as ClientAction from "../../redux/actions/ClientAction";
+import * as InvoiceAction from '../../redux/actions/InvoiceAction';
 import { bindActionCreators } from 'redux';
 
 
@@ -17,10 +18,13 @@ class InvoiceManagement extends Component {
 
     componentDidMount=async()=>{
         const { listOfClient }=this.props.ClientState
+        const { invoiceList }=this.props.InvoiceState
         const { authorization }=this.props.LoginState
         const { GetClientList }=this.props.ClientAction
+        const { GetInvoiceList }=this.props.InvoiceAction
         await this.handleInvoiceLoadvalue();
         (listOfClient && listOfClient<=0)&& await GetClientList(0,20,authorization);
+        (invoiceList && invoiceList<=0)&& await GetInvoiceList(0,20,authorization);
         await this.handleInvoiceLoadvalue();
     }
     
@@ -60,5 +64,6 @@ class InvoiceManagement extends Component {
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({
     ClientAction: bindActionCreators(ClientAction, dispatch),
+    InvoiceAction: bindActionCreators(InvoiceAction, dispatch),
 })
 export default connect(mapStateToProps,mapDispatchToProps)(InvoiceManagement);
