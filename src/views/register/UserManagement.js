@@ -119,8 +119,12 @@ class UserManagement extends Component {
                     loadAttendanceUrl={this.loadAttendanceUrl}
                     loadingCircle={this.loadingCircle}
                     loadFileUrlName={this.loadFileUrlName}
+<<<<<<< HEAD
                     mainProps={this.props}
                 />
+=======
+                 />
+>>>>>>> 0.14.32: Implemented structrised dashboard filter from
         </Dialog>
     }
 
@@ -309,7 +313,10 @@ class UserManagement extends Component {
 
 let AttendanceForm = (props) => {
     const { pristine, reset, submitting, handleSubmit, attendanceUrl, attendanceUpload, loadFileUrlName, handleAttendanceModel, loadingCircle,loadAttendanceUrl } = props
+<<<<<<< HEAD
     const { latestAttFromDate, latestAttToDate}=props.mainProps
+=======
+>>>>>>> 0.14.32: Implemented structrised dashboard filter from
     return  <form onSubmit={handleSubmit((values)=>{console.log("Data ", values)})}>
         <DialogContent>
             <Field name="latestAttFromDate" component={renderDateTimePicker} label="From Date" /> &nbsp;&nbsp;&nbsp;
