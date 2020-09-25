@@ -10,6 +10,8 @@ import { loadMessage } from "../../redux/actions/ClientAction"
 import { API_EXE_TIME } from '../../assets/config/Config';
 import { bindActionCreators } from 'redux';
 import RegisterTable from './RegisterTable';
+import { Field, reduxForm, reset } from 'redux-form';
+import { renderDateTimePicker } from '../utilites/FromUtilites';
 
 class UserManagement extends Component {
     constructor(props) {
@@ -24,6 +26,9 @@ class UserManagement extends Component {
             attendanceUpload: false,
             attendanceUrl: "",
             attendanceModel: false,
+            bulkEmployeeModel:false,
+            bulkEmployeeUrl:"",
+            bulkEmployeeUpload:false
         }
     }
 
@@ -62,6 +67,13 @@ class UserManagement extends Component {
     //this method will used for the handling attendance upload
     handleAttendanceUpload = () => { this.setState({ attendanceUpload: !this.state.attendanceUpload }) }
 
+    // this handleing the upload attendance model
+    handleBulkEmployeeModel = () => { this.setState({ bulkEmployeeModel: !this.state.bulkEmployeeModel }) }
+
+    //this method will used for the handling attendance upload
+    handleBulkEmployeeUpload = () => { this.setState({ bulkEmployeeUpload: !this.state.bulkEmployeeUpload }) }
+
+
     render() {
         const { fromAction } = this.state
         return fromAction ? this.loadRegisterForm() : this.loadRegisterTable();
@@ -73,8 +85,17 @@ class UserManagement extends Component {
         const { profileImageUpload, profileImageUrl } = this.state
         const data = { profileImageUpload, profileImageUrl }
         return <Card>
-            <center><h1>Register User</h1></center>
+            <div>
+               <span style={{ float:"left", marginLeft:10}}><h1>Register User</h1></span> 
+               <span style={{ float:"right", marginRight:30, marginTop:20}}>
+                   <Button variant="contained" color="primary" onClick={this.handleBulkEmployeeModel} >Upload Bulk Employee</Button>
+                </span> 
+               <span style={{ float:"right", marginRight:30, marginTop:20}}>
+                   <Button variant="contained" color="primary" onClick={this.handleDownloadExcel} >Download Employee Excel Template </Button>
+                </span>
+            </div>
             {common_message && <Alert severity={color} >{common_message}</Alert>}
+            {this.loadBulkEmployeeModel()}
             <RegsiterForm
                 stateData={data}
                 loadMethod={this.handleLoadValue}
@@ -91,38 +112,68 @@ class UserManagement extends Component {
         const { attendanceModel, attendanceUrl, attendanceUpload } = this.state
         return <Dialog open={attendanceModel} keepMounted onClose={this.handleAttendanceModel} aria-labelledby="alert-dialog-slide-title" aria-describedby="alert-dialog-slide-description"   >
             <DialogTitle id="alert-dialog-slide-title">{'Upload excel attendance file'}</DialogTitle>
+                <AttendanceForm
+                    handleAttendanceModel={this.handleAttendanceModel}
+                    attendanceUrl={attendanceUrl}
+                    attendanceUpload={attendanceUpload}
+                    loadAttendanceUrl={this.loadAttendanceUrl}
+                    loadingCircle={this.loadingCircle}
+                    loadFileUrlName={this.loadFileUrlName}
+                 />
+        </Dialog>
+    }
+
+    // this method will used for the loading attendance model
+    loadBulkEmployeeModel = () => {
+        const { bulkEmployeeModel, bulkEmployeeUrl, bulkEmployeeUpload } = this.state
+        return <Dialog open={bulkEmployeeModel} keepMounted onClose={this.handleBulkEmployeeModel} aria-labelledby="alert-dialog-slide-title" aria-describedby="alert-dialog-slide-description"   >
+            <DialogTitle id="alert-dialog-slide-title">{'Upload bulk of employees excel file'}</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
-                    {(attendanceUrl === "" || attendanceUrl === undefined) ? (attendanceUpload ? this.loadingCircle("Uploading") : this.loadAttendanceUrl())
-                        : <h5>{this.loadFileUrlName(attendanceUrl)}</h5>}
+                    {(bulkEmployeeUrl === "" || bulkEmployeeUrl === undefined) ? (bulkEmployeeUpload ? this.loadingCircle("Uploading") : this.loadBulkEmployeeUrl())
+                        : <h5>{this.loadFileUrlName(bulkEmployeeUrl)}</h5>}
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={this.handleAttendanceModel} color="primary">Cancel</Button>
+                <Button onClick={this.handleBulkEmployeeModel} color="primary">Cancel</Button>
             </DialogActions>
         </Dialog>
     }
 
     // this method will used for th show input for attendance file
     loadAttendanceUrl = () => <label htmlFor="attendanceFile">
-        <input name="attendanceFile" type="file" onChange={event => this.handleAttendanceFileChange(event)} />
+        <input name="attendanceFile" type="file" onChange={event => this.handleFileChange(event, "attendance")} />
+    </label>
+
+    // this method will used for th show input for attendance file
+    loadBulkEmployeeUrl = () => <label htmlFor="bulkEmployeeFile">
+        <input name="bulkEmployeeFile" type="file" onChange={event => this.handleFileChange(event,"bulkEmployee")} />
     </label>
 
     // this method will used for the showing attendance file name
     loadFileUrlName = (fileUrl) => {
-        let fileArray = fileUrl.split("\\");
+        console.log("File url",fileUrl);
+        let fileArray = fileUrl && fileUrl.split("\\");
         return fileArray.length > 0 ? fileArray[5] : "";
     }
 
+    // this method will help to download the excle
+    handleDownloadExcel=async()=>{
+        const { DownloadExcel } = this.props.FileAction
+        const { authorization } = this.props.LoginState
+        await DownloadExcel(authorization);
+    }
+
     // this method will used for the handling the attendance file upload
-    handleAttendanceFileChange = async (event) => {
+    handleFileChange = async (event,fileType) => {
         event.preventDefault();
         let imageFile = event.target.files[0];
         if (imageFile) {
             var reader = new FileReader();
             reader.onload = async () => {
                 let byteArray = reader.result.split(",")
-                this.uploadAttendanceFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type)
+                fileType  === "attendance" ? this.uploadAttendanceFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type)
+                    :this.uploadBulkEmployeeFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type)
             };
             reader.onerror = function (error) { console.log('Error: ', error); };
             await reader.readAsDataURL(imageFile);
@@ -131,7 +182,7 @@ class UserManagement extends Component {
 
     // this method will used for the loading Resgister table
     loadRegisterTable = () => {
-        const { load }=this.state
+        const { load } = this.state
         return <>
             {this.loadAttendanceModel()}
             {load ? this.loadingCircle("Loading...") 
@@ -145,13 +196,36 @@ class UserManagement extends Component {
     // this method will used for the reseting the value of file state variable
     clearFileUrl = () => { this.setState({ profileImageUrl: "" }) }
 
+    uploadBulkEmployeeFile = async (fileData, name, type) => {
+        const { SaveFileDetails, SaveFileData } = this.props.FileAction
+        const { authorization } = this.props.LoginState
+        const { GetEmployeeList }=this.props.MasterDataAction
+        let newFileData = [{
+            "fileName": name,
+            "description": "registration",
+            "contentType":  type === "application/vnd.ms-excel" ? 'xls':'xlsx',
+            "content": `${fileData}`
+        }]
+        await this.handleBulkEmployeeUpload();
+        await SaveFileDetails(newFileData, authorization)
+        setTimeout(async () => {
+            await loadMessage()
+            await GetEmployeeList(0,100,authorization);
+            await SaveFileData();
+            await this.handleBulkEmployeeUpload();
+            await this.handleBulkEmployeeModel();
+            await this.handleRegisterFromActions();
+        }, API_EXE_TIME)
+        this.setState({ attendanceUrl: (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && this.props.FileState.fileUrl[0] })
+    }
+
     uploadAttendanceFile = async (fileData, name, type) => {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
         const { authorization } = this.props.LoginState
         let newFileData = [{
             "fileName": name,
             "description": "attendance",
-            "contentType": 'xls',
+            "contentType": type === "application/vnd.ms-excel" ? 'xls':'xlsx',
             "content": `${fileData}`
         }]
         await this.handleAttendanceUpload();
@@ -205,11 +279,32 @@ class UserManagement extends Component {
             await GetEmployeeList(0,20,authorization)
             await loadMessage()
             alert("Your Employee Data Saved");
-            this.clearFileUrl();
-            this.handleLoadValue();
+            await this.clearFileUrl();
+            await this.handleLoadValue();
+            await this.handleRegisterFromActions();
         }, API_EXE_TIME)
     }
 }
+
+let AttendanceForm = (props) => {
+    const { pristine, reset, submitting, handleSubmit, attendanceUrl, attendanceUpload, loadFileUrlName, handleAttendanceModel, loadingCircle,loadAttendanceUrl } = props
+    return  <form onSubmit={handleSubmit((values)=>{console.log("Data ", values)})}>
+        <DialogContent>
+            <Field name="latestAttFromDate" component={renderDateTimePicker} label="From Date" /> &nbsp;&nbsp;&nbsp;
+            <Field name="latestAttToDate" component={renderDateTimePicker} label="To Date" /> <br /> <br/>
+            {(attendanceUrl === "" || attendanceUrl === undefined) ? (attendanceUpload ? loadingCircle("Uploading") : loadAttendanceUrl())
+                : <h5>{loadFileUrlName(attendanceUrl)}</h5>}
+        </DialogContent>
+        <DialogActions>
+            <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;&nbsp;&nbsp;
+            <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button> &nbsp;&nbsp;&nbsp;&nbsp;
+            <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); await handleAttendanceModel()}}> Cancel</Button>
+        </DialogActions>
+    </form>
+}
+
+const afterSubmit = (result, dispatch) => {dispatch(reset('AttendanceUploadFrom'))};
+AttendanceForm=reduxForm({ form: 'AttendanceUploadFrom', onSubmitSuccess: afterSubmit })(AttendanceForm);
 
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({

@@ -7,6 +7,7 @@ import { bindActionCreators } from 'redux';
 import * as ClientAction from "../../redux/actions/ClientAction";
 import * as MasterDataAction from "../../redux/actions/MasterDataAction";
 import * as FileAction from "../../redux/actions/FileAction"
+import { GetClientRevenueData } from "../../redux/actions/DashboardAction"
 import { API_EXE_TIME } from '../../assets/config/Config';
 
 class ClientManagment extends Component {
@@ -162,16 +163,18 @@ class ClientManagment extends Component {
             ...values,
             "gstUrl": (gstFileUrl === "" || gstFileUrl === undefined) ? values.gstUrl  :gstFileUrl,
             "tanUrl": (tanFileUrl === "" || tanFileUrl === undefined) ? values.tanUrl : tanFileUrl,
-            "addressDtos": [values.addressDtos],
+            "addressDtos": values.addressDtos ? [values.addressDtos] : null,
             rateCardDtos,
             "active": true,
-            "bankDetailsDtoList": [values.bankDetailsDtoList]
+            "bankDetailsDtoList": values.bankDetailsDtoList ? [values.bankDetailsDtoList] : null
         }
         await SaveClientData(newUserData, authorization)
         setTimeout(async () => {
             await loadMessage()
+            await GetClientRevenueData(authorization,{});
             await GetClientList(0, 20, authorization);
             await this.setState({tanFileUrl : "", gstFileUrl:""})
+            await alert("Your client details are saved");
             this.handleCreateClient();
         }, API_EXE_TIME)
     }
@@ -183,6 +186,7 @@ class ClientManagment extends Component {
         clientId && await DeleteClient(clientId, authorization);
         setTimeout(async () => {
             await loadMessage();
+            await GetClientRevenueData(authorization,{});
             await GetClientList(0, 20, authorization);
             await this.handleDeleteModel();
             await this.handleLoadClientList(false);
