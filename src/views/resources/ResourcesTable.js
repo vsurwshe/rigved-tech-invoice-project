@@ -18,6 +18,7 @@ import ResourceRateCardTable from "./ResourceRateCardTable";
 import moment from 'moment';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import { renderLoading } from '../utilites/FromUtilites';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -272,10 +273,6 @@ const renderTextField = (props) => {
     required={true}
   />
 }
-
-
-// this method will used for the loading circule progress bar
-const loadingCircle = () => <center> Saving.... <CircularProgress size={40} /> </center>
 
 // this method will used for the loading employee list
 const LoadEmployeeList = (props) => {

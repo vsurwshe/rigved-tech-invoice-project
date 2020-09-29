@@ -2,10 +2,10 @@ import React, { useState, forwardRef } from 'react';
 import { reduxForm, change, Field, formValueSelector } from 'redux-form';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Button, Grid, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Slide, AppBar, Toolbar, IconButton, CircularProgress } from '@material-ui/core';
+import { Button, Grid, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Slide, AppBar, Toolbar, IconButton } from '@material-ui/core';
 import useStyles from "../client/Styles";
 import { Alert, Autocomplete } from '@material-ui/lab';
-import { renderDateTimePicker, renderAutocompleteWithProps } from '../utilites/FromUtilites';
+import { renderDateTimePicker, renderAutocompleteWithProps, renderLoading } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
 import { GetBillingData } from "../../redux/actions/DashboardAction"
 import * as ClientAction from "../../redux/actions/ClientAction";
@@ -127,7 +127,7 @@ const LoadGird = (props) => {
                 {SectionTwo({ classes, "mainProps": props.mainProps })}
             </Grid>
         </Grid>
-        <center>{loading && LoadingCircle("Saving")}</center>
+        <center>{loading && renderLoading({message:"Saving", size:40})}</center>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
                 {viewSectionThree && SectionThree({ "mainProps": props.mainProps , viewSectionThree, setViewSectionThree, projectIdList, setLoading, setViewInvoice})}
@@ -135,9 +135,6 @@ const LoadGird = (props) => {
         </Grid>
     </>
 }
-
-// this method will used for the loading bar
-const LoadingCircle = (message) => <center> {message} <CircularProgress size={40} /> </center>
 
 // this method will used for the load the left side part 
 const SectionOne = (data) => {

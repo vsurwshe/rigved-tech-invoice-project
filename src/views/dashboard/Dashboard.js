@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, CircularProgress } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import SimplePieChart from "./chart/SimplePieChart";
 import StackedBarChart from "./chart/StackedBarChart";
 import SimpleLineChart from "./chart/SimpleLineChart";
@@ -8,6 +8,7 @@ import SideBySideBarChart from './chart/SideBySideBarChart';
 import * as DashboardAction from "../../redux/actions/DashboardAction";
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { renderLoading } from '../utilites/FromUtilites';
 
 class Dashboard extends Component {
   state = { 
@@ -52,11 +53,8 @@ class Dashboard extends Component {
   
   render() { 
     const { load }=this.state
-    return load ? this.loadingCircle("Loading Dashboard....") : <>{this.loadGird()}</>
+    return load ? renderLoading({ message:"Loading Dashboard....", size:80}) : <>{this.loadGird()}</>
   }
-
-  // this method used for the show circular progress bar 
-  loadingCircle = (message) => <center> <h3>{message}</h3> <CircularProgress size={80} /> </center>
 
   loadGird=()=>{
     return <> {this.loadPageTitle()}
@@ -166,22 +164,22 @@ class Dashboard extends Component {
     console.log("Calling Filter Chart Api", props)
   }
 
-  // this method will filter by client
-  filterByClient=(propsData)=>{
-    const { clientBillingData, clientEmployeeData }=this.props.DashboardState
-    if(propsData){
-      let keyValue=propsData.value;
-      let tempBillingFilter = (clientBillingData.length >0) && clientBillingData.filter((item)=>item.hasOwnProperty(propsData.value))
-      .map((item)=> {return {"xaxis":item.xaxis , [keyValue] : item.[keyValue]}});
-      let tempEmployeeFilter = (clientEmployeeData.length >0) && clientEmployeeData.filter((item)=>item.hasOwnProperty(propsData.value))
-      .map((item)=> {return {"xaxis":item.xaxis , [keyValue] : item.[keyValue]}});
-      this.handelBillingData(tempBillingFilter);
-      this.handelEmployeeData(tempEmployeeFilter);
-    }else{
-      this.handelBillingData(clientBillingData);
-      this.handelEmployeeData(clientEmployeeData);
-    }
-  }
+  // // this method will filter by client
+  // filterByClient=(propsData)=>{
+  //   const { clientBillingData, clientEmployeeData }=this.props.DashboardState
+  //   if(propsData){
+  //     let keyValue=propsData.value;
+  //     let tempBillingFilter = (clientBillingData.length >0) && clientBillingData.filter((item)=>item.hasOwnProperty(propsData.value))
+  //     .map((item)=> {return {"xaxis":item.xaxis , [keyValue] : item.[keyValue]}});
+  //     let tempEmployeeFilter = (clientEmployeeData.length >0) && clientEmployeeData.filter((item)=>item.hasOwnProperty(propsData.value))
+  //     .map((item)=> {return {"xaxis":item.xaxis , [keyValue] : item.[keyValue]}});
+  //     this.handelBillingData(tempBillingFilter);
+  //     this.handelEmployeeData(tempEmployeeFilter);
+  //   }else{
+  //     this.handelBillingData(clientBillingData);
+  //     this.handelEmployeeData(clientEmployeeData);
+  //   }
+  // }
 
   // this method will filter by project
   filterByProject=(propsData)=>{

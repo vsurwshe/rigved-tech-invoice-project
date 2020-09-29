@@ -1,9 +1,9 @@
 import React from 'react';
 import { reduxForm, Field, formValueSelector, change } from 'redux-form';
 import { connect } from 'react-redux';
-import { Button, Grid, CircularProgress } from '@material-ui/core';
+import { Button, Grid } from '@material-ui/core';
 import useStyles from "../client/Styles";
-import { renderTextField, renderDateTimePicker, renderAutocompleteWithProps, renderFileInput, renderAutocomplete, renderNumberField, renderTextAreaField, renderTextHiddenField } from '../utilites/FromUtilites';
+import { renderTextField, renderDateTimePicker, renderAutocompleteWithProps, renderFileInput, renderAutocomplete, renderNumberField, renderTextAreaField, renderTextHiddenField, renderLoading } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
 import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
@@ -144,7 +144,7 @@ const SectionTwo = (data) => {
         <Field name="projectCost" component={renderNumberField} className={classes.textField} label="Project Cost" helperText={(initialValues === undefined) && "Ex. 20000"} disabled={operation === FromActions.VI} validate={[Required]} />
         <Field name="projectDesc" component={renderTextAreaField} fullWidth maxRows={2} label="Project Description" disabled={operation === FromActions.VI} />
         {operation === FromActions.CR &&
-            <>{(projectContractFileUpload) ? loadingCircle()
+            <>{(projectContractFileUpload) ? renderLoading({message:"Uploading..", size:40})
                 : (projectContractFileUrl ? LoadFileUrl({ "url": projectContractFileUrl, "cid": 1, "mainProps": data, "componentName": "Purchase Order Image", "style": { height: "60%", width: "100%" } })
                     : <Field name="contractAttachmentUrl" component={renderFileInput} fullWidth type="file" successFunction={uploadFile} lable="Project File" />)
             }</>
@@ -166,9 +166,6 @@ const GetPhotos = async (parameter) => {
     const { authorization } = parameter.mainProps.props.LoginState
     return await FetchPhoto(parameter.url, authorization, parameter.cid, "application/pdf");
 }
-
-// this method will used for the loading circule progress bar
-const loadingCircle = () => <center> Uploading <CircularProgress size={40} /> </center>
 
 // this method will used for the loading tabs into project from
 const SectionThree = (data) => {

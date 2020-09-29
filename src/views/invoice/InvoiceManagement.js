@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import InvoiceFrom from './InvoiceFrom';
 import { connect } from 'react-redux';
-import { Card, CircularProgress } from '@material-ui/core';
+import { Card } from '@material-ui/core';
 import InvoiceTable from './InvoiceTable';
 import * as ClientAction from "../../redux/actions/ClientAction";
 import * as InvoiceAction from '../../redux/actions/InvoiceAction';
 import { bindActionCreators } from 'redux';
 import { FromActions } from '../../assets/config/Config';
-
-
+import { renderLoading } from '../utilites/FromUtilites';
 class InvoiceManagement extends Component {
     state = {  
         loadInvoiceList:false,
@@ -49,14 +48,12 @@ class InvoiceManagement extends Component {
     }
 
     loadInvoiceView=(invoiceData)=>{
-        console.log("Called liv", invoiceData)
         this.loadInvoiceFrom({
             "name":"vishva"
         },true)
     }
 
     loadInvoiceFrom=(invoiceData, viewInvoice)=>{
-        console.log("Called lif", invoiceData)
         return  <InvoiceFrom 
             cancle={this.handleInvoiceFromAction}
             viewInvoiceData={invoiceData}
@@ -66,12 +63,8 @@ class InvoiceManagement extends Component {
 
     loadInvoiceTable=()=>{
         const { loadInvoiceList }=this.state
-        return  < div style={{ paddingRight: 10 }}>  {loadInvoiceList ? this.loadingCircle() :this.loadingInvoiceTable()} </div>
+        return  < div style={{ paddingRight: 10 }}>  {loadInvoiceList ? renderLoading({ message:"Loading Invoice Management", size:80}) :this.loadingInvoiceTable()} </div>
     }
-
-    // this method used for the show circular progress bar 
-    loadingCircle = () => <center> <h3>Project Management</h3> <CircularProgress size={80} /> </center>
-
 
     loadingInvoiceTable=()=>{
         return <InvoiceTable 
