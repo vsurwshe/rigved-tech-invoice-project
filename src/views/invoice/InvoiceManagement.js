@@ -6,6 +6,7 @@ import InvoiceTable from './InvoiceTable';
 import * as ClientAction from "../../redux/actions/ClientAction";
 import * as InvoiceAction from '../../redux/actions/InvoiceAction';
 import { bindActionCreators } from 'redux';
+import { FromActions } from '../../assets/config/Config';
 
 
 class InvoiceManagement extends Component {
@@ -13,7 +14,8 @@ class InvoiceManagement extends Component {
         loadInvoiceList:false,
         fromAction:false,
         operations:"",
-        invoiceData:[]
+        invoiceData:[],
+        pdfInvoiceData:[]
     };
 
     componentDidMount=async()=>{
@@ -32,16 +34,33 @@ class InvoiceManagement extends Component {
     handleInvoiceLoadvalue=()=>{ this.setState({loadInvoiceList: !this.state.loadInvoiceList})}
     
     // this method will handle the form action
-    handleInvoiceFromAction=(invoiceData,operations)=>{this.setState({ invoiceData,fromAction: !this.state.fromAction, operations})}
+    handleInvoiceFromAction=async(invoiceData,operations)=>{
+        if(operations === FromActions.VI){
+           await this.loadInvoiceView(invoiceData);
+           await this.setState({operations, fromAction: !this.state.fromAction})
+        }else{
+            this.setState({ invoiceData,fromAction: !this.state.fromAction, operations})
+        }
+    }
 
-    render() {
+    render() { 
         const { fromAction, invoiceData }=this.state
         return <Card> {fromAction ? this.loadInvoiceFrom(invoiceData) : this.loadInvoiceTable()}</Card>;
     }
 
-    loadInvoiceFrom=(invoiceData)=>{
+    loadInvoiceView=(invoiceData)=>{
+        console.log("Called liv", invoiceData)
+        this.loadInvoiceFrom({
+            "name":"vishva"
+        },true)
+    }
+
+    loadInvoiceFrom=(invoiceData, viewInvoice)=>{
+        console.log("Called lif", invoiceData)
         return  <InvoiceFrom 
             cancle={this.handleInvoiceFromAction}
+            viewInvoiceData={invoiceData}
+            viewInvoiceByID={viewInvoice}
         />
     }
 

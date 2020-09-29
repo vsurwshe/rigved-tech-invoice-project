@@ -36,6 +36,18 @@ const GenerateInvoice = (invoiceData, authroizationKey) => {
     }
 }
 
+const GetPDFInvoiceData = (invoiceId, authroizationKey) => {
+    return (dispatch) => {
+        return CreateInstance()
+            .get('/innvoice/create/'+invoiceId,{headers: { 
+                'Content-Type': 'application/json',
+                Authorization: authroizationKey 
+            }})
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
 const GenerateInvoicePDF = (invoiceData, authroizationKey) => {
     return (dispatch) => {
         return CreateInstance()
@@ -75,6 +87,13 @@ export function SaveInvoiceEmployeeData(invoiceData) {
     }
 }
 
+export function SavePDFInvoiceData(invoiceData) {
+    return {
+        type: "SAVE_PDF_INVOICE_DATA",
+        invoiceData
+    }
+}
+
 export function SaveGenratedInvoiceData(invoiceData) {
     return {
         type: "SAVE_INVOICE_CREATE_PDF",
@@ -85,5 +104,6 @@ export function SaveGenratedInvoiceData(invoiceData) {
 export{
     GetInvoiceList,
     GenerateInvoice,
-    GenerateInvoicePDF
+    GenerateInvoicePDF,
+    GetPDFInvoiceData
 }

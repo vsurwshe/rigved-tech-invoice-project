@@ -23,14 +23,14 @@ const InvoiceTable=(props)=>{
         title: "",
         width:8,
         render: (rowData)=> {
-            return<VisibilityIcon variant="contained" color="primary" onClick={()=>fromAction(rowData.data,FromActions.VI,true)} />
+            return<VisibilityIcon variant="contained" color="primary" onClick={()=>fromAction(rowData.data,FromActions.VI)} />
         }
       },
       {
         title: "",
         width:8,
         render: (rowData)=> {
-            return<CancelIcon variant="contained" color="secondary" onClick={()=>fromAction(rowData.data,FromActions.ED,true)} />
+            return<CancelIcon variant="contained" color="secondary" onClick={()=>fromAction(rowData.data,FromActions.DE,true)} />
         }
       }
     ];

@@ -26,7 +26,7 @@ const Transition = forwardRef(function Transition(props, ref) { return <Slide di
 
 let InvoiceFrom = (props) => {
     var classes = useStyles();
-    const { pristine, reset, submitting, handleSubmit, cancle } = props
+    const { pristine, reset, submitting, handleSubmit, cancle, viewInvoiceByID } = props
     const { SaveInvoiceEmployeeData } = props.InvoiceAction
     const [viewInvoice, setViewInvoice] = useState(false);
     const [projectIdList, setProjectIdList] = useState([])
@@ -36,6 +36,7 @@ let InvoiceFrom = (props) => {
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit((values) => PostInvoiceData({ "mainProps": props, values, projectIdList, viewSectionThree, setSubmit, setViewSectionThree, setLoading }))}>
             {LoadGird({ "mainProps": props, projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, loading, setLoading, setViewInvoice })}
+            {viewInvoiceByID && setViewInvoice(viewInvoiceByID)}
             {ShowViewInvoice({ "mainProps": props, classes, viewInvoice, setViewInvoice })}
             <div className={classes.buttonStyle}>
                 <center>
