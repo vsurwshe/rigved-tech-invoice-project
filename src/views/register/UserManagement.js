@@ -119,12 +119,8 @@ class UserManagement extends Component {
                     loadAttendanceUrl={this.loadAttendanceUrl}
                     loadingCircle={this.loadingCircle}
                     loadFileUrlName={this.loadFileUrlName}
-<<<<<<< HEAD
                     mainProps={this.props}
                 />
-=======
-                 />
->>>>>>> 0.14.32: Implemented structrised dashboard filter from
         </Dialog>
     }
 
@@ -147,9 +143,9 @@ class UserManagement extends Component {
 
     // this method will used for th show input for attendance file
     loadAttendanceUrl = (propsData) => {
-        const {latestAttFromDate, latestAttToDate, reset }=propsData
+        const {latestAttFromDate, latestAttToDate }=propsData
         return <label htmlFor="attendanceFile">
-        <input name="attendanceFile" type="file" onChange={event => this.handleFileChange(event, "attendance", latestAttFromDate, latestAttToDate, reset)} />
+        <input name="attendanceFile" type="file" onChange={event => this.handleFileChange(event, "attendance", latestAttFromDate, latestAttToDate)} />
     </label>
     }
     
@@ -174,14 +170,14 @@ class UserManagement extends Component {
     }
 
     // this method will used for the handling the attendance file upload
-    handleFileChange = async (event,fileType, latestAttFromDate, latestAttToDate, reset ) => {
+    handleFileChange = async (event,fileType, latestAttFromDate, latestAttToDate ) => {
         event.preventDefault();
         let imageFile = event.target.files[0];
         if (imageFile) {
             var reader = new FileReader();
             reader.onload = async () => {
                 let byteArray = reader.result.split(",")
-                fileType  === "attendance" ? this.uploadAttendanceFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type, latestAttFromDate, latestAttToDate, reset)
+                fileType  === "attendance" ? this.uploadAttendanceFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type, latestAttFromDate, latestAttToDate)
                     :this.uploadBulkEmployeeFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type)
             };
             reader.onerror = function (error) { console.log('Error: ', error); };
@@ -313,10 +309,7 @@ class UserManagement extends Component {
 
 let AttendanceForm = (props) => {
     const { pristine, reset, submitting, handleSubmit, attendanceUrl, attendanceUpload, loadFileUrlName, handleAttendanceModel, loadingCircle,loadAttendanceUrl } = props
-<<<<<<< HEAD
     const { latestAttFromDate, latestAttToDate}=props.mainProps
-=======
->>>>>>> 0.14.32: Implemented structrised dashboard filter from
     return  <form onSubmit={handleSubmit((values)=>{console.log("Data ", values)})}>
         <DialogContent>
             <Field name="latestAttFromDate" component={renderDateTimePicker} label="From Date" /> &nbsp;&nbsp;&nbsp;
