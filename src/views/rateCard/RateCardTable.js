@@ -8,7 +8,6 @@ import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 const RateCardTable = (propsData) => {
   const { rateCardDtos,setRateCardDtos, Domains, SkillCategory, SkillSet, rateOptions }=propsData
-<<<<<<< HEAD
   const columns =[
       {   title: "Domain", 
           field: "domainName",
@@ -57,55 +56,6 @@ const RateCardTable = (propsData) => {
       }
   ]
   return  <div style={{ maxWidth: "100%" }}>
-=======
-    const columns =[
-        {   title: "Domain", 
-            field: "domainName",
-            editComponent :props =>{
-                return LoadAutoComplete({ id:"domainName", lable:"Domain", props, optionData:Domains })
-            }
-        },
-        {   title: "Category", 
-            field: "skillCategory",
-            editComponent :props =>{
-                return LoadAutoComplete({ id:"skillCategory", lable:"Category", props, optionData:SkillCategory })
-            }
-        },
-        {   title: "Skill", 
-            field: "skillSet",
-            editComponent :props =>{
-                return LoadAutoComplete({ id:"skillSet", lable:"Skill", props, optionData:SkillSet }) 
-            }
-        },
-        {   title: "Rate\u00a0Options", 
-            field: "rateOptions",
-            editComponent :props =>{
-                return LoadAutoComplete({ id:"rateOptions", lable:"Rate Options", props, optionData:rateOptions }) 
-            }
-        },
-        {   title: "Form\u00a0Year", 
-            field: "fromYearOfExp",
-            editComponent :props =>{ return LoadSelect({props}) }
-        },
-        {   title: "To\u00a0Year", 
-            field: "toYearOfExp",
-            editComponent :props =>{ return LoadSelect({props})}
-        },
-        {   title: "Rate", 
-            field: "rate",
-            editComponent :props =>{
-                return  <TextField
-                id="rate"
-                label="Rate"
-                onChange={(event) => props.onChange(event.target.value)}
-                error={props.touched && props.invalid}
-                helperText={(props.touched && props.error) && props.error}
-              />
-            }
-        }
-    ]
-    return  <div style={{ maxWidth: "100%" }}>
->>>>>>> 0.12.6: Add the two fileds in register from and rate crad from
     <MaterialTable
       title=""
       columns={columns}

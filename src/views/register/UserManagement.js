@@ -119,12 +119,8 @@ class UserManagement extends Component {
                     loadAttendanceUrl={this.loadAttendanceUrl}
                     loadingCircle={this.loadingCircle}
                     loadFileUrlName={this.loadFileUrlName}
-<<<<<<< HEAD
                     mainProps={this.props}
                 />
-=======
-                 />
->>>>>>> 0.14.32: Implemented structrised dashboard filter from
         </Dialog>
     }
 
@@ -255,6 +251,7 @@ class UserManagement extends Component {
             await attendanceFormReset();
             await dispatch(loadMessage());
             await SaveFileData();
+            await this.clearFileUrl();
             await this.handleAttendanceUpload();
             await this.handleAttendanceModel();
         }, API_EXE_TIME)
@@ -266,8 +263,9 @@ class UserManagement extends Component {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
         const { authorization } = this.props.LoginState
         const { dispatch }=this.props
+        let fileName= name && name.split(".")[0];
         let newFileData = [{
-            "fileName": name,
+            fileName,
             "description": "ClientDetail",
             "contentType": 'png',
             "content": `${fileData}`
@@ -313,10 +311,7 @@ class UserManagement extends Component {
 
 let AttendanceForm = (props) => {
     const { pristine, reset, submitting, handleSubmit, attendanceUrl, attendanceUpload, loadFileUrlName, handleAttendanceModel, loadingCircle,loadAttendanceUrl } = props
-<<<<<<< HEAD
     const { latestAttFromDate, latestAttToDate}=props.mainProps
-=======
->>>>>>> 0.14.32: Implemented structrised dashboard filter from
     return  <form onSubmit={handleSubmit((values)=>{console.log("Data ", values)})}>
         <DialogContent>
             <Field name="latestAttFromDate" component={renderDateTimePicker} label="From Date" /> &nbsp;&nbsp;&nbsp;
