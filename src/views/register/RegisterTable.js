@@ -18,6 +18,7 @@ const RegsiterTable=(props)=>{
         { title: 'Email', field: 'emailId' },
         { title: 'Designation', field: 'designation' },
         { title: 'Mobile\u00a0Number', field: 'mobileNumber', width: 10 },
+        { title: 'Last\u00a0Attendance\u00a0Date', field: 'lastUploadedAttendance'},
         // {
         //   title: "",
         //   width:8,
@@ -43,7 +44,7 @@ const RegsiterTable=(props)=>{
 
   // Creating rows
   const data = (EmployeeList && EmployeeList.length > 0) && EmployeeList.map((item, key) => {
-    return { "key": (key + 1), "data": item,"employeeNumber":item.employeeNumber,"designation":item.designation, "emailId": item.emailId,"mobileNumber": item.mobileNumber, "name": item.firstName+" "+item.lastName  }
+    return { "key": (key + 1), "data": item,"employeeNumber":item.employeeNumber,"designation":item.designation, "emailId": item.emailId,"mobileNumber": item.mobileNumber, "name": item.firstName+" "+item.lastName, "lastUploadedAttendance":item.latestAttFromDate && item.latestAttFromDate+"-"+item.latestAttToDate   }
   });
 
   return <div style={{ maxWidth: "100%" }}>
