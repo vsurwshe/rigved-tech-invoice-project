@@ -10,7 +10,7 @@ import { loadMessage } from "../../redux/actions/ClientAction"
 import { API_EXE_TIME } from '../../assets/config/Config';
 import { bindActionCreators } from 'redux';
 import RegisterTable from './RegisterTable';
-import { Field, reduxForm, reset } from 'redux-form';
+import { Field, formValueSelector, reduxForm, reset } from 'redux-form';
 import { renderDateTimePicker } from '../utilites/FromUtilites';
 
 class UserManagement extends Component {
@@ -119,7 +119,8 @@ class UserManagement extends Component {
                     loadAttendanceUrl={this.loadAttendanceUrl}
                     loadingCircle={this.loadingCircle}
                     loadFileUrlName={this.loadFileUrlName}
-                 />
+                    mainProps={this.props}
+                />
         </Dialog>
     }
 
@@ -141,9 +142,13 @@ class UserManagement extends Component {
     }
 
     // this method will used for th show input for attendance file
-    loadAttendanceUrl = () => <label htmlFor="attendanceFile">
-        <input name="attendanceFile" type="file" onChange={event => this.handleFileChange(event, "attendance")} />
+    loadAttendanceUrl = (propsData) => {
+        const {latestAttFromDate, latestAttToDate }=propsData
+        return <label htmlFor="attendanceFile">
+        <input name="attendanceFile" type="file" onChange={event => this.handleFileChange(event, "attendance", latestAttFromDate, latestAttToDate)} />
     </label>
+    }
+    
 
     // this method will used for th show input for attendance file
     loadBulkEmployeeUrl = () => <label htmlFor="bulkEmployeeFile">
@@ -165,14 +170,14 @@ class UserManagement extends Component {
     }
 
     // this method will used for the handling the attendance file upload
-    handleFileChange = async (event,fileType) => {
+    handleFileChange = async (event,fileType, latestAttFromDate, latestAttToDate ) => {
         event.preventDefault();
         let imageFile = event.target.files[0];
         if (imageFile) {
             var reader = new FileReader();
             reader.onload = async () => {
                 let byteArray = reader.result.split(",")
-                fileType  === "attendance" ? this.uploadAttendanceFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type)
+                fileType  === "attendance" ? this.uploadAttendanceFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type, latestAttFromDate, latestAttToDate)
                     :this.uploadBulkEmployeeFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type)
             };
             reader.onerror = function (error) { console.log('Error: ', error); };
@@ -222,8 +227,12 @@ class UserManagement extends Component {
     uploadAttendanceFile = async (fileData, name, type) => {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
         const { authorization } = this.props.LoginState
+        const { latestAttFromDate, latestAttToDate }= this.props
+        let fileName= name && name.split(".")[0];
         let newFileData = [{
-            "fileName": name,
+            fileName,
+            latestAttFromDate,
+            latestAttToDate,
             "description": "attendance",
             "contentType": type === "application/vnd.ms-excel" ? 'xls':'xlsx',
             "content": `${fileData}`
@@ -288,15 +297,19 @@ class UserManagement extends Component {
 
 let AttendanceForm = (props) => {
     const { pristine, reset, submitting, handleSubmit, attendanceUrl, attendanceUpload, loadFileUrlName, handleAttendanceModel, loadingCircle,loadAttendanceUrl } = props
+    const { latestAttFromDate, latestAttToDate}=props.mainProps
     return  <form onSubmit={handleSubmit((values)=>{console.log("Data ", values)})}>
         <DialogContent>
             <Field name="latestAttFromDate" component={renderDateTimePicker} label="From Date" /> &nbsp;&nbsp;&nbsp;
             <Field name="latestAttToDate" component={renderDateTimePicker} label="To Date" /> <br /> <br/>
-            {(attendanceUrl === "" || attendanceUrl === undefined) ? (attendanceUpload ? loadingCircle("Uploading") : loadAttendanceUrl())
-                : <h5>{loadFileUrlName(attendanceUrl)}</h5>}
+            {(attendanceUrl === "" || attendanceUrl === undefined) 
+            ? (attendanceUpload ? loadingCircle("Uploading") : 
+                   (latestAttFromDate && latestAttToDate) && loadAttendanceUrl({latestAttFromDate,latestAttToDate}))
+            : <h5>{loadFileUrlName(attendanceUrl)}</h5>
+            }
         </DialogContent>
         <DialogActions>
-            <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;&nbsp;&nbsp;
+            {/* <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;&nbsp;&nbsp; */}
             <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button> &nbsp;&nbsp;&nbsp;&nbsp;
             <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); await handleAttendanceModel()}}> Cancel</Button>
         </DialogActions>
@@ -306,7 +319,12 @@ let AttendanceForm = (props) => {
 const afterSubmit = (result, dispatch) => {dispatch(reset('AttendanceUploadFrom'))};
 AttendanceForm=reduxForm({ form: 'AttendanceUploadFrom', onSubmitSuccess: afterSubmit })(AttendanceForm);
 
-const mapStateToProps = state => { return state; };
+const selector = formValueSelector('AttendanceUploadFrom')
+const mapStateToProps = state => { 
+    const latestAttFromDate = selector(state, 'latestAttFromDate')
+    const latestAttToDate = selector(state, 'latestAttToDate')
+    return {...state, latestAttToDate, latestAttFromDate}; 
+};
 const mapDispatchToProps = (dispatch) => ({
     LoginActions: bindActionCreators(LoginActions, dispatch),
     MasterDataAction: bindActionCreators(MasterDataAction, dispatch),
