@@ -21,11 +21,12 @@ class InvoiceManagement extends Component {
         const { listOfClient }=this.props.ClientState
         const { invoiceList }=this.props.InvoiceState
         const { authorization }=this.props.LoginState
-        const { GetClientList }=this.props.ClientAction
+        const { GetClientList, loadMessage }=this.props.ClientAction
         const { GetInvoiceList }=this.props.InvoiceAction
         await this.handleInvoiceLoadvalue();
         (listOfClient && listOfClient<=0)&& await GetClientList(0,20,authorization);
         (invoiceList && invoiceList<=0)&& await GetInvoiceList(0,20,authorization);
+        await loadMessage();
         await this.handleInvoiceLoadvalue();
     }
     

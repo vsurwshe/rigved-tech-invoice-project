@@ -121,13 +121,13 @@ const LoadGird = (props) => {
         </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 30 }}>
-                {SectionOne({ classes, "mainProps": props.mainProps, projectIdList, setProjectIdList })}
+                {SectionOne({ classes, "mainProps": props.mainProps, projectIdList, setProjectIdList, setLoading })}
             </Grid>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 30 }} >
                 {SectionTwo({ classes, "mainProps": props.mainProps })}
             </Grid>
         </Grid>
-        <center>{loading && renderLoading({message:"Saving", size:40})}</center>
+        <center>{loading && renderLoading({message:"", size:40})}</center>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
                 {viewSectionThree && SectionThree({ "mainProps": props.mainProps , viewSectionThree, setViewSectionThree, projectIdList, setLoading, setViewInvoice})}
@@ -139,6 +139,7 @@ const LoadGird = (props) => {
 // this method will used for the load the left side part 
 const SectionOne = (data) => {
     const { setProjectIdList } = data
+    const { setLoading }= data
     const { listOfClient } = data.mainProps.ClientState
     const { authorization } = data.mainProps.LoginState
     const { projectListByClient } = data.mainProps.ProjectState
@@ -162,13 +163,17 @@ const SectionOne = (data) => {
 
     return <>
         <Field name="clientName" component={renderAutocompleteWithProps}
-            onChange={(value) => {
-                change('ProjectForm', 'clientName', value.title);
+            onChange={async(value) => {
+                await setLoading(true)
+                await change('ProjectForm', 'clientName', value.title);
                 // SavePurchaseOrderListByName([]);
-                GetProjectListByClient(0, 20, value.id, authorization)
+                await GetProjectListByClient(0, 20, value.id, authorization)
                 // GetPurchaseOrderListByName(0, 20, value.id, authorization)
+                await setLoading(false);
             }}
-            optionData={clientOptions} label="Client Name" validate={[Required]} />
+            optionData={clientOptions} label="Client Name" validate={[Required]} 
+            style={{marginTop:-15}}
+        />
         {/* <Field name="poNum" component={renderAutocompleteWithProps}
             onChange={(value) => {
                 change('ProjectForm', 'poNum', value.title);

@@ -180,7 +180,7 @@ const renderAutocompleteWithProps=({label,name,optionData,className, input, meta
     value={input.value}
     autoHighlight
     options={(optionData && optionData.length >0) ? optionData: []}
-    getOptionLabel={optionData => (optionData && optionData.title) && optionData.title}
+    getOptionLabel={optionData => optionData.title ? optionData.title : optionData}
     onChange={(event, value) => value && input.onChange(value)}
     renderInput={(params) => ( <TextField {...params} label={label} margin="normal"  /> )}
     {...custom}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState} from 'react';
 import { reduxForm, Field, formValueSelector, change } from 'redux-form';
 import { connect } from 'react-redux';
 import { Button, Grid } from '@material-ui/core';
@@ -7,6 +7,7 @@ import { renderTextField, renderDateTimePicker, renderAutocompleteWithProps, ren
 import { Required } from '../utilites/FormValidation';
 import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
+import { loadMessage } from "../../redux/actions/ClientAction"
 import * as FileAction from '../../redux/actions/FileAction'
 import * as PurchaseOrderAction from '../../redux/actions/PurchaseOrderAction';
 import ExpensesTable from '../Expenses/ExpensesTable';
@@ -22,9 +23,11 @@ let ProjectForm = (props) => {
     var classes = useStyles();
     const { SaveMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues, clearFile } = props
     const { operation } = props.stateData
+    const [loading, setLoading] = useState(false);
+    
     return <div className={classes.girdContainer}>
-        <form onSubmit={handleSubmit(SaveMethod)}>
-            {LoadGird(props)}
+        <form onSubmit={handleSubmit(values=>SaveMethod({sendUserValues:values, setLoading}))}>
+            {LoadGird({"mainProps":props, loading, setLoading})}
             <div className={classes.buttonStyle}>
                 <center>
                     {(operation === FromActions.CR || operation === FromActions.ED) && <>
@@ -38,24 +41,26 @@ let ProjectForm = (props) => {
 }
 
 // this method will used for the gird structure of this component
-const LoadGird = (props) => {
+const LoadGird = (propsData) => {
     var classes = useStyles();
-    const {color, common_message}=props.ClientState
-    const { initialValues } = props
+    const {color, common_message}=propsData.mainProps.ClientState
+    const { initialValues, loading, setLoading } = propsData
+    
     return <><Grid container spacing={5}>
         {(common_message)&& showMessage(common_message, color)}
         </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 20 }}>
-                {SectionOne({ classes, props, initialValues })}
+                {SectionOne({ classes, props:propsData.mainProps, initialValues, setLoading })}
             </Grid>
             <Grid item xs={12} sm={6} style={{ paddingTop: 50 }}>
-                {SectionTwo({ classes, props, initialValues })}
+                {SectionTwo({ classes, props:propsData.mainProps, initialValues })}
             </Grid>
         </Grid>
+        {loading && renderLoading({message:"",size:50})}
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
-                {SectionThree({ classes, "mainProps": props })}
+                {SectionThree({ classes, "mainProps": propsData.mainProps })}
             </Grid>
         </Grid>
     </>
@@ -72,13 +77,14 @@ const showMessage=(common_message,color)=>{
 
 // this method will used for the load the left side part 
 const SectionOne = (data) => {
-    const { classes, initialValues } = data
+    const { classes, initialValues, setLoading } = data
     const { operation } = data.props.stateData
-    return <> {(operation === FromActions.CR || operation === FromActions.VIED ) ? LoadFields({ classes, "mainProps": data.props }) : LoadHeader({ classes, initialValues, "mainProps": data.props })}</>
+    return <> {(operation === FromActions.CR || operation === FromActions.VIED ) ? LoadFields({ classes, "mainProps": data.props, setLoading }) : LoadHeader({ classes, initialValues, "mainProps": data.props })}</>
 }
 
 // this method will used for showing fileds as per operations
 const LoadFields = (parameter) => {
+    const { setLoading }=parameter
     const { change } = parameter.mainProps
     const { authorization }=parameter.mainProps.LoginState
     const { listOfClient } = parameter.mainProps.ClientState
@@ -88,7 +94,7 @@ const LoadFields = (parameter) => {
     let projectManagerOptions = ManagerList.length > 0 && ManagerList.map((item, key) => {
         return { title: item.firstName + " " + item.lastName, id: item.accountId }
     })
-    let clientOptions = listOfClient.length > 0 && listOfClient.map((item, key) => {
+    let clientOptions = (listOfClient && listOfClient.length > 0) && listOfClient.map((item, key) => {
         return { title: item.clientName ? item.clientName : "", id: item.id }
     })
     let purchaseOrderOptions = purchaseOrderListByName.length > 0 && purchaseOrderListByName.map((item, key) => {
@@ -101,18 +107,22 @@ const LoadFields = (parameter) => {
         <Field name="projectName" component={renderTextField} fullWidth label="Project Name" helperText="Ex. PRMS" />
         <Field name="projectType" component={renderAutocomplete} optionData={projectTypeOptions} label="Project Type" validate={[Required]} />
         <Field name="clientName" component={renderAutocompleteWithProps}
-            onChange={(value) => {
-                change('ProjectForm', 'clientName', value.title);
-                change('ProjectForm', 'clientId', value.id);
-                GetPurchaseOrderListByName(0,20,value.id,authorization)
+            onChange={async(value) => {
+                await setLoading(true);
+                await change('ProjectForm', 'clientName', value.title);
+                await change('ProjectForm', 'clientId', value.id);
+                await GetPurchaseOrderListByName(0,20,value.id,authorization)
+                await setLoading(false);
             }}
             optionData={clientOptions} label="Client Name" validate={[Required]} />
         <Field name="clientId" component={renderTextHiddenField} />
         <Field name="projectManager" component={renderAutocomplete} optionData={projectManagerOptions} label="Project Manager Name" validate={[Required]} />
         <Field name="purchaseOrder" component={renderAutocompleteWithProps} 
-            onChange={(value) => {
-                change('ProjectForm', 'purchaseOrder', value.title);
-                change('ProjectForm', 'purchaseOrderId', value.id);
+            onChange={async(value) => {
+                await setLoading(true);
+                await change('ProjectForm', 'purchaseOrder', value.title);
+                await change('ProjectForm', 'purchaseOrderId', value.id);
+                await setLoading(false);
             }}
         optionData={purchaseOrderOptions} label="Purchase Order Number (Current)" />
     </>
