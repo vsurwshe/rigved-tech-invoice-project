@@ -143,9 +143,9 @@ class UserManagement extends Component {
 
     // this method will used for th show input for attendance file
     loadAttendanceUrl = (propsData) => {
-        const {latestAttFromDate, latestAttToDate }=propsData
+        const {latestAttFromDate, latestAttToDate, reset }=propsData
         return <label htmlFor="attendanceFile">
-        <input name="attendanceFile" type="file" onChange={event => this.handleFileChange(event, "attendance", latestAttFromDate, latestAttToDate)} />
+        <input name="attendanceFile" type="file" onChange={event => this.handleFileChange(event, "attendance", latestAttFromDate, latestAttToDate, reset)} />
     </label>
     }
     
@@ -169,14 +169,14 @@ class UserManagement extends Component {
     }
 
     // this method will used for the handling the attendance file upload
-    handleFileChange = async (event,fileType, latestAttFromDate, latestAttToDate ) => {
+    handleFileChange = async (event,fileType, latestAttFromDate, latestAttToDate, reset ) => {
         event.preventDefault();
         let imageFile = event.target.files[0];
         if (imageFile) {
             var reader = new FileReader();
             reader.onload = async () => {
                 let byteArray = reader.result.split(",")
-                fileType  === "attendance" ? this.uploadAttendanceFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type, latestAttFromDate, latestAttToDate)
+                fileType  === "attendance" ? this.uploadAttendanceFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type, latestAttFromDate, latestAttToDate, reset)
                     :this.uploadBulkEmployeeFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type)
             };
             reader.onerror = function (error) { console.log('Error: ', error); };
@@ -198,7 +198,7 @@ class UserManagement extends Component {
     }
 
     // this method will used for the reseting the value of file state variable
-    clearFileUrl = () => { this.setState({ profileImageUrl: "" }) }
+    clearFileUrl = () => { this.setState({ profileImageUrl: "", attendanceUrl: "" }) }
 
     uploadBulkEmployeeFile = async (fileData, name, type) => {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
@@ -215,6 +215,7 @@ class UserManagement extends Component {
         setTimeout(async () => {
             await loadMessage()
             await GetEmployeeList(0,100,authorization);
+            (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && alert("Your Bluk of Empolyee is uploaded");
             await SaveFileData();
             await this.handleBulkEmployeeUpload();
             await this.handleBulkEmployeeModel();
@@ -223,10 +224,11 @@ class UserManagement extends Component {
         this.setState({ attendanceUrl: (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && this.props.FileState.fileUrl[0] })
     }
 
-    uploadAttendanceFile = async (fileData, name, type) => {
+    uploadAttendanceFile = async (fileData, name, type, reset) => {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
         const { authorization } = this.props.LoginState
         const { latestAttFromDate, latestAttToDate }= this.props
+        const { attendanceFormReset }=this.props.AttendanceFormReset
         let fileName= name && name.split(".")[0];
         let newFileData = [{
             fileName,
@@ -239,6 +241,9 @@ class UserManagement extends Component {
         await this.handleAttendanceUpload();
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
+            (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && alert(this.props.FileState.fileUrl+" Your excel file is uploaded is successfully");
+            await this.clearFileUrl();
+            await attendanceFormReset();
             await loadMessage()
             await SaveFileData();
             await this.handleAttendanceUpload();
@@ -268,7 +273,7 @@ class UserManagement extends Component {
     }
 
     // this method used for the show circular progress bar 
-    loadingCircle = (message) => <center> <h3>{message}</h3> <CircularProgress size={80} /> </center>
+    loadingCircle = (message) => <center> <h3>{message}</h3> <CircularProgress size={50} /> </center>
 
     // this method will used for the saving user data
     RegisterUser = async (sendUserValues) => {
@@ -315,8 +320,8 @@ let AttendanceForm = (props) => {
     </form>
 }
 
-const afterSubmit = (result, dispatch) => {dispatch(reset('AttendanceUploadFrom'))};
-AttendanceForm=reduxForm({ form: 'AttendanceUploadFrom', onSubmitSuccess: afterSubmit })(AttendanceForm);
+const attendanceFormReset=() => reset('AttendanceUploadFrom');
+AttendanceForm=reduxForm({ form: 'AttendanceUploadFrom'})(AttendanceForm);
 
 const selector = formValueSelector('AttendanceUploadFrom')
 const mapStateToProps = state => { 
@@ -324,10 +329,12 @@ const mapStateToProps = state => {
     const latestAttToDate = selector(state, 'latestAttToDate')
     return {...state, latestAttToDate, latestAttFromDate}; 
 };
+
 const mapDispatchToProps = (dispatch) => ({
     LoginActions: bindActionCreators(LoginActions, dispatch),
     MasterDataAction: bindActionCreators(MasterDataAction, dispatch),
-    FileAction: bindActionCreators(FileAction, dispatch)
+    FileAction: bindActionCreators(FileAction, dispatch),
+    AttendanceFormReset: bindActionCreators({attendanceFormReset},dispatch) 
 })
 export default connect(mapStateToProps, mapDispatchToProps)(UserManagement);
 
