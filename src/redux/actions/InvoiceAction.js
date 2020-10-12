@@ -26,6 +26,8 @@ const GenerateInvoice = (invoiceData, authroizationKey) => {
                         return dispatch(loadMessage(AlertColor.danger, InvoiceError.NO_CONTENT));  
                     case "CONFLICT":
                         return dispatch(loadMessage(AlertColor.danger, InvoiceError.CONFLICT + response.data.fromDate +" to "+response.data.toDate)); 
+                    case "INTERNAL_SERVER_ERROR":
+                        return dispatch(loadMessage(AlertColor.danger, InvoiceError.INTERNAL_SERVER_ERROR)); 
                     default:
                         return SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) 
                 }
@@ -47,6 +49,8 @@ const GenerateInvoicePDF = (invoiceData, authroizationKey) => {
                         return dispatch(loadMessage(AlertColor.danger, InvoiceError.NO_CONTENT));  
                     case "CONFLICT":
                         return dispatch(loadMessage(AlertColor.danger, InvoiceError.CONFLICT + response.data.fromDate +" to "+response.data.toDate)); 
+                    case "INTERNAL_SERVER_ERROR":
+                        return dispatch(loadMessage(AlertColor.danger, InvoiceError.INTERNAL_SERVER_ERROR));
                     default:
                         return SuccessFunction({ dispatch , "successMethod": SaveGenratedInvoiceData, "loadMessage":loadMessage, response}) 
                 }

@@ -5,7 +5,7 @@ import { Button, Grid, CircularProgress } from '@material-ui/core';
 import useStyles from "../client/Styles";
 import { renderTextField, renderDateTimePicker, renderAutocompleteWithProps, renderFileInput, renderAutocomplete, renderNumberField, renderTextAreaField, renderTextHiddenField } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
-import { FromActions } from '../../assets/config/Config';
+import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
 import * as FileAction from '../../redux/actions/FileAction'
 import * as PurchaseOrderAction from '../../redux/actions/PurchaseOrderAction';
@@ -14,6 +14,8 @@ import ResourcesTable from '../resources/ResourcesTable';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
 import { Alert } from '@material-ui/lab';
+import { loadMessage } from "../../redux/actions/ClientAction"
+
 
 // this is main component
 let ProjectForm = (props) => {
@@ -40,8 +42,9 @@ const LoadGird = (props) => {
     var classes = useStyles();
     const {color, common_message}=props.ClientState
     const { initialValues } = props
+    console.log("CV ",color, common_message);
     return <><Grid container spacing={5}>
-        {(common_message)&&<center><Alert color={color}>{common_message}</Alert></center>}
+        {(common_message)&& showMessage(common_message, color)}
         </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 20 }}>
@@ -56,6 +59,15 @@ const LoadGird = (props) => {
                 {SectionThree({ classes, "mainProps": props })}
             </Grid>
         </Grid>
+    </>
+}
+
+const showMessage=(common_message,color)=>{
+    return <>
+    <center><Alert color={color}>{common_message}</Alert></center>
+    {setTimeout(async()=>{
+        await loadMessage();
+    },API_EXE_TIME)}
     </>
 }
 
