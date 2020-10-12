@@ -6,7 +6,7 @@ const GetEmployeeListByProjectId = (firstIndex, lastIndex,projectId, authroizati
     return (dispatch) => {
         return CreateInstance()
             .get('/project/employeeList/' + firstIndex + '/' + lastIndex+'/'+projectId, HeaderConfig(authroizationKey))
-            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveEmployeeListByProjectId, "loadMessage":null,check:true, response, "id":projectId}) })
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveEmployeeListByProjectId, "loadMessage":loadMessage,check:true, response, "id":projectId}) })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
