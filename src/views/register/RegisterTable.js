@@ -4,7 +4,7 @@ import MaterialTable from "material-table";
 import { Button } from '@material-ui/core';
 import { FromActions } from '../../assets/config/Config';
 import { TableHeaderText } from '../../assets/config/TextConfig';
-
+import moment from 'moment';
 
 const RegsiterTable=(props)=>{
     const { EmployeeList } = props.MasterDataSet
@@ -44,7 +44,7 @@ const RegsiterTable=(props)=>{
 
   // Creating rows
   const data = (EmployeeList && EmployeeList.length > 0) && EmployeeList.map((item, key) => {
-    return { "key": (key + 1), "data": item,"employeeNumber":item.employeeNumber,"designation":item.designation, "emailId": item.emailId,"mobileNumber": item.mobileNumber, "name": item.firstName+" "+item.lastName, "lastUploadedAttendance":item.latestAttFromDate && item.latestAttFromDate+"-"+item.latestAttToDate  }
+    return { "key": (key + 1), "data": item,"employeeNumber":item.employeeNumber,"designation":item.designation, "emailId": item.emailId,"mobileNumber": item.mobileNumber, "name": item.firstName+" "+item.lastName, "lastUploadedAttendance":item.latestAttFromDate && moment(item.latestAttFromDate).format('DD-MM-YYYY') +" to "+moment(item.latestAttToDate).format('DD-MM-YYYY') }
   });
 
   return <div style={{ maxWidth: "100%" }}>
