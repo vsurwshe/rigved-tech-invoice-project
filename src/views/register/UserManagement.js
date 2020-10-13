@@ -234,8 +234,8 @@ class UserManagement extends Component {
         let fileName= name && name.split(".")[0];
         let newFileData = [{
             fileName,
-            latestAttFromDate,
-            latestAttToDate,
+            "fromAttedDate":latestAttFromDate,
+            "toAttedDate":latestAttToDate,
             "description": "attendance",
             "contentType": type === "application/vnd.ms-excel" ? 'xls':'xlsx',
             "content": `${fileData}`
