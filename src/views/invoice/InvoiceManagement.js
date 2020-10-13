@@ -4,9 +4,7 @@ import { connect } from 'react-redux';
 import { Card } from '@material-ui/core';
 
 class InvoiceManagement extends Component {
-    state = {  
-
-    };
+    state = { };
     
     render() {
         return <Card>

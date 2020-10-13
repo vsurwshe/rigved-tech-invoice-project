@@ -104,7 +104,7 @@ const Assign = (props) => {
         <AccordionDetails>
             <Grid container spacing={5}>
                 <Grid item xs={12} sm={6}>
-                    <Field name="roles" component={renderAutocompleteByName} optionData={RoleList} label="Roles" />
+                    <Field name="userType" component={renderAutocompleteByName} optionData={RoleList} label="Roles" />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <Field name="domain" component={renderAutocompleteByName} optionData={Domains} label="Domain" />
