@@ -37,7 +37,6 @@ const InvoiceTable=(props)=>{
 
   // Creating rows
   const data = (invoiceList && invoiceList.length > 0) && invoiceList.map((item, key) => {
-    console.log("Invoice Item",item);
     return {...item,"key": (key + 1), "data": item, "invoiceDate": item.invoiceDate && moment(item.invoiceDate).format('YYYY-MM-DD'), "dueDate":item.dueDate && moment(item.dueDate).format('YYYY-MM-DD') }
   });
 

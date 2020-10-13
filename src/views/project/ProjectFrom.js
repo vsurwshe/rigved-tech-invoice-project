@@ -5,7 +5,7 @@ import { Button, Grid } from '@material-ui/core';
 import useStyles from "../client/Styles";
 import { renderTextField, renderDateTimePicker, renderAutocompleteWithProps, renderFileInput, renderAutocomplete, renderNumberField, renderTextAreaField, renderTextHiddenField, renderLoading } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
-import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
+import { FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
 import { loadMessage } from "../../redux/actions/ClientAction"
 import * as FileAction from '../../redux/actions/FileAction'
@@ -15,7 +15,6 @@ import ResourcesTable from '../resources/ResourcesTable';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
 import { Alert } from '@material-ui/lab';
-import { loadMessage } from "../../redux/actions/ClientAction"
 
 
 // this is main component
@@ -24,14 +23,13 @@ let ProjectForm = (props) => {
     const { SaveMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues, clearFile } = props
     const { operation } = props.stateData
     const [loading, setLoading] = useState(false);
-    
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(values=>SaveMethod({sendUserValues:values, setLoading}))}>
             {LoadGird({"mainProps":props, loading, setLoading})}
             <div className={classes.buttonStyle}>
                 <center>
                     {(operation === FromActions.CR || operation === FromActions.ED) && <>
-                        <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> {(initialValues === undefined) ? "SUBMIT" : "EDIT"}</Button> &nbsp;&nbsp;
+                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> {(initialValues === undefined) ? "SUBMIT" : "EDIT"}</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button></>}&nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await clearFile(); await reset(); cancle() }}> Cancel</Button>
                 </center>
@@ -44,8 +42,8 @@ let ProjectForm = (props) => {
 const LoadGird = (propsData) => {
     var classes = useStyles();
     const {color, common_message}=propsData.mainProps.ClientState
-    const { initialValues, loading, setLoading } = propsData
-    
+    const { loading, setLoading } = propsData
+    const { initialValues }= propsData.mainProps
     return <><Grid container spacing={5}>
         {(common_message)&& showMessage(common_message, color)}
         </Grid>
@@ -71,7 +69,7 @@ const showMessage=(common_message,color)=>{
     <center><Alert color={color}>{common_message}</Alert></center>
     {setTimeout(async()=>{
         await loadMessage();
-    },API_EXE_TIME)}
+    },500)}
     </>
 }
 
@@ -131,16 +129,17 @@ const LoadFields = (parameter) => {
 // this method will used for the showing header information as per oprations
 const LoadHeader = (parameter) => {
     const { initialValues } = parameter
-    const { purchaseOrderList } = parameter.mainProps.PurchaseOrderState
-    let purchaseOrderDetails = (purchaseOrderList && purchaseOrderList.length > 0) && purchaseOrderList.filter(item => item.poNum === initialValues.purchaseOrder)
+    const { purchaseOrderList } =  parameter.mainProps ? parameter.mainProps.PurchaseOrderState :[]
+    let purchaseOrderDetails = (purchaseOrderList && purchaseOrderList.length > 0) && purchaseOrderList.filter(item => initialValues && (item.poNum === initialValues.purchaseOrder))
     return <>
-        <h2>{initialValues.projectName}</h2>
+        {initialValues && <><h2>{initialValues.projectName}</h2>
         <h4>Client Name: {initialValues.clientName}</h4>
         <h4>Project Manager: {initialValues.projectManager}</h4>
         <h4>Purchase Order: {initialValues.purchaseOrder}&nbsp;&nbsp;&nbsp;
             <Button component={Link} to={{ pathname: '/purchaseOrder', purchaseOrderDetails }} color="secondary" variant="contained">View PO</Button>
-        </h4>
+        </h4></>}
     </>
+
 }
 
 // this method will used for the right side part of this component
@@ -225,6 +224,7 @@ const validate=(values)=>{
 // make the selector 
 const selector = formValueSelector('ProjectForm')
 const mapDispatchToProps = (dispatch) => ({
+    dispatch,
     FileAction: bindActionCreators(FileAction, dispatch),
     PurchaseOrderAction: bindActionCreators(PurchaseOrderAction,dispatch),
     change: bindActionCreators(change, dispatch)

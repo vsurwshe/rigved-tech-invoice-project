@@ -29,7 +29,7 @@ class ProjectManagement extends Component {
      }
     
     componentDidMount=async()=>{
-        const { listOfClient } = this.props.ClientState;
+        const { listOfClient, color } = this.props.ClientState;
         const { projectList }= this.props.ProjectState
         const { authorization }= this.props.LoginState
         const { purchaseOrderList }= this.props.PurchaseOrderState
@@ -46,7 +46,7 @@ class ProjectManagement extends Component {
         (listOfClient && listOfClient.length === 0) && await GetClientList(0,20,authorization);
         (purchaseOrderList && purchaseOrderList.length === 0) && await GetPurchaseOrderList(0,20,authorization);
         (projectList && projectList.length === 0) && await GetProjectList(0,20,authorization);
-        await loadMessage();
+        color && await loadMessage();
         await this.handleLoadProjectList();
     }
 
@@ -54,7 +54,7 @@ class ProjectManagement extends Component {
     handleLoadProjectList = () => { this.setState({ loadProjectList: !this.state.loadProjectList }) }
 
     // this method used for the from actions in project 
-    handleProjectFromActions = (projectData,operation,showTabsOps) => { this.setState({ fromAction: !this.state.fromAction, projectData, operation, showTabs: showTabsOps ? true: false  }) }
+    handleProjectFromActions = (projectData,operation,showTabsOps) => {  this.setState({ fromAction: !this.state.fromAction, projectData, operation, showTabs: showTabsOps ? true: false  }) }
 
     // this method used for the load the delete model
     handleDeleteModel = (projectData) => { this.setState({ deleteModel: !this.state.deleteModel, projectData }) };
@@ -71,7 +71,8 @@ class ProjectManagement extends Component {
     }
 
     uploadContractFile=async(fileData,name,type)=>{
-        const {SaveFileDetails, SaveFileData}= this.props.FileAction
+        const { SaveFileDetails, SaveFileData }= this.props.FileAction
+        const { dispatch }=this.props
         const { authorization } = this.props.LoginState
         let newFileData=[{
             "fileName":name,
@@ -82,7 +83,7 @@ class ProjectManagement extends Component {
         await this.handleProjectContractFileUplaod();
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
-            await loadMessage()
+            await dispatch(loadMessage());
             await SaveFileData();
             await this.handleProjectContractFileUplaod();
         }, API_EXE_TIME)
@@ -157,8 +158,6 @@ class ProjectManagement extends Component {
         const { authorization } = this.props.LoginState
         const newProjectData = {
             ...sendUserValues,
-            "purchaseOrder":sendUserValues.purchaseOrder && sendUserValues.purchaseOrder.title,
-            "clientName":sendUserValues.clientName && sendUserValues.clientName.title,
             "contractAttachmentUrl":(projectContractFileUrl === "" || projectContractFileUrl === undefined) ? sendUserValues.contractAttachmentUrl  : projectContractFileUrl,
             "active": true,
         }
@@ -190,6 +189,7 @@ class ProjectManagement extends Component {
 
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({
+    dispatch,
     ProjectAction: bindActionCreators(ProjectAction, dispatch),
     MasterDataAction: bindActionCreators(MasterDataAction, dispatch),
     ClientAction: bindActionCreators(ClientAction, dispatch),

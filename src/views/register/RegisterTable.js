@@ -5,10 +5,6 @@ import { Button } from '@material-ui/core';
 import { FromActions } from '../../assets/config/Config';
 import { TableHeaderText } from '../../assets/config/TextConfig';
 import moment from 'moment';
-<<<<<<< HEAD
-=======
-
->>>>>>> 0.16.6: Recycle the loading circle
 
 const RegsiterTable=(props)=>{
     const { EmployeeList } = props.MasterDataSet
@@ -48,15 +44,7 @@ const RegsiterTable=(props)=>{
 
   // Creating rows
   const data = (EmployeeList && EmployeeList.length > 0) && EmployeeList.map((item, key) => {
-<<<<<<< HEAD
-<<<<<<< HEAD
     return { "key": (key + 1), "data": item,"employeeNumber":item.employeeNumber,"designation":item.designation, "emailId": item.emailId,"mobileNumber": item.mobileNumber, "name": item.firstName+" "+item.lastName, "lastUploadedAttendance":item.latestAttFromDate && moment(item.latestAttFromDate).format('DD-MM-YYYY') +" to "+moment(item.latestAttToDate).format('DD-MM-YYYY') }
-=======
-    return { "key": (key + 1), "data": item,"employeeNumber":item.employeeNumber,"designation":item.designation, "emailId": item.emailId,"mobileNumber": item.mobileNumber, "name": item.firstName+" "+item.lastName, "lastUploadedAttendance":item.latestAttFromDate && item.latestAttFromDate+"-"+item.latestAttToDate  }
->>>>>>> 0.14.31: Modify the upload attendance and added last updated attendance
-=======
-    return { "key": (key + 1), "data": item,"employeeNumber":item.employeeNumber,"designation":item.designation, "emailId": item.emailId,"mobileNumber": item.mobileNumber, "name": item.firstName+" "+item.lastName, "lastUploadedAttendance":item.latestAttFromDate && moment(item.latestAttFromDate).format('DD-MM-YYYY') +" to "+moment(item.latestAttToDate).format('DD-MM-YYYY') }
->>>>>>> 0.16.6: Recycle the loading circle
   });
 
   return <div style={{ maxWidth: "100%" }}>

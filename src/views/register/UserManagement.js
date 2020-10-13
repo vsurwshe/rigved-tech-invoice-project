@@ -130,7 +130,7 @@ class UserManagement extends Component {
             <DialogTitle id="alert-dialog-slide-title">{'Upload bulk of employees excel file'}</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
-                    {(bulkEmployeeUrl === "" || bulkEmployeeUrl === undefined) ? (bulkEmployeeUpload ? renderLoading({ message:"Uploading...", size:80}) : this.loadBulkEmployeeUrl())
+                    {(bulkEmployeeUrl === "" || bulkEmployeeUrl === undefined) ? (bulkEmployeeUpload ? renderLoading({ message:"Uploading...", size:50}) : this.loadBulkEmployeeUrl())
                         : <h5>{this.loadFileUrlName(bulkEmployeeUrl)}</h5>}
                 </DialogContentText>
             </DialogContent>
@@ -156,7 +156,6 @@ class UserManagement extends Component {
 
     // this method will used for the showing attendance file name
     loadFileUrlName = (fileUrl) => {
-        console.log("File url",fileUrl);
         let fileArray = fileUrl && fileUrl.split("\\");
         return fileArray.length > 0 ? fileArray[5] : "";
     }
@@ -279,9 +278,6 @@ class UserManagement extends Component {
         this.setState({ profileImageUrl: (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && this.props.FileState.fileUrl[0] })
     }
 
-    // this method used for the show circular progress bar 
-    loadingCircle = (message) => <center> <h3>{message}</h3> <CircularProgress size={50} /> </center>
-
     // this method will used for the saving user data
     RegisterUser = async (sendUserValues) => {
         const { profileImageUrl } = this.state
@@ -316,7 +312,7 @@ let AttendanceForm = (props) => {
             <Field name="latestAttFromDate" component={renderDateTimePicker} label="From Date" /> &nbsp;&nbsp;&nbsp;
             <Field name="latestAttToDate" component={renderDateTimePicker} label="To Date" /> <br /> <br/>
             {(attendanceUrl === "" || attendanceUrl === undefined) 
-            ? (attendanceUpload ? renderLoading({message: "Uploading...", size:80}) : 
+            ? (attendanceUpload ? renderLoading({message: "Uploading...", size:50}) : 
                    (latestAttFromDate && latestAttToDate) && loadAttendanceUrl({latestAttFromDate,latestAttToDate}))
             : <h5>{loadFileUrlName(attendanceUrl)}</h5>
             }
