@@ -205,6 +205,7 @@ class UserManagement extends Component {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
         const { authorization } = this.props.LoginState
         const { GetEmployeeList }=this.props.MasterDataAction
+        const { dispatch }=this.props
         let newFileData = [{
             "fileName": name,
             "description": "registration",
@@ -214,7 +215,7 @@ class UserManagement extends Component {
         await this.handleBulkEmployeeUpload();
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
-            await loadMessage()
+            await dispatch(loadMessage());
             await GetEmployeeList(0,100,authorization);
             (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && alert("Your Bluk of Empolyee is uploaded");
             await SaveFileData();
@@ -231,6 +232,7 @@ class UserManagement extends Component {
         const { latestAttFromDate, latestAttToDate }= this.props
         const { attendanceFormReset }=this.props.AttendanceFormReset
         const { GetEmployeeList }=this.props.MasterDataAction
+        const { dispatch }=this.props
         let fileName= name && name.split(".")[0];
         let newFileData = [{
             fileName,
@@ -247,7 +249,7 @@ class UserManagement extends Component {
             await this.clearFileUrl();
             await GetEmployeeList(0,100,authorization);
             await attendanceFormReset();
-            await loadMessage()
+            await dispatch(loadMessage());
             await SaveFileData();
             await this.handleAttendanceUpload();
             await this.handleAttendanceModel();
@@ -259,6 +261,7 @@ class UserManagement extends Component {
     uploadProfileImageFile = async (fileData, name, type) => {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
         const { authorization } = this.props.LoginState
+        const { dispatch }=this.props
         let newFileData = [{
             "fileName": name,
             "description": "ClientDetail",
@@ -268,7 +271,7 @@ class UserManagement extends Component {
         await this.handleProfileImageValue();
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
-            await loadMessage()
+            await dispatch(loadMessage());
             await SaveFileData();
             await this.handleProfileImageValue();
         }, API_EXE_TIME)
@@ -284,6 +287,7 @@ class UserManagement extends Component {
         const { RegisterUserDetails, loadMessage } = this.props.LoginActions
         const { authorization } = this.props.LoginState
         const { GetEmployeeList }=this.props.MasterDataAction
+        const { dispatch }=this.props
         const newUserData = {
             ...sendUserValues,
             "profilePic": profileImageUrl,
@@ -293,7 +297,7 @@ class UserManagement extends Component {
         await RegisterUserDetails(newUserData, authorization)
         setTimeout(async () => {
             await GetEmployeeList(0,20,authorization)
-            await loadMessage()
+            await dispatch(loadMessage());
             alert("Your Employee Data Saved");
             await this.clearFileUrl();
             await this.handleLoadValue();
@@ -334,6 +338,7 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = (dispatch) => ({
+    dispatch,
     LoginActions: bindActionCreators(LoginActions, dispatch),
     MasterDataAction: bindActionCreators(MasterDataAction, dispatch),
     FileAction: bindActionCreators(FileAction, dispatch),

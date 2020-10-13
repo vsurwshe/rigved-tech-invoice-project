@@ -62,6 +62,7 @@ class ClientManagment extends Component {
         const {SaveFileDetails, SaveFileData}= this.props.FileAction
         const { authorization } = this.props.LoginState
         const { loadMessage } = this.props.ClientAction;
+        const { dispatch }=this.props
         let newFileData=[{
             "fileName":name,
 	        "description":"ClientDetail",
@@ -71,7 +72,7 @@ class ClientManagment extends Component {
         await this.handleGSTUpload();
         await SaveFileDetails(newFileData, authorization,fileData)
         setTimeout(async () => {
-            await loadMessage();
+            await dispatch(loadMessage());
             await SaveFileData();
             await this.handleGSTUpload();
         }, API_EXE_TIME)
@@ -82,6 +83,7 @@ class ClientManagment extends Component {
         const {SaveFileDetails, SaveFileData}= this.props.FileAction
         const { authorization } = this.props.LoginState
         const { loadMessage} = this.props.ClientAction;
+        const { dispatch }=this.props
         let newFileData=[{
             "fileName":name,
 	        "description":"ClientDetail",
@@ -91,16 +93,14 @@ class ClientManagment extends Component {
         await this.handleTANUpload();
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
-            await loadMessage()
+            await dispatch(loadMessage());
             await SaveFileData();
             await this.handleTANUpload();
         }, API_EXE_TIME)
         this.setState({tanFileUrl : (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length >0)  && this.props.FileState.fileUrl[0]})
     }
 
-    clearFileUrl=()=>{
-        this.setState({gstFileUrl:"",tanFileUrl:""})
-    }
+    clearFileUrl=()=>{ this.setState({gstFileUrl:"",tanFileUrl:""}) }
 
     // this method used for the loading client form
     loadClientForm = (clientData) => {
@@ -142,10 +142,9 @@ class ClientManagment extends Component {
     // this method used for load the client table
     loadingClientTable = () => {
         const {operation}=this.state
-        return <>
-        {this.loadDeleteModel()}
-        <ClientTable  operation={operation} createClient={this.handleCreateClient} viewClientDetails={this.viewClientDetails}  deleteClientDetails={this.handleDeleteModel}  />
-    </>
+        return <> {this.loadDeleteModel()}
+            <ClientTable  operation={operation} createClient={this.handleCreateClient} viewClientDetails={this.viewClientDetails}  deleteClientDetails={this.handleDeleteModel}  />
+        </>
     }
     // this method used for the show circular progress bar 
     loadingCircle = () => <center> <h3>Client Managment</h3> <CircularProgress size={80} /> </center>
@@ -159,6 +158,7 @@ class ClientManagment extends Component {
         const { authorization } = this.props.LoginState
         const { gstFileUrl, tanFileUrl} =this.state
         const { values,rateCardDtos }=propsData
+        const { dispatch }=this.props
         const newUserData = {
             ...values,
             "gstUrl": (gstFileUrl === "" || gstFileUrl === undefined) ? values.gstUrl  :gstFileUrl,
@@ -170,8 +170,7 @@ class ClientManagment extends Component {
         }
         await SaveClientData(newUserData, authorization)
         setTimeout(async () => {
-            await loadMessage()
-            await GetClientRevenueData(authorization,{});
+            await dispatch(loadMessage());
             await GetClientList(0, 20, authorization);
             await this.setState({tanFileUrl : "", gstFileUrl:""})
             await alert("Your client details are saved");
@@ -182,11 +181,11 @@ class ClientManagment extends Component {
     DeleteClientDetails = async (clientId) => {
         const { DeleteClient, loadMessage, GetClientList } = this.props.ClientAction;
         const { authorization } = this.props.LoginState
+        const { dispatch }=this.props
         await this.handleLoadClientList(true);
         clientId && await DeleteClient(clientId, authorization);
         setTimeout(async () => {
-            await loadMessage();
-            await GetClientRevenueData(authorization,{});
+            await dispatch(loadMessage());
             await GetClientList(0, 20, authorization);
             await this.handleDeleteModel();
             await this.handleLoadClientList(false);
@@ -196,6 +195,7 @@ class ClientManagment extends Component {
 
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({
+    dispatch,
     ClientAction: bindActionCreators(ClientAction, dispatch),
     FileAction: bindActionCreators(FileAction, dispatch),
     MasterDataAction: bindActionCreators(MasterDataAction, dispatch)
