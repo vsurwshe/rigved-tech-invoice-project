@@ -229,6 +229,7 @@ class UserManagement extends Component {
         const { authorization } = this.props.LoginState
         const { latestAttFromDate, latestAttToDate }= this.props
         const { attendanceFormReset }=this.props.AttendanceFormReset
+        const { GetEmployeeList }=this.props.MasterDataAction
         let fileName= name && name.split(".")[0];
         let newFileData = [{
             fileName,
@@ -243,6 +244,7 @@ class UserManagement extends Component {
         setTimeout(async () => {
             (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && alert(this.props.FileState.fileUrl+" Your excel file is uploaded is successfully");
             await this.clearFileUrl();
+            await GetEmployeeList(0,100,authorization);
             await attendanceFormReset();
             await loadMessage()
             await SaveFileData();
