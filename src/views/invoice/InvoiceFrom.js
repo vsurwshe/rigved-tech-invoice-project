@@ -16,6 +16,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import MaterialTable from 'material-table';
+import moment from 'moment';
 import { API_EXE_TIME } from '../../assets/config/Config';
 
 // this method will used for the transition for model 
@@ -90,8 +91,8 @@ const PostInvoiceData = async (propsData) => {
     const { GenerateInvoice, SaveInvoiceEmployeeData } = propsData.mainProps.InvoiceAction
     const { loadMessage } = propsData.mainProps.ClientAction
     let newInvoiceData = {
-        "fromDate": (values && values.fromDate) && values.fromDate,
-        "toDate": (values && values.toDate) && values.toDate,
+        "fromDate": (values && values.fromDate) &&  new moment(values.fromDate).format('x'),
+        "toDate": (values && values.toDate) && new moment(values.toDate).format('x'),
         "projectId": (projectIdList && projectIdList.length > 0) && projectIdList[0].id
     }
     await setLoading(true);
