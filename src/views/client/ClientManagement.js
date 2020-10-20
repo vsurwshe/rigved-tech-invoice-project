@@ -156,6 +156,7 @@ class ClientManagment extends Component {
     SaveClientDetails = async (propsData) => {
         const { SaveClientData, loadMessage, GetClientList } = this.props.ClientAction;
         const { authorization } = this.props.LoginState
+        const { clientDetails } = this.props.ClientState
         const { gstFileUrl, tanFileUrl} =this.state
         const { values,rateCardDtos }=propsData
         const { dispatch }=this.props
@@ -173,7 +174,7 @@ class ClientManagment extends Component {
             await dispatch(loadMessage());
             await GetClientList(0, 20, authorization);
             await this.setState({tanFileUrl : "", gstFileUrl:""})
-            await alert("Your client details are saved");
+            clientDetails.Status === "OK" && await alert("Your client details are saved");
             this.handleCreateClient();
         }, API_EXE_TIME)
     }
