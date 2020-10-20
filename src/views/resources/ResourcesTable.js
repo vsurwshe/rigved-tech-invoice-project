@@ -1,5 +1,5 @@
 import React, { useState, forwardRef } from 'react';
-import { Dialog, Button, Slide, DialogTitle, DialogActions, makeStyles, DialogContent, Grid, CircularProgress, RadioGroup } from '@material-ui/core';
+import { Dialog, Button, Slide, DialogTitle, DialogActions, makeStyles, DialogContent, Grid, RadioGroup } from '@material-ui/core';
 import { connect } from 'react-redux';
 import MaterialTable from 'material-table';
 import AppBar from '@material-ui/core/AppBar';
@@ -214,7 +214,7 @@ const LoadAddResourceModel = (data) => {
       </Toolbar>
     </AppBar>
     <DialogContent>
-      {load ? loadingCircle() : <><Grid container spacing={3}>
+      {load ? renderLoading({message:"", size:50}) : <><Grid container spacing={3}>
         <Grid item xs={7}>
           {LoadRateCardList({ "mainProps": data.mainProps, selectedRateCard, setSelectedRateCard })}
         </Grid>

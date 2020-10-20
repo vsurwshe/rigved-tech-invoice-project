@@ -7,7 +7,6 @@ import { bindActionCreators } from 'redux';
 import * as ClientAction from "../../redux/actions/ClientAction";
 import * as MasterDataAction from "../../redux/actions/MasterDataAction";
 import * as FileAction from "../../redux/actions/FileAction"
-import { GetClientRevenueData } from "../../redux/actions/DashboardAction"
 import { API_EXE_TIME } from '../../assets/config/Config';
 import { renderLoading } from '../utilites/FromUtilites';
 
