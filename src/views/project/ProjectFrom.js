@@ -42,7 +42,6 @@ const LoadGird = (props) => {
     var classes = useStyles();
     const {color, common_message}=props.ClientState
     const { initialValues } = props
-    console.log("CV ",color, common_message);
     return <><Grid container spacing={5}>
         {(common_message)&& showMessage(common_message, color)}
         </Grid>
