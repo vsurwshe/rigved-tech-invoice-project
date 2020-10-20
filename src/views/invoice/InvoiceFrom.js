@@ -90,6 +90,7 @@ const PostInvoiceData = async (propsData) => {
     const { invoiceEmployeeData } = propsData.mainProps.InvoiceState
     const { GenerateInvoice, SaveInvoiceEmployeeData } = propsData.mainProps.InvoiceAction
     const { loadMessage } = propsData.mainProps.ClientAction
+    const { dispatch } = propsData.mainProps
     let newInvoiceData = {
         "fromDate": (values && values.fromDate) &&  new moment(values.fromDate).format('x'),
         "toDate": (values && values.toDate) && new moment(values.toDate).format('x'),
@@ -99,7 +100,7 @@ const PostInvoiceData = async (propsData) => {
     await SaveInvoiceEmployeeData([]);
     await GenerateInvoice(newInvoiceData, authorization);
     setTimeout(async () => {
-        await loadMessage();
+        await dispatch(loadMessage());
         await setLoading(false);
         await setViewSectionThree(true);
         (invoiceEmployeeData && invoiceEmployeeData.length >0)&&await setSubmit(true); 
@@ -329,6 +330,7 @@ const validate = (values) => {
 }
 
 const mapDispatchToProps = (dispatch) => ({
+    dispatch,
     ClientAction: bindActionCreators(ClientAction, dispatch),
     InvoiceAction: bindActionCreators(InvoiceAction, dispatch),
     ProjectAction: bindActionCreators(ProjectAction, dispatch),

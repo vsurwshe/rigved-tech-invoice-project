@@ -284,7 +284,7 @@ class UserManagement extends Component {
     RegisterUser = async (sendUserValues) => {
         const { profileImageUrl } = this.state
         const { RegisterUserDetails, loadMessage } = this.props.LoginActions
-        const { authorization } = this.props.LoginState
+        const { authorization, userData } = this.props.LoginState
         const { GetEmployeeList }=this.props.MasterDataAction
         const { dispatch }=this.props
         const newUserData = {
@@ -297,7 +297,8 @@ class UserManagement extends Component {
         setTimeout(async () => {
             await GetEmployeeList(0,20,authorization)
             await dispatch(loadMessage());
-            alert("Your Employee Data Saved");
+            console.log("UserData",userData)
+             alert("Your Employee Data Saved");
             await this.clearFileUrl();
             await this.handleLoadValue();
             await this.handleRegisterFromActions();
