@@ -117,8 +117,8 @@ const validate=(rowData)=>{
       rowData.skillSet === '' ||
       rowData.rateCardType === undefined ||
       rowData.rateCardType === '' ||
-      rowData.rateCardDuration === undefined ||
-      rowData.rateCardDuration === '' ||
+      (rowData.rateCardType !== "Daily" && rowData.rateCardDuration === undefined) ||
+      (rowData.rateCardType !== "Daily" && rowData.rateCardDuration === '') ||
       rowData.rate === undefined ||
       rowData.rate === ''  
     ){
