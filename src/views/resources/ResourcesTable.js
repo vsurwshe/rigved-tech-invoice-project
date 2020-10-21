@@ -210,18 +210,20 @@ const LoadAddResourceModel = (data) => {
       </Toolbar>
     </AppBar>
     <DialogContent>
-      {load ? loadingCircle() : <><Grid container spacing={3}>
-        <Grid item xs={7}>
-          {LoadRateCardList({ "mainProps": data.mainProps, selectedRateCard, setSelectedRateCard })}
+      {load ? loadingCircle() : <>
+        <Grid container spacing={3}>
+          <Grid item xs={7}>
+            {LoadRateCardList({ "mainProps": data.mainProps, selectedRateCard, setSelectedRateCard })}
+          </Grid>
+          <Grid item xs={5}>
+            {(selectedRateCard && selectedRateCard.domainName) && LoadEmployeeList({ "mainProps": data.mainProps, listOfEmployeeAccount, setEmployeeAccount, tableData, setTableData, selectedRateCard })}
+          </Grid>
         </Grid>
-        <Grid item xs={5}>
-          {(selectedRateCard && selectedRateCard.domainName) && LoadEmployeeList({ "mainProps": data.mainProps, listOfEmployeeAccount, setEmployeeAccount, tableData, setTableData, selectedRateCard })}
-        </Grid>
-      </Grid></>
+      </>
       }
     </DialogContent>
     <DialogActions>
-      <Button onClick={() => { handleClose(); setSelectedRateCard({}); setTableData({}) }} color="primary">Cancel</Button>
+      <Button onClick={() => { handleClose(); setSelectedRateCard({}); setTableData([]) }} color="primary">Cancel</Button>
       <Button onClick={() => loadAssignResource({ listOfEmployeeAccount, selectedRateCard, "mainProps": data.mainProps, load, setLoad, handleClose, tableData, setTableData })} color="secondary">Assign Resource</Button>
     </DialogActions>
   </Dialog>
