@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, Button } from "@material-ui/core";
+import { Card, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, Button } from "@material-ui/core";
 import { Alert } from '@material-ui/lab';
 import RegsiterForm from './RegsiterForm';
 import { connect } from 'react-redux';
@@ -10,8 +10,8 @@ import { loadMessage } from "../../redux/actions/ClientAction"
 import { API_EXE_TIME } from '../../assets/config/Config';
 import { bindActionCreators } from 'redux';
 import RegisterTable from './RegisterTable';
-import { Field, reduxForm, reset } from 'redux-form';
-import { renderDateTimePicker } from '../utilites/FromUtilites';
+import { Field, formValueSelector, reduxForm, reset } from 'redux-form';
+import { renderDateTimePicker, renderLoading } from '../utilites/FromUtilites';
 
 class UserManagement extends Component {
     constructor(props) {
@@ -117,9 +117,9 @@ class UserManagement extends Component {
                     attendanceUrl={attendanceUrl}
                     attendanceUpload={attendanceUpload}
                     loadAttendanceUrl={this.loadAttendanceUrl}
-                    loadingCircle={this.loadingCircle}
                     loadFileUrlName={this.loadFileUrlName}
-                 />
+                    mainProps={this.props}
+                />
         </Dialog>
     }
 
@@ -130,7 +130,7 @@ class UserManagement extends Component {
             <DialogTitle id="alert-dialog-slide-title">{'Upload bulk of employees excel file'}</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
-                    {(bulkEmployeeUrl === "" || bulkEmployeeUrl === undefined) ? (bulkEmployeeUpload ? this.loadingCircle("Uploading") : this.loadBulkEmployeeUrl())
+                    {(bulkEmployeeUrl === "" || bulkEmployeeUrl === undefined) ? (bulkEmployeeUpload ? renderLoading({ message:"Uploading...", size:50}) : this.loadBulkEmployeeUrl())
                         : <h5>{this.loadFileUrlName(bulkEmployeeUrl)}</h5>}
                 </DialogContentText>
             </DialogContent>
@@ -141,9 +141,13 @@ class UserManagement extends Component {
     }
 
     // this method will used for th show input for attendance file
-    loadAttendanceUrl = () => <label htmlFor="attendanceFile">
-        <input name="attendanceFile" type="file" onChange={event => this.handleFileChange(event, "attendance")} />
+    loadAttendanceUrl = (propsData) => {
+        const {latestAttFromDate, latestAttToDate }=propsData
+        return <label htmlFor="attendanceFile">
+        <input name="attendanceFile" type="file" onChange={event => this.handleFileChange(event, "attendance", latestAttFromDate, latestAttToDate)} />
     </label>
+    }
+    
 
     // this method will used for th show input for attendance file
     loadBulkEmployeeUrl = () => <label htmlFor="bulkEmployeeFile">
@@ -152,7 +156,6 @@ class UserManagement extends Component {
 
     // this method will used for the showing attendance file name
     loadFileUrlName = (fileUrl) => {
-        console.log("File url",fileUrl);
         let fileArray = fileUrl && fileUrl.split("\\");
         return fileArray.length > 0 ? fileArray[5] : "";
     }
@@ -165,14 +168,14 @@ class UserManagement extends Component {
     }
 
     // this method will used for the handling the attendance file upload
-    handleFileChange = async (event,fileType) => {
+    handleFileChange = async (event,fileType, latestAttFromDate, latestAttToDate ) => {
         event.preventDefault();
         let imageFile = event.target.files[0];
         if (imageFile) {
             var reader = new FileReader();
             reader.onload = async () => {
                 let byteArray = reader.result.split(",")
-                fileType  === "attendance" ? this.uploadAttendanceFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type)
+                fileType  === "attendance" ? this.uploadAttendanceFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type, latestAttFromDate, latestAttToDate)
                     :this.uploadBulkEmployeeFile(byteArray.length > 0 && byteArray[1], imageFile.name, imageFile.type)
             };
             reader.onerror = function (error) { console.log('Error: ', error); };
@@ -185,7 +188,7 @@ class UserManagement extends Component {
         const { load } = this.state
         return <>
             {this.loadAttendanceModel()}
-            {load ? this.loadingCircle("Loading...") 
+            {load ? renderLoading({message:"Loading Employee List..."}) 
             : <RegisterTable
                 fromAction={this.handleRegisterFromActions}
                 handleAttendance={this.handleAttendanceModel}
@@ -194,12 +197,13 @@ class UserManagement extends Component {
     }
 
     // this method will used for the reseting the value of file state variable
-    clearFileUrl = () => { this.setState({ profileImageUrl: "" }) }
+    clearFileUrl = () => { this.setState({ profileImageUrl: "", attendanceUrl: "" }) }
 
     uploadBulkEmployeeFile = async (fileData, name, type) => {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
         const { authorization } = this.props.LoginState
         const { GetEmployeeList }=this.props.MasterDataAction
+        const { dispatch }=this.props
         let newFileData = [{
             "fileName": name,
             "description": "registration",
@@ -209,8 +213,9 @@ class UserManagement extends Component {
         await this.handleBulkEmployeeUpload();
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
-            await loadMessage()
+            await dispatch(loadMessage());
             await GetEmployeeList(0,100,authorization);
+            (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && alert("Your Bluk of Empolyee is uploaded");
             await SaveFileData();
             await this.handleBulkEmployeeUpload();
             await this.handleBulkEmployeeModel();
@@ -219,11 +224,18 @@ class UserManagement extends Component {
         this.setState({ attendanceUrl: (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && this.props.FileState.fileUrl[0] })
     }
 
-    uploadAttendanceFile = async (fileData, name, type) => {
+    uploadAttendanceFile = async (fileData, name, type, reset) => {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
         const { authorization } = this.props.LoginState
+        const { latestAttFromDate, latestAttToDate }= this.props
+        const { attendanceFormReset }=this.props.AttendanceFormReset
+        const { GetEmployeeList }=this.props.MasterDataAction
+        const { dispatch }=this.props
+        let fileName= name && name.split(".")[0];
         let newFileData = [{
-            "fileName": name,
+            fileName,
+            "fromAttedDate":latestAttFromDate,
+            "toAttedDate":latestAttToDate,
             "description": "attendance",
             "contentType": type === "application/vnd.ms-excel" ? 'xls':'xlsx',
             "content": `${fileData}`
@@ -231,8 +243,13 @@ class UserManagement extends Component {
         await this.handleAttendanceUpload();
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
-            await loadMessage()
+            (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && alert(this.props.FileState.fileUrl+" Your excel file is uploaded is successfully");
+            await this.clearFileUrl();
+            await GetEmployeeList(0,100,authorization);
+            await attendanceFormReset();
+            await dispatch(loadMessage());
             await SaveFileData();
+            await this.clearFileUrl();
             await this.handleAttendanceUpload();
             await this.handleAttendanceModel();
         }, API_EXE_TIME)
@@ -243,8 +260,10 @@ class UserManagement extends Component {
     uploadProfileImageFile = async (fileData, name, type) => {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
         const { authorization } = this.props.LoginState
+        const { dispatch }=this.props
+        let fileName= name && name.split(".")[0];
         let newFileData = [{
-            "fileName": name,
+            fileName,
             "description": "ClientDetail",
             "contentType": 'png',
             "content": `${fileData}`
@@ -252,22 +271,20 @@ class UserManagement extends Component {
         await this.handleProfileImageValue();
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
-            await loadMessage()
+            await dispatch(loadMessage());
             await SaveFileData();
             await this.handleProfileImageValue();
         }, API_EXE_TIME)
         this.setState({ profileImageUrl: (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && this.props.FileState.fileUrl[0] })
     }
 
-    // this method used for the show circular progress bar 
-    loadingCircle = (message) => <center> <h3>{message}</h3> <CircularProgress size={80} /> </center>
-
     // this method will used for the saving user data
     RegisterUser = async (sendUserValues) => {
         const { profileImageUrl } = this.state
         const { RegisterUserDetails, loadMessage } = this.props.LoginActions
-        const { authorization } = this.props.LoginState
+        const { authorization, userData } = this.props.LoginState
         const { GetEmployeeList }=this.props.MasterDataAction
+        const { dispatch }=this.props
         const newUserData = {
             ...sendUserValues,
             "profilePic": profileImageUrl,
@@ -277,8 +294,9 @@ class UserManagement extends Component {
         await RegisterUserDetails(newUserData, authorization)
         setTimeout(async () => {
             await GetEmployeeList(0,20,authorization)
-            await loadMessage()
-            alert("Your Employee Data Saved");
+            await dispatch(loadMessage());
+            console.log("UserData",userData)
+             alert("Your Employee Data Saved");
             await this.clearFileUrl();
             await this.handleLoadValue();
             await this.handleRegisterFromActions();
@@ -287,30 +305,42 @@ class UserManagement extends Component {
 }
 
 let AttendanceForm = (props) => {
-    const { pristine, reset, submitting, handleSubmit, attendanceUrl, attendanceUpload, loadFileUrlName, handleAttendanceModel, loadingCircle,loadAttendanceUrl } = props
+    const { pristine, reset, submitting, handleSubmit, attendanceUrl, attendanceUpload, loadFileUrlName, handleAttendanceModel, loadAttendanceUrl } = props
+    const { latestAttFromDate, latestAttToDate}=props.mainProps
     return  <form onSubmit={handleSubmit((values)=>{console.log("Data ", values)})}>
         <DialogContent>
             <Field name="latestAttFromDate" component={renderDateTimePicker} label="From Date" /> &nbsp;&nbsp;&nbsp;
             <Field name="latestAttToDate" component={renderDateTimePicker} label="To Date" /> <br /> <br/>
-            {(attendanceUrl === "" || attendanceUrl === undefined) ? (attendanceUpload ? loadingCircle("Uploading") : loadAttendanceUrl())
-                : <h5>{loadFileUrlName(attendanceUrl)}</h5>}
+            {(attendanceUrl === "" || attendanceUrl === undefined) 
+            ? (attendanceUpload ? renderLoading({message: "Uploading...", size:50}) : 
+                   (latestAttFromDate && latestAttToDate) && loadAttendanceUrl({latestAttFromDate,latestAttToDate}))
+            : <h5>{loadFileUrlName(attendanceUrl)}</h5>
+            }
         </DialogContent>
         <DialogActions>
-            <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;&nbsp;&nbsp;
+            {/* <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> Submit </Button> &nbsp;&nbsp;&nbsp;&nbsp; */}
             <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button> &nbsp;&nbsp;&nbsp;&nbsp;
             <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); await handleAttendanceModel()}}> Cancel</Button>
         </DialogActions>
     </form>
 }
 
-const afterSubmit = (result, dispatch) => {dispatch(reset('AttendanceUploadFrom'))};
-AttendanceForm=reduxForm({ form: 'AttendanceUploadFrom', onSubmitSuccess: afterSubmit })(AttendanceForm);
+const attendanceFormReset=() => reset('AttendanceUploadFrom');
+AttendanceForm=reduxForm({ form: 'AttendanceUploadFrom'})(AttendanceForm);
 
-const mapStateToProps = state => { return state; };
+const selector = formValueSelector('AttendanceUploadFrom')
+const mapStateToProps = state => { 
+    const latestAttFromDate = selector(state, 'latestAttFromDate')
+    const latestAttToDate = selector(state, 'latestAttToDate')
+    return {...state, latestAttToDate, latestAttFromDate}; 
+};
+
 const mapDispatchToProps = (dispatch) => ({
+    dispatch,
     LoginActions: bindActionCreators(LoginActions, dispatch),
     MasterDataAction: bindActionCreators(MasterDataAction, dispatch),
-    FileAction: bindActionCreators(FileAction, dispatch)
+    FileAction: bindActionCreators(FileAction, dispatch),
+    AttendanceFormReset: bindActionCreators({attendanceFormReset},dispatch) 
 })
 export default connect(mapStateToProps, mapDispatchToProps)(UserManagement);
 

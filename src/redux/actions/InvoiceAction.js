@@ -7,7 +7,7 @@ import { InvoiceError } from '../../assets/config/ErrorStringFile';
 const GetInvoiceList = (firstIndex, lastIndex, authroizationKey) => {
     return (dispatch) => {
         return CreateInstance()
-            .get('/invoice/invoiceList/' + firstIndex + '/' + lastIndex, HeaderConfig(authroizationKey))
+            .get('/innvoice/invoiceList/' + firstIndex + '/' + lastIndex, HeaderConfig(authroizationKey))
             .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceList, "loadMessage":loadMessage, response}) })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
@@ -26,10 +26,24 @@ const GenerateInvoice = (invoiceData, authroizationKey) => {
                         return dispatch(loadMessage(AlertColor.danger, InvoiceError.NO_CONTENT));  
                     case "CONFLICT":
                         return dispatch(loadMessage(AlertColor.danger, InvoiceError.CONFLICT + response.data.fromDate +" to "+response.data.toDate)); 
+                    case "INTERNAL_SERVER_ERROR":
+                        return dispatch(loadMessage(AlertColor.danger, InvoiceError.INTERNAL_SERVER_ERROR)); 
                     default:
                         return SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) 
                 }
             })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
+const GetPDFInvoiceData = (invoiceId, authroizationKey) => {
+    return (dispatch) => {
+        return CreateInstance()
+            .get('/innvoice/create/'+invoiceId,{headers: { 
+                'Content-Type': 'application/json',
+                Authorization: authroizationKey 
+            }})
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
@@ -47,6 +61,8 @@ const GenerateInvoicePDF = (invoiceData, authroizationKey) => {
                         return dispatch(loadMessage(AlertColor.danger, InvoiceError.NO_CONTENT));  
                     case "CONFLICT":
                         return dispatch(loadMessage(AlertColor.danger, InvoiceError.CONFLICT + response.data.fromDate +" to "+response.data.toDate)); 
+                    case "INTERNAL_SERVER_ERROR":
+                        return dispatch(loadMessage(AlertColor.danger, InvoiceError.INTERNAL_SERVER_ERROR));
                     default:
                         return SuccessFunction({ dispatch , "successMethod": SaveGenratedInvoiceData, "loadMessage":loadMessage, response}) 
                 }
@@ -71,6 +87,13 @@ export function SaveInvoiceEmployeeData(invoiceData) {
     }
 }
 
+export function SavePDFInvoiceData(invoiceData) {
+    return {
+        type: "SAVE_PDF_INVOICE_DATA",
+        invoiceData
+    }
+}
+
 export function SaveGenratedInvoiceData(invoiceData) {
     return {
         type: "SAVE_INVOICE_CREATE_PDF",
@@ -81,5 +104,6 @@ export function SaveGenratedInvoiceData(invoiceData) {
 export{
     GetInvoiceList,
     GenerateInvoice,
-    GenerateInvoicePDF
+    GenerateInvoicePDF,
+    GetPDFInvoiceData
 }

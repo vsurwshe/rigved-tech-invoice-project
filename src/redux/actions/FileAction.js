@@ -12,7 +12,7 @@ const SaveFileDetails = (fileData, authroizationKey) => {
                     Authorization: authroizationKey
                 }
             })
-            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveFileData, "loadMessage":loadMessage, response}) })
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveFileData, "loadMessage":loadMessage, response, message:response.data[0]}) })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }

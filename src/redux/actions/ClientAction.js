@@ -19,7 +19,7 @@ const SaveClientData=(userData,authroizationKey)=>{
                 Authorization: authroizationKey 
             }
         })
-        .then(response => { SuccessFunction({ dispatch , "successMethod": SaveClientList, "loadMessage":loadMessage, response, "postMethod":true}) })
+        .then(response => { SuccessFunction({ dispatch , "successMethod": SaveClientDetails, "loadMessage":loadMessage, response, "postMethod":true}) })
         .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }

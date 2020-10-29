@@ -5,11 +5,12 @@ import * as FileAction from '../../redux/actions/FileAction'
 import * as ClientAction from "../../redux/actions/ClientAction"
 import { loadMessage } from '../../redux/actions/ClientAction'
 import { bindActionCreators } from 'redux';
-import { Card, Dialog, DialogTitle, DialogContent, DialogContentText, Button, CircularProgress, DialogActions } from '@material-ui/core';
+import { Card, Dialog, DialogTitle, DialogContent, DialogContentText, Button, DialogActions } from '@material-ui/core';
 import PurchaseOrderTable from './PurchaseOrderTable';
 import PurchaseOrderForm from './PurchaseOrderFrom'
 import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
 import moment from 'moment';
+import { renderLoading } from '../utilites/FromUtilites';
 
 class PurchaseOrderManagement extends Component {
     state = {
@@ -35,7 +36,6 @@ class PurchaseOrderManagement extends Component {
         if (listOfClient && listOfClient.length === 0) {
             await GetClientList(0, 20, authorization);
         }
-        await loadMessage();
         await this.handleLoadPurchaseOrdertList()
     }
 
@@ -67,6 +67,7 @@ class PurchaseOrderManagement extends Component {
     uploadPurchaseFile = async (fileData, name, type) => {
         const { SaveFileDetails, SaveFileData } = this.props.FileAction
         const { authorization } = this.props.LoginState
+        const { dispatch }=this.props
         let newFileData = [{
             "fileName": name,
             "description": "PoDetail",
@@ -76,7 +77,7 @@ class PurchaseOrderManagement extends Component {
         await this.handlePurchaseOrderUplaod();
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
-            await loadMessage()
+            await dispatch(loadMessage());
             await SaveFileData();
             await this.handlePurchaseOrderUplaod();
         }, API_EXE_TIME)
@@ -126,19 +127,16 @@ class PurchaseOrderManagement extends Component {
     // this method main framework which calling load PurchaseOrder table method
     loadPurchaseOrder = () => {
         const { loadPuchaseOrderList } = this.state
-        return <div>  {loadPuchaseOrderList ? this.loadingCircle() : this.loadingPurchaseOrderTable()} </div>
+        return <div>  {loadPuchaseOrderList ? renderLoading({ message:"Loading Purchase Order Management", size:80 }) : this.loadingPurchaseOrderTable()} </div>
     }
 
     // this method used for load the client table
     loadingPurchaseOrderTable = () => {
         const { operation } = this.state
-        return <>
-            {this.loadDeleteModel()}
+        return <>{this.loadDeleteModel()}
             <PurchaseOrderTable operation={operation} createPurchaseOrder={this.handleCreatePurchaseOrder} viewPurchaseOrder={this.viewPuchaseOrderDetails} deletePuchaseOrder={this.handleDeleteModel} />
         </>
     }
-    // this method used for the show circular progress bar 
-    loadingCircle = () => <center> <h3>Purchase Order Management</h3> <CircularProgress size={80} /> </center>
 
     // this method called when we click the view button in client table
     viewPuchaseOrderDetails = (data, operation) => { this.handleCreatePurchaseOrder(data, operation) }
@@ -148,6 +146,7 @@ class PurchaseOrderManagement extends Component {
         const { purchaseOrderFileUrl } = this.state
         const { SavePurchaseOrderDetails, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
         const { authorization } = this.props.LoginState
+        const { dispatch }=this.props
         const newUserData = {
             ...sendUserValues,
             "clientName":sendUserValues.clientName && sendUserValues.clientName.title,
@@ -156,7 +155,7 @@ class PurchaseOrderManagement extends Component {
         }
         await SavePurchaseOrderDetails(newUserData, authorization)
         setTimeout(async () => {
-            await loadMessage()
+            await dispatch(loadMessage());
             await GetPurchaseOrderList(0, 20, authorization);
             await this.clearFileUrl();
             this.handleCreatePurchaseOrder();
@@ -167,10 +166,11 @@ class PurchaseOrderManagement extends Component {
     DeletePurchaseOrderDetails = async (purchaseOrderId) => {
         const { DeletePurchaseOrder, GetPurchaseOrderList } = this.props.PurchaseOrderAction;
         const { authorization } = this.props.LoginState
+        const { dispatch }=this.props
         await this.handleLoadPurchaseOrdertList();
         purchaseOrderId && await DeletePurchaseOrder(purchaseOrderId, authorization);
         setTimeout(async () => {
-            await loadMessage();
+            await dispatch(loadMessage());
             await GetPurchaseOrderList(0, 20, authorization);
             await this.handleDeleteModel();
             await this.handleLoadPurchaseOrdertList();
@@ -180,6 +180,7 @@ class PurchaseOrderManagement extends Component {
 
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({
+    dispatch,
     PurchaseOrderAction: bindActionCreators(PurchaseOrderAction, dispatch),
     FileAction: bindActionCreators(FileAction, dispatch),
     ClientAction: bindActionCreators(ClientAction,dispatch)
