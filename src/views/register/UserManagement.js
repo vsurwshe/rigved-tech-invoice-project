@@ -47,7 +47,7 @@ class UserManagement extends Component {
             await GetRoleList(0, 20, authorization)
         }
         if (EmployeeList && EmployeeList.length <= 0) {
-            await GetEmployeeList(0, 20, authorization)
+            await GetEmployeeList(0, 100, authorization)
         }
         await this.handleLoadValue();
     }
@@ -295,7 +295,7 @@ class UserManagement extends Component {
         this.handleLoadValue()
         await RegisterUserDetails(newUserData, authorization)
         setTimeout(async () => {
-            await GetEmployeeList(0,20,authorization)
+            await GetEmployeeList(0,100,authorization)
             await dispatch(loadMessage());
             console.log("UserData",userData)
              alert("Your Employee Data Saved");

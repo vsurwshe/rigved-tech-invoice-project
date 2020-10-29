@@ -40,7 +40,7 @@ class ProjectManagement extends Component {
         (Domains && Domains.length === 0) && await GetDomains(0, 10, authorization);
         (ManagerList && ManagerList.length === 0) && await GetManagerList(0,10,authorization);
         (ExpenseTypeList && ExpenseTypeList.length === 0) && await GetExpenseTypeList(0,20,authorization);
-        (EmployeeList && EmployeeList.length === 0) && await GetEmployeeList(0,20,authorization);
+        (EmployeeList && EmployeeList.length === 0) && await GetEmployeeList(0,100,authorization);
         (listOfClient && listOfClient.length === 0) && await GetClientList(0,20,authorization);
         (purchaseOrderList && purchaseOrderList.length === 0) && await GetPurchaseOrderList(0,20,authorization);
         (projectList && projectList.length === 0) && await GetProjectList(0,20,authorization);
