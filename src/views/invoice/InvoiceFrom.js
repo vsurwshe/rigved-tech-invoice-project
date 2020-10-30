@@ -51,7 +51,10 @@ let InvoiceFrom = (props) => {
 // this method will used for the showing invoice after posting successfully resource table
 const ShowViewInvoice = (propsData) => {
     const { viewInvoice, setViewInvoice, classes } = propsData
-    const { genratedInvoiceData }=propsData.mainProps.InvoiceState 
+    const { genratedInvoiceData }=propsData.mainProps.InvoiceState
+    if(viewInvoice && JSON.stringify(genratedInvoiceData) === "[]"){
+        return setViewInvoice(false);
+    }
     return <Dialog fullScreen open={viewInvoice} onClose={() => setViewInvoice(false)} TransitionComponent={Transition}>
         <AppBar className={classes.dialogAppBar} style={{ float: "right" }} >
             <Toolbar >
@@ -60,7 +63,7 @@ const ShowViewInvoice = (propsData) => {
             </Toolbar>
         </AppBar>
         <DialogContent>
-            { genratedInvoiceData.invoiceNo !== "" ? <Invoice inoiceData={genratedInvoiceData}/>: <h3>Sorry there is no invoice created</h3>}
+            { JSON.stringify(genratedInvoiceData) !== "[]" && <Invoice inoiceData={genratedInvoiceData}/>}
         </DialogContent>
         <DialogActions>
             <Button onClick={() => setViewInvoice(false)} color="primary">Cancel</Button>
@@ -287,7 +290,7 @@ const GenratePDFInvoice=async (propsData)=>{
     const { fromDateProps, toDateProps }=propsData.mainProps
     const { authorization }=propsData.mainProps.LoginState
     const { loadMessage } = propsData.mainProps.ClientAction
-    const { genratedInvoiceData } = propsData.mainProps.InvoiceState
+    // const { genratedInvoiceData } = propsData.mainProps.InvoiceState
     const { GenerateInvoicePDF, SaveGenratedInvoiceData}=propsData.mainProps.InvoiceAction
     let newInvoiceGenratePDFData={
         "fromDate":fromDateProps && fromDateProps ,
@@ -302,7 +305,7 @@ const GenratePDFInvoice=async (propsData)=>{
         await loadMessage();
         // await GetBillingData(authorization,{});
         await setLoading(false);
-        (genratedInvoiceData && genratedInvoiceData.invoiceNo !== "") && await setViewInvoice(true);
+        await setViewInvoice(true);
     }, API_EXE_TIME)
 }
 

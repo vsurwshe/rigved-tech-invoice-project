@@ -284,7 +284,7 @@ class UserManagement extends Component {
     RegisterUser = async (sendUserValues) => {
         const { profileImageUrl } = this.state
         const { RegisterUserDetails, loadMessage } = this.props.LoginActions
-        const { authorization, userData } = this.props.LoginState
+        const { authorization } = this.props.LoginState
         const { GetEmployeeList }=this.props.MasterDataAction
         const { dispatch }=this.props
         const newUserData = {
