@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, FormControlLabel, Checkbox, FormControl, RadioGroup, Radio, FormHelperText, InputLabel, Select, FormLabel, Button } from "@material-ui/core"
+import { TextField, FormControlLabel, Checkbox, FormControl, RadioGroup, Radio, FormHelperText, InputLabel, Select, FormLabel, Button, CircularProgress } from "@material-ui/core"
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Required, PhoneNumber, Email } from '../utilites/FormValidation';
 import { FromActions } from '../../assets/config/Config';
@@ -216,6 +216,11 @@ const renderContact = ({ classes, open, handleClickOpen, handleClose, fields, in
   </span>
 }
 
+const renderLoading=({message , size})=>{
+  return <center> <h3>{message}</h3> <CircularProgress size={size} /> </center>
+}
+
+
 export{
     renderTextField,
     renderTextHiddenField,
@@ -230,5 +235,6 @@ export{
     renderAutocompleteByName,
     renderAutocompleteWithProps,
     renderPasswordTextField,
-    renderContact
+    renderContact,
+    renderLoading
 }

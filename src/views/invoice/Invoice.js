@@ -1,11 +1,10 @@
+
 import React from 'react';
 import "../../scss/invoiceTemplate.css"
-
 let Invoice=(props)=>{
     const {inoiceData }=props
     return LoadInvoiceTable(inoiceData);
 }
-
 const LoadInvoiceTable=(props)=>{
 return <div  className="invoice-box">
     <table id="invoiceProject" cellPadding="0" border="1" cellSpacing="0">
@@ -18,7 +17,6 @@ return <div  className="invoice-box">
     </table>
 </div>
 }
-
 const MainTableSectionOne=(propsData)=>{ 
     return <table className="table-border-bottom">
         <tbody>
@@ -26,7 +24,6 @@ const MainTableSectionOne=(propsData)=>{
         </tbody>
     </table>
 }
-
 const MainTableSectionTwo=(propsData)=>{
     const { mainProps }=propsData
     return <table>
@@ -37,7 +34,6 @@ const MainTableSectionTwo=(propsData)=>{
                 </tbody>
         </table>
 }
-
 // this will load the from Section row
 const FormSection=(propsData)=>{
     const { mainProps }=propsData
@@ -55,7 +51,6 @@ const FormSection=(propsData)=>{
         </tbody>
     </table>
 }
-
 // this will load the Conact info and Details Row
 const ContactAndInvoiceDetailsRow=(propsData)=>{
     const { mainProps }=propsData
@@ -82,7 +77,6 @@ const ContactAndInvoiceDetailsRow=(propsData)=>{
         </tbody>
     </table>
 }
-
 // this will load the to info details row
 const ToSection=(propsData)=>{
     const { mainProps }=propsData
@@ -103,7 +97,6 @@ const ToSection=(propsData)=>{
             </tbody>
     </table> 
 }
-
 const MainTableSectionThree=(propsData)=>{
     const {mainProps }=propsData
     return <table style={{fontSize:"12px" , borderCollapse:"collapse", lineHeight:"initial"}} cellPadding="0" border="1" cellSpacing="0">
@@ -173,7 +166,6 @@ const MainTableSectionThree=(propsData)=>{
         </tbody>
     </table>
 }
-
 const MainTableSectionFourth=(propsData)=>{
     return <table>
         <tbody>
@@ -182,7 +174,6 @@ const MainTableSectionFourth=(propsData)=>{
         </tbody>
     </table>
 }
-
 const FooterBankSections=(propsData)=>{
     return <table>
     <tbody>
@@ -205,7 +196,6 @@ const FooterBankSections=(propsData)=>{
     </tbody>
 </table>
 }
-
 const FooterDigitalSignSections=(propsData)=>{
     return<table style={{float:"right", position:"relative", width:"30%", marginTop:"-45px"}}>
         <tbody>
@@ -213,6 +203,4 @@ const FooterDigitalSignSections=(propsData)=>{
         </tbody>
     </table> 
 }
-
-
 export default Invoice;

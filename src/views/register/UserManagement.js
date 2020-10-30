@@ -297,8 +297,7 @@ class UserManagement extends Component {
         setTimeout(async () => {
             await GetEmployeeList(0,100,authorization)
             await dispatch(loadMessage());
-            console.log("UserData",userData)
-             alert("Your Employee Data Saved");
+            alert("Your Employee Data Saved");
             await this.clearFileUrl();
             await this.handleLoadValue();
             await this.handleRegisterFromActions();

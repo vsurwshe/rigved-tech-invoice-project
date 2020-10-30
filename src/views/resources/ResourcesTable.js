@@ -234,7 +234,6 @@ const LoadAddResourceModel = (data) => {
 
 // this method will used for the loading assign resource
 const loadAssignResource = (data) => {
-  console.log("LR ",data.mainProps)
   const { setLoad, load, handleClose, tableData, setTableData, setSelectedRateCard } = data
   const { projectId, dispatch } = data.mainProps
   const { authorization } = data.mainProps.LoginState
