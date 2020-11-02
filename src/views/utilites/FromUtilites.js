@@ -6,6 +6,9 @@ import { FromActions } from '../../assets/config/Config';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import { Field } from 'redux-form';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
 // this is render text filed
 const renderTextField = ({ label, name, input, helperText, meta: { touched, invalid, error }, ...custom }) => (
     <TextField
@@ -220,6 +223,19 @@ const renderLoading=({message , size})=>{
   return <center> <h3>{message}</h3> <CircularProgress size={size} /> </center>
 }
 
+// this method will used for the download the invoice table as pdf
+const dwonloadInvoice = () => {
+  let htmlTable = document.getElementById('invoiceProject');
+  html2canvas(htmlTable, {
+      allowTaint: true,
+      backgroundColor: "rgba(255, 255, 255, 1)",
+  }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      pdf.addImage(imgData, 'PNG', 25, 70);
+      pdf.save("downloadInvoice.pdf");
+  });
+}
 
 export{
     renderTextField,
@@ -236,5 +252,6 @@ export{
     renderAutocompleteWithProps,
     renderPasswordTextField,
     renderContact,
-    renderLoading
+    renderLoading,
+    dwonloadInvoice
 }

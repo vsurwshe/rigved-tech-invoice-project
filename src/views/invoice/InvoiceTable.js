@@ -4,7 +4,7 @@ import MaterialTable from "material-table";
 import { Button } from '@material-ui/core';
 import { FromActions } from '../../assets/config/Config';
 import VisibilityIcon from '@material-ui/icons/Visibility';
-import CancelIcon from '@material-ui/icons/Cancel';
+import DescriptionIcon from '@material-ui/icons/Description';
 import moment from 'moment';
 
 const InvoiceTable=(props)=>{
@@ -13,12 +13,12 @@ const InvoiceTable=(props)=>{
     // creating columns
     const columns = [
       { title: 'Sr.\u00a0No.', field: 'key', width: 5 },
-      { title: 'Client', field: 'clientName', width: 30 },
       { title: 'Invoice\u00a0Date', field: 'invoiceDate',width: 10 },
-      { title: 'Invoice\u00a0Number', field: 'invoiceNumber', width:10 },
+      { title: 'Invoice\u00a0Number', field: 'invoiceNo', width:10 },
+      { title: 'Client', field: 'toCompanyName'},
       { title: 'Person\u00a0Responsible', field: 'personName' },
       // { title: 'Due\u00a0Date', field: 'dueDate', width: 10 },
-      { title: 'Total\u00a0Amount', field: 'totalAmount', width: 10 },
+      { title: 'Total\u00a0Amount', field: 'billWitGST', width: 10 },
       {
         title: "",
         width:8,
@@ -30,7 +30,7 @@ const InvoiceTable=(props)=>{
         title: "",
         width:8,
         render: (rowData)=> {
-            return<CancelIcon variant="contained" color="secondary" onClick={()=>fromAction(rowData.data,FromActions.DE,true)} />
+            return<DescriptionIcon variant="contained" color="primary" onClick={()=>fromAction(rowData.data, FromActions.VIED)} />
         }
       }
     ];

@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import InvoiceFrom from './InvoiceFrom';
 import { connect } from 'react-redux';
-import { Card } from '@material-ui/core';
+import { Button, Card } from '@material-ui/core';
 import InvoiceTable from './InvoiceTable';
 import * as ClientAction from "../../redux/actions/ClientAction";
 import * as InvoiceAction from '../../redux/actions/InvoiceAction';
 import { bindActionCreators } from 'redux';
 import { FromActions } from '../../assets/config/Config';
-import { renderLoading } from '../utilites/FromUtilites';
+import { dwonloadInvoice, renderLoading } from '../utilites/FromUtilites';
+import Invoice from './Invoice';
 class InvoiceManagement extends Component {
     state = {  
         loadInvoiceList:false,
@@ -22,10 +23,10 @@ class InvoiceManagement extends Component {
         const { invoiceList }=this.props.InvoiceState
         const { authorization }=this.props.LoginState
         const { GetClientList, loadMessage }=this.props.ClientAction
-        const { GetInvoiceList }=this.props.InvoiceAction
+        const { getPDFInvoiceList }=this.props.InvoiceAction
         await this.handleInvoiceLoadvalue();
         (listOfClient && listOfClient<=0)&& await GetClientList(0,20,authorization);
-        (invoiceList && invoiceList<=0)&& await GetInvoiceList(0,20,authorization);
+        (invoiceList && invoiceList<=0)&& await getPDFInvoiceList(0,20,authorization);
         await loadMessage();
         await this.handleInvoiceLoadvalue();
     }
@@ -48,18 +49,18 @@ class InvoiceManagement extends Component {
         return <Card> {fromAction ? this.loadInvoiceFrom(invoiceData) : this.loadInvoiceTable()}</Card>;
     }
 
-    loadInvoiceView=(invoiceData)=>{
-        this.loadInvoiceFrom({
-            "name":"vishva"
-        },true)
-    }
-
-    loadInvoiceFrom=(invoiceData, viewInvoice)=>{
-        return  <InvoiceFrom 
-            cancle={this.handleInvoiceFromAction}
-            viewInvoiceData={invoiceData}
-            viewInvoiceByID={viewInvoice}
-        />
+    loadInvoiceFrom=()=>{
+        const { operations, invoiceData }=this.state
+        if(operations === FromActions.VIED){
+            return <Card>
+                <Invoice inoiceData={invoiceData} />
+                <center>
+                    <Button type="button" variant="outlined" color="primary" onClick={async ()=> await dwonloadInvoice()} >Download Invoice</Button> &nbsp;&nbsp;
+                    <Button type="button" variant="outlined" color="secondary" onClick={async () => { await this.handleInvoiceFromAction();} }> Cancle</Button>&nbsp;&nbsp;
+                </center>
+            </Card>
+        }
+        return  <InvoiceFrom  cancle={this.handleInvoiceFromAction} />
     }
 
     loadInvoiceTable=()=>{
@@ -70,6 +71,7 @@ class InvoiceManagement extends Component {
     loadingInvoiceTable=()=>{
         return <InvoiceTable 
             fromAction={this.handleInvoiceFromAction}
+            viewInvoice={this.loadInvoiceView}
         />
     }
 }

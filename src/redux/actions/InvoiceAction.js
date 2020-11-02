@@ -4,11 +4,11 @@ import { loadMessage } from "../actions/ClientAction";
 import { SuccessFunction, ErrorFunction } from "./CommonAction"
 import { InvoiceError } from '../../assets/config/ErrorStringFile';
 
-const GetInvoiceList = (firstIndex, lastIndex, authroizationKey) => {
+const GetInvoiceUserList = (firstIndex, lastIndex, invoiceId, authroizationKey) => {
     return (dispatch) => {
         return CreateInstance()
-            .get('/innvoice/invoiceList/' + firstIndex + '/' + lastIndex, HeaderConfig(authroizationKey))
-            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceList, "loadMessage":loadMessage, response}) })
+            .get('/innvoice/invoiceList/' + firstIndex + '/' + lastIndex+'/'+invoiceId, HeaderConfig(authroizationKey))
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceUserList, "loadMessage":loadMessage, response}) })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
@@ -71,11 +71,39 @@ const GenerateInvoicePDF = (invoiceData, authroizationKey) => {
     }
 }
 
+const getPDFInvoiceList=(firstIndex, lastIndex,authroizationKey)=>{
+    return (dispatch) => {
+        return CreateInstance()
+            .get('/innvoice/invoicePDFData/'+firstIndex+'/'+lastIndex,HeaderConfig(authroizationKey))
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SavePDFInvoiceList, "loadMessage":loadMessage, response}) })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
+const viewInvoicePDFData = (invoiceId, authroizationKey) => {
+    return (dispatch) => {
+        return CreateInstance()
+            .get('/innvoice/invoicePDFData/'+invoiceId,{headers: { 
+                'Content-Type': 'application/json',
+                Authorization: authroizationKey 
+            }})
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
 //-------------------------------------
 
-export function SaveInvoiceList(invoiceList) {
+export function SaveInvoiceUserList(invoiceList) {
     return {
-        type: "SAVE_INVOICE_LIST",
+        type: "SAVE_INVOICE_USER_LIST",
+        invoiceList
+    }
+}
+
+export function SavePDFInvoiceList(invoiceList) {
+    return {
+        type: "SAVE_INVOICE_PDF_LIST",
         invoiceList
     }
 }
@@ -101,9 +129,18 @@ export function SaveGenratedInvoiceData(invoiceData) {
     }
 }
 
+export function SaveViewInvoicePDFData(invoiceData) {
+    return {
+        type: "SAVE_VIEW_INVOICE_PDF",
+        invoiceData
+    }
+}
+
 export{
-    GetInvoiceList,
+    GetInvoiceUserList,
     GenerateInvoice,
     GenerateInvoicePDF,
-    GetPDFInvoiceData
+    GetPDFInvoiceData,
+    viewInvoicePDFData,
+    getPDFInvoiceList
 }
