@@ -142,6 +142,14 @@ const MainTableSectionThree=(propsData)=>{
                 </tr>
             }
             { 
+                (mainProps && mainProps.sgstutgs) && <tr>
+                    <td>Add :SGST @ 9.0%</td>
+                    <td></td>
+                    <td></td>
+                    <td>{mainProps.sgstutgs}</td>
+                </tr>
+            }
+            { 
                 (mainProps && mainProps.igst) && <tr>
                     <td>Add :IGST @ 18%</td>
                     <td></td>

@@ -37,30 +37,34 @@ class InvoiceManagement extends Component {
     // this method will handle the form action
     handleInvoiceFromAction=async(invoiceData,operations)=>{
         if(operations === FromActions.VI){
-           await this.loadInvoiceView(invoiceData);
-           await this.setState({operations, fromAction: !this.state.fromAction})
+            const { authorization }=this.props.LoginState
+            const { GetInvoiceUserList }=this.props.InvoiceAction
+            await this.handleInvoiceLoadvalue();
+            (invoiceData && invoiceData.id) && await GetInvoiceUserList(0,20,invoiceData.id,authorization)
+            await this.handleInvoiceLoadvalue();
+            await this.setState({invoiceData, operations, fromAction: !this.state.fromAction})
         }else{
             this.setState({ invoiceData,fromAction: !this.state.fromAction, operations})
         }
     }
 
     render() { 
-        const { fromAction, invoiceData }=this.state
-        return <Card> {fromAction ? this.loadInvoiceFrom(invoiceData) : this.loadInvoiceTable()}</Card>;
+        const { fromAction }=this.state
+        return <Card> {fromAction ? this.loadInvoiceFrom() : this.loadInvoiceTable()}</Card>;
     }
 
     loadInvoiceFrom=()=>{
         const { operations, invoiceData }=this.state
         if(operations === FromActions.VIED){
-            return <Card>
+            return <>
                 <Invoice inoiceData={invoiceData} />
                 <center>
                     <Button type="button" variant="outlined" color="primary" onClick={async ()=> await dwonloadInvoice()} >Download Invoice</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await this.handleInvoiceFromAction();} }> Cancle</Button>&nbsp;&nbsp;
                 </center>
-            </Card>
-        }
-        return  <InvoiceFrom  cancle={this.handleInvoiceFromAction} />
+            </>
+        } 
+        return  <InvoiceFrom  initialValues={invoiceData} cancle={this.handleInvoiceFromAction} />
     }
 
     loadInvoiceTable=()=>{

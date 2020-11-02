@@ -25,7 +25,7 @@ const Transition = forwardRef(function Transition(props, ref) { return <Slide di
 
 let InvoiceFrom = (props) => {
     var classes = useStyles();
-    const { pristine, reset, submitting, handleSubmit, cancle, viewInvoiceByID } = props
+    const { pristine, reset, submitting, handleSubmit, cancle, initialValues } = props
     const { SaveInvoiceEmployeeData } = props.InvoiceAction
     const [viewInvoice, setViewInvoice] = useState(false);
     const [projectIdList, setProjectIdList] = useState([])
@@ -35,12 +35,11 @@ let InvoiceFrom = (props) => {
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit((values) => PostInvoiceData({ "mainProps": props, values, projectIdList, viewSectionThree, setSubmit, setViewSectionThree, setLoading }))}>
             {LoadGird({ "mainProps": props, projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, loading, setLoading, setViewInvoice })}
-            {viewInvoiceByID && setViewInvoice(viewInvoiceByID)}
             {ShowViewInvoice({ "mainProps": props, classes, viewInvoice, setViewInvoice })}
             <div className={classes.buttonStyle}>
                 <center>
-                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting || submit}>SUBMIT</Button> &nbsp;&nbsp;
-                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={async () => { await reset(); await SaveInvoiceEmployeeData([]); await setViewSectionThree(false); }}> Clear Values</Button>&nbsp;&nbsp;
+                    {!initialValues && <><Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting || submit}>SUBMIT</Button> &nbsp;&nbsp;
+                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={async () => { await reset(); await SaveInvoiceEmployeeData([]); await setViewSectionThree(false); }}> Clear Values</Button>&nbsp;&nbsp;</>}
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button> &nbsp;&nbsp;
                 </center>
             </div>
@@ -115,6 +114,7 @@ const LoadGird = (props) => {
     var classes = useStyles();
     const { projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, loading, setLoading, setViewInvoice } = props
     const { color, common_message } = props.mainProps.ClientState
+    const { initialValues }=props.mainProps
     return <>
         <Grid container spacing={5}>
             <Grid item xs={12} style={{ padding: 30 }}>
@@ -122,18 +122,46 @@ const LoadGird = (props) => {
             </Grid>
         </Grid>
         <Grid container spacing={5}>
-            <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 30 }}>
-                {SectionOne({ classes, "mainProps": props.mainProps, projectIdList, setProjectIdList, setLoading })}
-            </Grid>
-            <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 30 }} >
-                {SectionTwo({ classes, "mainProps": props.mainProps })}
-            </Grid>
+            { initialValues ? <LoadHeader initialValues={initialValues} mainProps={props.mainProps}/>:
+                <>
+                <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 30 }}>
+                    {SectionOne({ classes, "mainProps": props.mainProps, projectIdList, setProjectIdList, setLoading })}
+                </Grid>
+                <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 30 }} >
+                    {SectionTwo({ classes, "mainProps": props.mainProps })}
+                </Grid>
+            </>}
         </Grid>
         <center>{loading && renderLoading({message:"", size:40})}</center>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
                 {viewSectionThree && SectionThree({ "mainProps": props.mainProps , viewSectionThree, setViewSectionThree, projectIdList, setLoading, setViewInvoice})}
             </Grid>
+        </Grid>
+    </>
+}
+
+const LoadHeader=(props)=>{
+    const { initialValues }=props
+    const { invoiceUserList }=props.mainProps.InvoiceState
+    let columns = [
+        { title: "EMP\u00a0ID", field: "employeeId" },
+        { title: "EMP\u00a0NAME", field: "employeeName" },
+        { title: "PER\u00a0DAY\u00a0RATE", field: "perDayRate" },
+        { title: "TOTAL\u00a0DAYS", field: "totalDays" },
+        { title: "TOTAL\u00a0AMOUNT", field: "totalAmt" }
+    ];
+    let data = [];
+    return <>
+        <Grid item xs={12} sm={6} style={{ paddingLeft: 20 }}> 
+            <h4>Client Name : {initialValues.toCompanyName}</h4>
+            <h4>Date : {initialValues.invoiceDate}</h4>
+            <h4>Subtotal : {initialValues.billWitoutGST}</h4>
+            <h4>Total Amount : {initialValues.billWitGST}</h4>
+        </Grid>
+        <Grid item xs={12}>
+            <PrepareDataForResourceTable listOfRows={invoiceUserList} data={data} columns={columns} />
+            <LoadInvoiceResourceTable data={data} columns={columns} initialValues={initialValues} title="List of assigned resource" />
         </Grid>
     </>
 }
@@ -252,35 +280,66 @@ const SectionThree = (propsData) => {
             columns.splice(5, 0, ...tempColunmsData)
             return "";
         })
-        return LoadInvoiceResourceTable({ columns, data, "mainProps": propsData.mainProps, projectIdList: propsData.projectIdList, setLoading, setViewInvoice });
+        return LoadInvoiceResourceTable({ columns, data, title:"", "mainProps": propsData.mainProps, projectIdList: propsData.projectIdList, setLoading, setViewInvoice });
     }else{
         return setViewSectionThree(false);
     }
 }
 
+const PrepareDataForResourceTable=(props)=>{
+    const { listOfRows, data, columns}=props
+   return (listOfRows && listOfRows.length > 0) && listOfRows.map((item, key) => {
+        let monthString = item.attendancepermonth ? item.attendancepermonth : "";
+        let firstArray = monthString && monthString.split(',');
+        let tempColunmsData = [];
+        data.push({ "data":item, ...item })
+        firstArray.forEach(element => {
+            let monthNumber;
+            let filterEqualArray;
+            if (element.includes("{")) {
+                let tempArray = element.split('{')
+                filterEqualArray = tempArray[1].split("=");
+            } else if (element.includes("}")) {
+                let tempArray = element.split('}')
+                filterEqualArray = tempArray[0].split("=");
+            } else {
+                filterEqualArray = element.split("=");
+            }
+            monthNumber = filterEqualArray && filterEqualArray[0].replace(/ /g, "");
+            key === 0 && tempColunmsData.push({ title: months[monthNumber], field: months[monthNumber] })
+            data[key][months[monthNumber]] = (filterEqualArray[1] && filterEqualArray[1].includes("}")) ? (filterEqualArray[1].split('}')[0]) : filterEqualArray[1]
+        });
+        columns.splice(5, 0, ...tempColunmsData)
+        return "";
+    })
+}
+
 // this method will used for the loading resource table
 const LoadInvoiceResourceTable = (propsData) => {
-    const { columns, data, projectIdList, setLoading, setViewInvoice } = propsData
+    const { columns, data, projectIdList, setLoading, setViewInvoice, initialValues, title } = propsData
     return <div style={{ maxWidth: "100%" }}>
         <MaterialTable
-            title=""
+            title={title}
             columns={columns}
             data={data.length > 0 ? data : []}
             options={{
                 headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
                 search: false,
-                selection: true
+                selection: !initialValues ? true : false,
+                actionsColumnIndex: -1
             }}
-            actions={[{   
-                icon: () => <div><Button variant="contained" color="primary">Generate Invoice</Button></div>,
-                onClick: (event, rowData) =>{
-                    let tempInvoiceDetails= (rowData && rowData.length >0) && rowData.map((item,key)=>item.data);
-                    if(tempInvoiceDetails){
-                        GenratePDFInvoice({invoiceDetailDtos: tempInvoiceDetails, "mainProps":propsData.mainProps, projectIdList, setLoading, setViewInvoice })
-                    } 
-                },
-                tooltip: 'Generate Invoice'
-            }]}
+            actions={[
+                (rowData) => { return !initialValues && {   
+                    icon: () => <div><Button variant="contained" color="primary">Generate Invoice</Button></div>,
+                    onClick: (event, rowData) =>{
+                        let tempInvoiceDetails= (rowData && rowData.length >0) && rowData.map((item,key)=>item.data);
+                        if(tempInvoiceDetails){
+                            GenratePDFInvoice({invoiceDetailDtos: tempInvoiceDetails, "mainProps":propsData.mainProps, projectIdList, setLoading, setViewInvoice })
+                        } 
+                    },
+                    tooltip: 'Generate Invoice'
+                }}
+            ]}
         />
     </div>
 }
