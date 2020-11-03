@@ -18,7 +18,7 @@ const InvoiceTable=(props)=>{
       { title: 'Client', field: 'toCompanyName'},
       { title: 'Person\u00a0Responsible', field: 'personName' },
       // { title: 'Due\u00a0Date', field: 'dueDate', width: 10 },
-      { title: 'Total\u00a0Amount', field: 'billWitGST', width: 10 },
+      { title: 'Total\u00a0Amount\u00a0(INR)', field: 'billWitGST', width: 10 },
       {
         title: "",
         width:8,
@@ -37,7 +37,7 @@ const InvoiceTable=(props)=>{
 
   // Creating rows
   const data = (invoiceList && invoiceList.length > 0) && invoiceList.map((item, key) => {
-    return {...item,"key": (key + 1), "data": item, "invoiceDate": item.invoiceDate && moment(item.invoiceDate).format('YYYY-MM-DD'), "dueDate":item.dueDate && moment(item.dueDate).format('YYYY-MM-DD') }
+    return {...item,"key": (key + 1), "data": item, "invoiceDate": item.invoiceDate && moment(item.invoiceDate).format('YYYY-MM-DD'), "dueDate":item.dueDate && moment(item.dueDate).format('YYYY-MM-DD'), "billWitGST":item.billWitGST && Math.round(item.billWitGST) }
   });
 
   return <div style={{ maxWidth: "100%" }}>

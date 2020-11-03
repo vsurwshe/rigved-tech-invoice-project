@@ -156,8 +156,8 @@ const LoadHeader=(props)=>{
         <Grid item xs={12} sm={6} style={{ paddingLeft: 20 }}> 
             <h4>Client Name : {initialValues.toCompanyName}</h4>
             <h4>Date : {initialValues.invoiceDate}</h4>
-            <h4>Subtotal : {initialValues.billWitoutGST}</h4>
-            <h4>Total Amount : {initialValues.billWitGST}</h4>
+            <h4>Total Amount : {initialValues.billWitoutGST}</h4>
+            <h4>Total Amount with Tax : {initialValues.billWitGST}</h4>
         </Grid>
         <Grid item xs={12}>
             <PrepareDataForResourceTable listOfRows={invoiceUserList} data={data} columns={columns} />

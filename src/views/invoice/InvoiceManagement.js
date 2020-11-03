@@ -60,7 +60,7 @@ class InvoiceManagement extends Component {
                 <Invoice inoiceData={invoiceData} />
                 <center>
                     <Button type="button" variant="outlined" color="primary" onClick={async ()=> await dwonloadInvoice()} >Download Invoice</Button> &nbsp;&nbsp;
-                    <Button type="button" variant="outlined" color="secondary" onClick={async () => { await this.handleInvoiceFromAction();} }> Cancle</Button>&nbsp;&nbsp;
+                    <Button type="button" variant="outlined" color="secondary" onClick={async () => { await this.handleInvoiceFromAction();} }> Cancel</Button>&nbsp;&nbsp;
                 </center>
             </>
         } 
