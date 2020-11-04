@@ -71,8 +71,8 @@ const RateCardTable = (propsData) => {
         Delete: () => {return <DeleteOutlineIcon variant="contained" color="secondary" />}
       }}
       editable={{
-        isEditable: rowData => false, 
-        isEditHidden: rowData => true,
+        isEditable: rowData => true, 
+        isEditHidden: rowData => false,
         isDeletable: rowData => false,
         isDeleteHidden: rowData => true,
         onRowAdd: newData =>{
@@ -101,7 +101,15 @@ const RateCardTable = (propsData) => {
               }
             })
         },
-        onRowUpdate: (newData, oldData) =>{ return new Promise(async(resolve, reject) => { reject() })},
+        onRowUpdate: (newData, oldData) =>{ return new Promise(async(resolve, reject) => { 
+          if(rateCardDtos && rateCardDtos.length >=0){
+              let filterData = rateCardDtos.filter(item => item.id !== oldData.id);
+              await setRateCardDtos([...filterData,newData]);
+              resolve();
+          }else{
+            reject()
+          }
+        })},
         onRowDelete: oldData =>{ return new Promise(async(resolve, reject) => { resolve() }) }
       }}
     />
@@ -136,12 +144,13 @@ const renderAutoComplete=(propsData)=>{
   style={{marginTop:"-10px"}}
   autoHighlight
   options={(optionData && optionData.length >0) ? optionData: []}
-  getOptionLabel={optionData => (optionData && optionData.name) && optionData.name}
+  getOptionLabel={option => option.name ? option.name :option}
   getOptionSelected={(option, value) => option.id === value.id}
   onChange={(event, value) =>{
       setOpen && setOpen(true);
       value && props.onChange(value.name)
   }}
+  value={props.value}
   renderInput={(params) => ( <TextField {...params} error={!props.value} helperText={!props.value ? helperText:""} label={lable} margin="normal"  /> )}
 />
 }
@@ -151,7 +160,7 @@ const renderSelect=(propsData)=>{
   const { props ,label }=propsData
   return <FormControl error={props.touched && props.error} style={{width:"100%"}}>
   <InputLabel htmlFor="age-native-simple">{label}</InputLabel>
-  <Select  native onChange={(event) => props.onChange(event.target.value)} >
+  <Select  native value={props.value} onChange={(event) => props.onChange(event.target.value)} >
       {[...Array(10)].map((item, key) => <option key={key} value={key}>{key}</option>)}
   </Select>
 </FormControl>
@@ -162,6 +171,7 @@ const renderTextField=({name, label, action, errorText,disabled})=>(
   <TextField
     id={name}
     label={label}
+    value={action.props.value}
     onChange={(event) => action.props.onChange(event.target.value)}
     error={ disabled ? "": (!action.props.value)}
     helperText={ disabled ? "": ((!action.props.value) ? errorText:"")}
