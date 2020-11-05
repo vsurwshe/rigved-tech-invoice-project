@@ -27,6 +27,7 @@ class ProjectManagement extends Component {
      }
     
     componentDidMount=async()=>{
+        const { dispatch }=this.props
         const { listOfClient } = this.props.ClientState;
         const { projectList }= this.props.ProjectState
         const { authorization }= this.props.LoginState
@@ -44,7 +45,7 @@ class ProjectManagement extends Component {
         (listOfClient && listOfClient.length === 0) && await GetClientList(0,20,authorization);
         (purchaseOrderList && purchaseOrderList.length === 0) && await GetPurchaseOrderList(0,20,authorization);
         (projectList && projectList.length === 0) && await GetProjectList(0,20,authorization);
-        await loadMessage();
+        await dispatch(loadMessage());
         await this.handleLoadProjectList();
     }
 
@@ -186,6 +187,7 @@ class ProjectManagement extends Component {
 
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({
+    dispatch,
     ProjectAction: bindActionCreators(ProjectAction, dispatch),
     MasterDataAction: bindActionCreators(MasterDataAction, dispatch),
     ClientAction: bindActionCreators(ClientAction, dispatch),

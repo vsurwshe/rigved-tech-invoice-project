@@ -41,9 +41,9 @@ let ProjectForm = (props) => {
 const LoadGird = (props) => {
     var classes = useStyles();
     const {color, common_message}=props.ClientState
-    const { initialValues } = props
+    const { initialValues, dispatch } = props
     return <><Grid container spacing={5}>
-        {(common_message)&& showMessage(common_message, color)}
+        {(common_message && common_message !== "Something went worng..!")&& showMessage({common_message, color, dispatch})}
         </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 20 }}>
@@ -61,12 +61,11 @@ const LoadGird = (props) => {
     </>
 }
 
-const showMessage=(common_message,color)=>{
+const showMessage=(props)=>{
+    const { common_message, color, dispatch }=props
     return <>
     <center><Alert color={color}>{common_message}</Alert></center>
-    {setTimeout(async()=>{
-        await loadMessage();
-    },API_EXE_TIME)}
+    {setTimeout(async()=>{ await dispatch(loadMessage()); },API_EXE_TIME)}
     </>
 }
 
@@ -218,6 +217,7 @@ const validate=(values)=>{
 // make the selector 
 const selector = formValueSelector('ProjectForm')
 const mapDispatchToProps = (dispatch) => ({
+    dispatch,
     FileAction: bindActionCreators(FileAction, dispatch),
     PurchaseOrderAction: bindActionCreators(PurchaseOrderAction,dispatch),
     change: bindActionCreators(change, dispatch)

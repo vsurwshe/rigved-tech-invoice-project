@@ -212,7 +212,7 @@ const LoadAddResourceModel = (data) => {
       </Toolbar>
     </AppBar>
     <DialogContent>
-      {common_message && alert(common_message)}
+      {(common_message && common_message !== "Something went worng..!") && alert(common_message)}
       {load ? loadingCircle() : <>
         <Grid container spacing={3}>
           <Grid item xs={7}>
