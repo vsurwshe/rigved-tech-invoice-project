@@ -15,7 +15,7 @@ import { FromActions } from '../../assets/config/Config';
 
 let ClientForm = (props) => {
     var classes = useStyles();
-    const { SaveClientMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues, clearFile,rateCardDtosProps } = props
+    const { SaveClientMethod, pristine, reset, submitting, handleSubmit, cancle, clearFile,rateCardDtosProps } = props
     const { operation } = props.stateData
     const [rateCardDtos,setRateCardDtos] = useState([])
     const [rateCardCountCall, setRateCardCountCall] = useState(0)
@@ -29,8 +29,7 @@ let ClientForm = (props) => {
             <div className={classes.buttonStyle}>
                 <center>
                     {(operation === FromActions.ED || operation === FromActions.CR) && <>
-                    {(initialValues === undefined) ? <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting }>SUBMIT</Button> 
-                        :<Button  type="submit" variant="outlined" color="primary">EDIT</Button> }&nbsp;&nbsp;
+                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting }>SUBMIT</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button></>}&nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await clearFile(); await reset(); cancle() }}> Cancel</Button>
                 </center>
@@ -117,6 +116,7 @@ const AddressTextArea = () => {
         disabled
         />
 }
+
 // this method used for the show the address inputs 
 const AddressDto = (props) => {
     const { classes, initialValues } = props
@@ -172,7 +172,6 @@ const LoadFileUrlName = (fileUrl) => {
     return fileArray.length > 0 ? fileArray[5] : "";
 }
 
-
 let LoadFileUrl = (parameter) => {
     const { listOfFiles } = parameter.props.FileState
     const exitsData = (listOfFiles.length > 0) && listOfFiles.filter(x => (x.cid === parameter.cid && x.fileName === parameter.url));
@@ -198,14 +197,23 @@ const BankDetailsDto = () => {
     </span>
 }
 
-
-
 // rate card
 const RateCard = (data) => {
     const { Domains, SkillCategory, SkillSet, rateCardDtos,setRateCardDtos} = data
     const { operation }=(data.mainProps && data.mainProps.stateData) ? data.mainProps.stateData : ""
+    const { initialValues } = data.mainProps
     let rateOptions=[{id: 1, name: "Monthly"},{id:1, name:"Daily"},{ id: 3, name:"Hourly"}]
-    return <RateCardTable operation={operation} data={data} rateOptions={rateOptions} SkillCategory={SkillCategory} Domains={Domains} SkillSet={SkillSet} rateCardDtos={rateCardDtos} setRateCardDtos={setRateCardDtos} />
+    return <RateCardTable 
+        operation={operation} 
+        data={data} 
+        rateOptions={rateOptions} 
+        SkillCategory={SkillCategory} 
+        Domains={Domains} 
+        SkillSet={SkillSet} 
+        rateCardDtos={rateCardDtos} 
+        setRateCardDtos={setRateCardDtos} 
+        initialValues={initialValues} 
+    />
 }
 
 // contact address
@@ -241,8 +249,4 @@ ClientForm = connect(state => {
 }, FileActions)(ClientForm)
 
 const afterSubmit = (result, dispatch) => dispatch(reset('ClientForm'));
-export default reduxForm({ 
-    form: 'ClientForm', 
-    onSubmitSuccess: afterSubmit,
-    enableReinitialize: true  
-})(ClientForm);
+export default reduxForm({  form: 'ClientForm',  onSubmitSuccess: afterSubmit, enableReinitialize: true   })(ClientForm);

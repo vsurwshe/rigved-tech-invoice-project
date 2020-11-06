@@ -7,7 +7,7 @@ import { Autocomplete } from '@material-ui/lab';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 const RateCardTable = (propsData) => {
-  const { rateCardDtos,setRateCardDtos, Domains, SkillCategory, SkillSet, rateOptions }=propsData
+  const { rateCardDtos,setRateCardDtos, Domains, SkillCategory, SkillSet, rateOptions, initialValues }=propsData
   const columns =[
       {   title: "Domain", 
           field: "domainName",
@@ -66,7 +66,7 @@ const RateCardTable = (propsData) => {
         actionsColumnIndex: -1
       }}
       icons={{
-        Add: () => <Button variant="contained" color="primary">Add Rate Card</Button>,
+        Add: () => { return initialValues === undefined && <Button variant="contained" color="primary">Add Rate Card</Button>},
         Edit:() => { return <CreateIcon variant="contained" color="primary" /> },
         Delete: () => {return <DeleteOutlineIcon variant="contained" color="secondary" />}
       }}

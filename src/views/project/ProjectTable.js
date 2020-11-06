@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from "react-redux";
 import MaterialTable from "material-table";
-import Checkbox from '@material-ui/core/Checkbox';
+// import Checkbox from '@material-ui/core/Checkbox';
 import { Button } from '@material-ui/core';
 import { FromActions } from '../../assets/config/Config';
 import CreateIcon from '@material-ui/icons/Create';
@@ -19,14 +19,14 @@ const ProjectTable = (props) => {
     { title: 'Project\u00a0Name', field: 'projectName' },
     { title: 'Client\u00a0Name', field: 'clientName' },
     { title: 'Resources', field: 'resource', width: 30 },
-    {
-      title: "PO\u00a0Recieved",
-      width: 8,
-      render: (rowData) => {
-        return <Checkbox onChange={() => console.log("Checkbox Clicked")} name="jason" />
-      }
-    },
-    { title: 'Status', field: 'status', width: 60 },
+    // {
+    //   title: "PO\u00a0Recieved",
+    //   width: 8,
+    //   render: (rowData) => {
+    //     return <Checkbox onChange={() => console.log("Checkbox Clicked")} name="jason" />
+    //   }
+    // },
+    // { title: 'Status', field: 'status', width: 60 },
     {
       title: "",
       width:8,
