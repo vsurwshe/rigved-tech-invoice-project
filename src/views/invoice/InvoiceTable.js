@@ -16,7 +16,7 @@ const InvoiceTable=(props)=>{
       { title: 'Invoice\u00a0Date', field: 'invoiceDate',width: 10 },
       { title: 'Invoice\u00a0Number', field: 'invoiceNo', width:10 },
       { title: 'Client', field: 'toCompanyName'},
-      { title: 'Person\u00a0Responsible', field: 'personName' },
+      { title: 'Person\u00a0Responsible', field: 'managerName' },
       // { title: 'Due\u00a0Date', field: 'dueDate', width: 10 },
       { title: 'Total\u00a0Amount\u00a0(INR)', field: 'billWitGST', width: 10 },
       {

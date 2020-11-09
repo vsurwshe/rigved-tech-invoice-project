@@ -68,7 +68,11 @@ const rootReducer = (state, action) => {
   return reducer(state, action)
 }
 // this function will be createing store
-const store = createStore(rootReducer, persistedState, enhancer);
+const store = createStore(
+  rootReducer, 
+  persistedState, 
+  // enhancer
+);
 // this function get the store from local storage
 store.subscribe(()=> saveToLocalStorage(store.getState()))
 
