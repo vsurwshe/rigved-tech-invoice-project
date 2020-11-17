@@ -71,7 +71,7 @@ const rootReducer = (state, action) => {
 const store = createStore(
   rootReducer, 
   persistedState, 
-  // enhancer
+  enhancer
 );
 // this function get the store from local storage
 store.subscribe(()=> saveToLocalStorage(store.getState()))
