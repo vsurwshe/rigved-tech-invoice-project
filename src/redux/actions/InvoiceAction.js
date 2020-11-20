@@ -92,6 +92,16 @@ const viewInvoicePDFData = (invoiceId, authroizationKey) => {
     }
 }
 
+const payInvoiceBill = (invoiceId, authroizationKey) => {
+    return (dispatch) => {
+        return CreateInstance()
+            .get('/innvoice/invoicePaid/' + invoiceId, HeaderConfig(authroizationKey))
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceUserList, "loadMessage":loadMessage, response}) })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
+
 //-------------------------------------
 
 export function SaveInvoiceUserList(invoiceList) {
@@ -136,11 +146,19 @@ export function SaveViewInvoicePDFData(invoiceData) {
     }
 }
 
+export function SavePaidInvoiceData(invoiceData) {
+    return {
+        type: "SAVE_PAY_INVOICE_DATA",
+        invoiceData
+    }
+}
+
 export{
     GetInvoiceUserList,
     GenerateInvoice,
     GenerateInvoicePDF,
     GetPDFInvoiceData,
     viewInvoicePDFData,
-    getPDFInvoiceList
+    getPDFInvoiceList,
+    payInvoiceBill
 }
