@@ -244,12 +244,13 @@ class UserManagement extends Component {
         await this.handleAttendanceUpload();
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
-            (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && alert(this.props.FileState.fileUrl+" Your excel file is uploaded is successfully");
+            (this.props.ClientState.common_message && this.props.ClientState.common_message !=="") && await alert(this.props.ClientState.common_message);
+            await console.log(this.props.ClientState.common_message)
             await this.clearFileUrl();
+            await SaveFileData();
             await GetEmployeeList(0,100,authorization);
             await attendanceFormReset();
             await dispatch(loadMessage());
-            await SaveFileData();
             await this.handleAttendanceUpload();
             await this.handleAttendanceModel();
         }, API_EXE_TIME)

@@ -35,7 +35,7 @@ let InvoiceFrom = (props) => {
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit((values) => PostInvoiceData({ "mainProps": props, values, projectIdList, viewSectionThree, setSubmit, setViewSectionThree, setLoading }))}>
             {LoadGird({ "mainProps": props, projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, loading, setLoading, setViewInvoice })}
-            {ShowViewInvoice({ "mainProps": props, classes, viewInvoice, setViewInvoice })}
+            {ShowViewInvoice({ "mainProps": props, classes, viewInvoice, setViewInvoice, reset, cancle })}
             <div className={classes.buttonStyle}>
                 <center>
                     {!initialValues && <><Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting || submit}>SUBMIT</Button> &nbsp;&nbsp;
@@ -49,7 +49,7 @@ let InvoiceFrom = (props) => {
 
 // this method will used for the showing invoice after posting successfully resource table
 const ShowViewInvoice = (propsData) => {
-    const { viewInvoice, setViewInvoice, classes } = propsData
+    const { viewInvoice, setViewInvoice, classes, reset, cancle } = propsData
     const { genratedInvoiceData }=propsData.mainProps.InvoiceState
     if(viewInvoice && JSON.stringify(genratedInvoiceData) === "[]"){
         return setViewInvoice(false);
@@ -65,7 +65,7 @@ const ShowViewInvoice = (propsData) => {
             { JSON.stringify(genratedInvoiceData) !== "[]" && <Invoice inoiceData={genratedInvoiceData}/>}
         </DialogContent>
         <DialogActions>
-            <Button onClick={() => setViewInvoice(false)} color="primary">Cancel</Button>
+            <Button onClick={async () => {await reset(); await setViewInvoice(false); await cancle()}} color="primary">Cancel</Button>
             <Button onClick={() => DwonloadInvoice()} color="secondary">Download Invoice</Button>
         </DialogActions>
     </Dialog>
@@ -350,7 +350,7 @@ const GenratePDFInvoice=async (propsData)=>{
     const { authorization }=propsData.mainProps.LoginState
     const { loadMessage } = propsData.mainProps.ClientAction
     // const { genratedInvoiceData } = propsData.mainProps.InvoiceState
-    const { GenerateInvoicePDF, SaveGenratedInvoiceData}=propsData.mainProps.InvoiceAction
+    const { GenerateInvoicePDF, SaveGenratedInvoiceData, getPDFInvoiceList}=propsData.mainProps.InvoiceAction
     let newInvoiceGenratePDFData={
         "fromDate":fromDateProps && fromDateProps ,
         "toDate": toDateProps && toDateProps ,
@@ -363,6 +363,7 @@ const GenratePDFInvoice=async (propsData)=>{
     setTimeout(async () => {
         await loadMessage();
         // await GetBillingData(authorization,{});
+        await getPDFInvoiceList(0,100,authorization);
         await setLoading(false);
         await setViewInvoice(true);
     }, API_EXE_TIME)
