@@ -180,10 +180,10 @@ const renderAutocompleteWithProps=({label,name,optionData,className, input, meta
   <Autocomplete
     id={name}
     key={name}
-    value={input.value}
     autoHighlight
     options={(optionData && optionData.length >0) ? optionData: []}
     getOptionLabel={optionData => (optionData && optionData.title) && optionData.title}
+    getOptionSelected={(option, value) => option.id === value.id}
     onChange={(event, value) => value && input.onChange(value)}
     renderInput={(params) => ( <TextField {...params} label={label} margin="normal"  /> )}
     {...custom}
@@ -191,9 +191,6 @@ const renderAutocompleteWithProps=({label,name,optionData,className, input, meta
 
 // this will be render contact
 const renderContact = ({ classes, open, handleClickOpen, handleClose, fields, initialValues, operation, meta: { error, submitFailed } }) => {
-  // const [open, setOpen] = useState(false);
-  // const handleClickOpen = () => { setOpen(true); fields.push({}) };
-  // const handleClose = () => { setOpen(false) };
   return <span>
       { (operation !== FromActions.VI )&&<Button style={{ float: "Right" }} variant="contained" color="primary" onClick={()=>handleClickOpen(fields)}>ADD</Button>}
       <Dialog open={open} onClose={handleClose} classes={{ paper: classes.dialogPaper }} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >

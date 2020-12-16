@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import ProjectTable from "./ProjectTable";
 import ProjectForm from "./ProjectFrom";
-import {Card, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
+import {Card, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
 import * as ProjectAction from "../../redux/actions/ProjectAction"
 import * as MasterDataAction from "../../redux/actions/MasterDataAction"
 import * as ClientAction from "../../redux/actions/ClientAction"
@@ -13,6 +13,7 @@ import { API_EXE_TIME } from '../../assets/config/Config';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import { FromActions } from '../../assets/config/Config';
+import { renderLoading } from '../utilites/FromUtilites';
 
 class ProjectManagement extends Component {
     state = { 
@@ -116,7 +117,7 @@ class ProjectManagement extends Component {
     // this method main framework which calling load PurchaseOrder table method
     loadProjectTable = () => {
         const { loadProjectList } = this.state
-        return < div style={{ paddingRight: 10 }}>  {loadProjectList ? this.loadingCircle() :this.loadingProjectTable()} </div>
+        return < div style={{ paddingRight: 10 }}>  {loadProjectList ? renderLoading({message:"Project Management", size:80}):this.loadingProjectTable()} </div>
     }
 
     // this method used for load the client table
@@ -131,10 +132,8 @@ class ProjectManagement extends Component {
         />
     </>
     }
-    
-    // this method used for the show circular progress bar 
-    loadingCircle = () => <center> <h3>Project Management</h3> <CircularProgress size={80} /> </center>
 
+    // this method will used for the delete project model
     loadDeleteModel = () => {
         const { deleteModel, projectData } = this.state
         const { id, projectName } = projectData  ? projectData : ''

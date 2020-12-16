@@ -1,9 +1,9 @@
 import React from 'react';
 import { reduxForm, Field, formValueSelector, change } from 'redux-form';
 import { connect } from 'react-redux';
-import { Button, Grid, CircularProgress } from '@material-ui/core';
+import { Button, Grid} from '@material-ui/core';
 import useStyles from "../client/Styles";
-import { renderTextField, renderDateTimePicker, renderAutocompleteWithProps, renderFileInput, renderAutocomplete, renderNumberField, renderTextAreaField, renderTextHiddenField } from '../utilites/FromUtilites';
+import { renderTextField, renderDateTimePicker, renderAutocompleteWithProps, renderFileInput, renderAutocomplete, renderNumberField, renderTextAreaField, renderTextHiddenField, renderLoading } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
 import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
@@ -15,6 +15,7 @@ import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
 import { Alert } from '@material-ui/lab';
 import { loadMessage } from "../../redux/actions/ClientAction"
+import { structureOptions } from './ProjectFormUtilites';
 
 
 // this is main component
@@ -84,37 +85,56 @@ const LoadFields = (parameter) => {
     const { ManagerList, Domains } = parameter.mainProps.MasterDataSet
     const { purchaseOrderListByName } = parameter.mainProps.PurchaseOrderState
     const { GetPurchaseOrderListByName }=parameter.mainProps.PurchaseOrderAction
-    let projectManagerOptions = ManagerList.length > 0 && ManagerList.map((item, key) => {
-        return { title: item.firstName + " " + item.lastName, id: item.accountId }
-    })
-    let clientOptions = listOfClient.length > 0 && listOfClient.map((item, key) => {
-        return { title: item.clientName ? item.clientName : "", id: item.id }
-    })
-    let purchaseOrderOptions = purchaseOrderListByName.length > 0 && purchaseOrderListByName.map((item, key) => {
-        return { title: item.poNum ? item.poNum : "", id: item.id }
-    })
-    let projectTypeOptions = Domains.length > 0 && Domains.map((item, key) => {
-        return { title: item.name ? item.name : "", id: item.id }
-    })
+    let projectManagerOptions=structureOptions({options:ManagerList,keys: ['firstName','lastName'],idKey:'accountId'});
+    let clientOptions= structureOptions({options:listOfClient,keys: ['clientName'],idKey:'id'});
+    let purchaseOrderOptions= structureOptions({options :purchaseOrderListByName,keys: ['poNum'],idKey:'id'});
+    let projectTypeOptions= structureOptions({options:Domains,keys: ['name'], idKey:'id'})
+    let projectBillingType=[
+        {title:"Milestone",id:1},
+        {title:"Fiexd Cost",id:2},
+        {title:"Payables",id:3},
+        {title:"Free Style",id:4}
+    ]
     return <>
         <Field name="projectName" component={renderTextField} fullWidth label="Project Name" helperText="Ex. PRMS" />
         <Field name="projectType" component={renderAutocomplete} optionData={projectTypeOptions} label="Project Type" validate={[Required]} />
-        <Field name="clientName" component={renderAutocompleteWithProps}
-            onChange={(value) => {
-                change('ProjectForm', 'clientName', value.title);
-                change('ProjectForm', 'clientId', value.id);
-                GetPurchaseOrderListByName(0,20,value.id,authorization)
-            }}
+        <Field name="projectBillingType" component={renderAutocompleteWithProps} onChange={(value)=> billingTypeChnage(value)} optionData={projectBillingType} label="Project Billing Type" validate={[Required]} />
+        <Field name="clientName" component={renderAutocompleteWithProps} onChange={(value) => clientChange({value,change,GetPurchaseOrderListByName,authorization})}
             optionData={clientOptions} label="Client Name" validate={[Required]} />
         <Field name="clientId" component={renderTextHiddenField} />
         <Field name="projectManager" component={renderAutocomplete} optionData={projectManagerOptions} label="Project Manager Name" validate={[Required]} />
-        <Field name="purchaseOrder" component={renderAutocompleteWithProps} 
-            onChange={(value) => {
-                change('ProjectForm', 'purchaseOrder', value.title);
-                change('ProjectForm', 'purchaseOrderId', value.id);
-            }}
-        optionData={purchaseOrderOptions} label="Purchase Order Number (Current)" />
+        <Field name="purchaseOrder" component={renderAutocompleteWithProps} onChange={(value) => purchaseOrderChange({value,change})}
+            optionData={purchaseOrderOptions} label="Purchase Order Number (Current)" />
     </>
+}
+
+// this method will used for purchase order change
+const clientChange=async (dataProps)=>{
+    const { value, change, GetPurchaseOrderListByName,authorization}=dataProps
+    await change('ProjectForm', 'purchaseOrder', value.title);
+    await change('ProjectForm', 'purchaseOrderId', value.id);   
+    await GetPurchaseOrderListByName(0,20,value.id,authorization)
+}
+
+
+// this method will used for purchase order change
+const purchaseOrderChange=async(dataProps)=>{
+    const { value, change}=dataProps
+    await change('ProjectForm', 'purchaseOrder', value.title);
+    await change('ProjectForm', 'purchaseOrderId', value.id);   
+}
+
+// this method will used for billing type change
+const billingTypeChnage=(dataValue)=>{
+    switch (dataValue.id) {
+        case 1:
+            console.log("MileStone")
+            break;
+    
+        default:
+            break;
+    }
+    console.log("Bill Type",dataValue)
 }
 
 // this method will used for the showing header information as per oprations
@@ -143,7 +163,7 @@ const SectionTwo = (data) => {
         <Field name="projectCost" component={renderNumberField} className={classes.textField} label="Project Cost" helperText={(initialValues === undefined) && "Ex. 20000"} disabled={operation === FromActions.VI} validate={[Required]} />
         <Field name="projectDesc" component={renderTextAreaField} fullWidth maxRows={2} label="Project Description" disabled={operation === FromActions.VI} />
         {operation === FromActions.CR &&
-            <>{(projectContractFileUpload) ? loadingCircle()
+            <>{(projectContractFileUpload) ? renderLoading({message:"Uploading", size:40})
                 : (projectContractFileUrl ? LoadFileUrl({ "url": projectContractFileUrl, "cid": 1, "mainProps": data, "componentName": "Purchase Order Image", "style": { height: "60%", width: "100%" } })
                     : <Field name="contractAttachmentUrl" component={renderFileInput} fullWidth type="file" successFunction={uploadFile} lable="Project File" />)
             }</>
@@ -165,9 +185,6 @@ const GetPhotos = async (parameter) => {
     const { authorization } = parameter.mainProps.props.LoginState
     return await FetchPhoto(parameter.url, authorization, parameter.cid, "application/pdf");
 }
-
-// this method will used for the loading circule progress bar
-const loadingCircle = () => <center> Uploading <CircularProgress size={40} /> </center>
 
 // this method will used for the loading tabs into project from
 const SectionThree = (data) => {

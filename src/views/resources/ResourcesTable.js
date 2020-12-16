@@ -1,5 +1,5 @@
 import React, { useState, forwardRef } from 'react';
-import { Dialog, Button, Slide, DialogTitle, DialogActions, makeStyles, DialogContent, Grid, CircularProgress, RadioGroup } from '@material-ui/core';
+import { Dialog, Button, Slide, DialogTitle, DialogActions, makeStyles, DialogContent, Grid, RadioGroup } from '@material-ui/core';
 import { connect } from 'react-redux';
 import MaterialTable from 'material-table';
 import AppBar from '@material-ui/core/AppBar';
@@ -17,6 +17,7 @@ import { loadMessage } from "../../redux/actions/ClientAction";
 import moment from 'moment';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import { renderLoading } from '../utilites/FromUtilites';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -213,7 +214,7 @@ const LoadAddResourceModel = (data) => {
     </AppBar>
     <DialogContent>
       {(common_message && common_message !== "Something went worng..!") && alert(common_message)}
-      {load ? loadingCircle() : <>
+      {load ? renderLoading({message:"Saving....",size:"40"}) : <>
         <Grid container spacing={3}>
           <Grid item xs={7}>
             {LoadRateCardList({ "mainProps": data.mainProps, selectedRateCard, setSelectedRateCard })}
@@ -274,10 +275,6 @@ const renderTextField = (props) => {
     required={true}
   />
 }
-
-
-// this method will used for the loading circule progress bar
-const loadingCircle = () => <center> Saving.... <CircularProgress size={40} /> </center>
 
 // this method will used for the loading employee list
 const LoadEmployeeList = (props) => {
