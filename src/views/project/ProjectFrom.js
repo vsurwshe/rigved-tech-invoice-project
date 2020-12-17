@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { reduxForm, Field, formValueSelector, change } from 'redux-form';
 import { connect } from 'react-redux';
 import { Button, Grid} from '@material-ui/core';
 import useStyles from "../client/Styles";
-import { renderTextField, renderDateTimePicker, renderAutocompleteWithProps, renderFileInput, renderAutocomplete, renderNumberField, renderTextAreaField, renderTextHiddenField, renderLoading } from '../utilites/FromUtilites';
+import { renderTextField, renderDateTimePicker, renderAutocompleteWithProps, renderFileInput, renderAutocomplete, renderNumberField, renderTextAreaField, renderTextHiddenField, renderLoading, renderSanckbarAlert } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
 import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
@@ -15,7 +15,7 @@ import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
 import { Alert } from '@material-ui/lab';
 import { loadMessage } from "../../redux/actions/ClientAction"
-import { structureOptions } from './ProjectFormUtilites';
+import { MileStoneTabel, structureOptions } from './ProjectFormUtilites';
 
 
 // this is main component
@@ -65,8 +65,10 @@ const LoadGird = (props) => {
 const showMessage=(props)=>{
     const { common_message, color, dispatch }=props
     return <>
-    <center><Alert color={color}>{common_message}</Alert></center>
-    {setTimeout(async()=>{ await dispatch(loadMessage()); },API_EXE_TIME)}
+    <center>
+        {renderSanckbarAlert({message:common_message, color:color})}
+    </center>
+    {setTimeout(async()=>{ await dispatch(loadMessage()); },1000)}
     </>
 }
 
@@ -190,8 +192,9 @@ const GetPhotos = async (parameter) => {
 const SectionThree = (data) => {
     const { showTabs } = data.mainProps.stateData
     const tabsData = [
+        { label: "MileStones", component: MilestoneTab(data) },
         { label: "Resources", component: Resources(data) },
-        { label: "Expenses", component: Expenses(data) },
+        { label: "Expenses", component: Expenses(data) }
     ]
     return showTabs && <SimpleTabs tabData={tabsData} />
 }
@@ -208,6 +211,17 @@ const Expenses = (data) => {
     const { initialValues } = data.mainProps
     let projectId = initialValues ? initialValues.id : (data.mainProps.ProjectState.projectDetails && data.mainProps.ProjectState.projectDetails.Id)
     return <ExpensesTable projectId={projectId} stateData={data.mainProps.stateData} />
+}
+
+const MilestoneTab=(propsData)=>{
+    console.log("MIT ",propsData)
+    const { dispatch, loadMessage }=propsData.mainProps
+    const [milestoneData, setMilestoneData] = useState([])
+    return <MileStoneTabel
+        dispatch={dispatch}
+        data={milestoneData} 
+        saveMileStone={setMilestoneData}
+        />
 }
 
 const validate=(values)=>{

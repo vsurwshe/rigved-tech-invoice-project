@@ -8,6 +8,9 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } 
 import { Field } from 'redux-form';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { CheckBox } from '@material-ui/icons';
+import { Snackbar } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 
 // this is render text filed
 const renderTextField = ({ label, name, input, helperText, meta: { touched, invalid, error }, ...custom }) => (
@@ -234,6 +237,21 @@ const dwonloadInvoice = () => {
   });
 }
 
+// this will used render matrial checkbox 
+const renderMatiralCheckbox = props => (
+  <CheckBox label={props.label}
+    checked={props.value ? true : false}
+    onCheck={props.onChange}/>
+)
+
+// render sankbar with alert
+const renderSanckbarAlert=(props)=>{
+  const { message, color }=props
+  return <Snackbar open={message !== ""} autoHideDuration={1000} anchorOrigin= {{ vertical: 'top', horizontal: 'right' }}>
+        <Alert severity={color}> {message} </Alert>
+    </Snackbar>
+}
+
 export{
     renderTextField,
     renderTextHiddenField,
@@ -250,5 +268,7 @@ export{
     renderPasswordTextField,
     renderContact,
     renderLoading,
-    dwonloadInvoice
+    dwonloadInvoice,
+    renderMatiralCheckbox,
+    renderSanckbarAlert
 }
