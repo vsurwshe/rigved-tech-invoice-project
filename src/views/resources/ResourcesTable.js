@@ -197,14 +197,15 @@ let ResourcesTable = (props) => {
 }
 
 // this method will used for the loading add resource model
-const LoadAddResourceModel = (data) => {
+const LoadAddResourceModel = (propsData) => {
+  console.log("MD ", propsData)
   const classes = useStyles();
-  const { open, handleClose } = data
+  const { open, handleClose } = propsData
   const [listOfEmployeeAccount, setEmployeeAccount] = useState([]);
   const [selectedRateCard, setSelectedRateCard] = useState({});
   const [tableData, setTableData] = useState([]);
   const [load, setLoad] = useState(false);
-  const { common_message }= data.mainProps.ClientState
+  const { common_message }= propsData.mainProps.ClientState
   return <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
     <AppBar className={classes.appBar} style={{ float: "right" }}>
       <Toolbar >
@@ -217,10 +218,10 @@ const LoadAddResourceModel = (data) => {
       {load ? renderLoading({message:"Saving....",size:"40"}) : <>
         <Grid container spacing={3}>
           <Grid item xs={7}>
-            {LoadRateCardList({ "mainProps": data.mainProps, selectedRateCard, setSelectedRateCard })}
+            {LoadRateCardList({ "mainProps": propsData.mainProps, selectedRateCard, setSelectedRateCard })}
           </Grid>
           <Grid item xs={5}>
-            {(selectedRateCard && selectedRateCard.domainName) && LoadEmployeeList({ "mainProps": data.mainProps, listOfEmployeeAccount, setEmployeeAccount, tableData, setTableData, selectedRateCard })}
+            {(selectedRateCard && selectedRateCard.domainName) && LoadEmployeeList({ "mainProps": propsData.mainProps, listOfEmployeeAccount, setEmployeeAccount, tableData, setTableData, selectedRateCard })}
           </Grid>
         </Grid>
       </>
@@ -228,7 +229,7 @@ const LoadAddResourceModel = (data) => {
     </DialogContent>
     <DialogActions>
       <Button onClick={() => { handleClose(); setSelectedRateCard({}); setTableData([]) }} color="primary">Cancel</Button>
-      <Button onClick={() => loadAssignResource({ listOfEmployeeAccount, selectedRateCard, "mainProps": data.mainProps, load, setLoad, handleClose, tableData, setTableData, setSelectedRateCard })} color="secondary">Assign Resource</Button>
+      <Button onClick={() => loadAssignResource({ listOfEmployeeAccount, selectedRateCard, "mainProps": propsData.mainProps, load, setLoad, handleClose, tableData, setTableData, setSelectedRateCard })} color="secondary">Assign Resource</Button>
     </DialogActions>
   </Dialog>
 }

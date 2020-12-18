@@ -5,7 +5,7 @@ import { Button, Grid} from '@material-ui/core';
 import useStyles from "../client/Styles";
 import { renderTextField, renderDateTimePicker, renderAutocompleteWithProps, renderFileInput, renderAutocomplete, renderNumberField, renderTextAreaField, renderTextHiddenField, renderLoading, renderSanckbarAlert } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
-import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
+import { FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
 import * as FileAction from '../../redux/actions/FileAction'
 import * as PurchaseOrderAction from '../../redux/actions/PurchaseOrderAction';
@@ -13,7 +13,6 @@ import ExpensesTable from '../Expenses/ExpensesTable';
 import ResourcesTable from '../resources/ResourcesTable';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
-import { Alert } from '@material-ui/lab';
 import { loadMessage } from "../../redux/actions/ClientAction"
 import { MileStoneTabel, structureOptions } from './ProjectFormUtilites';
 
@@ -86,21 +85,17 @@ const LoadFields = (parameter) => {
     const { listOfClient } = parameter.mainProps.ClientState
     const { ManagerList, Domains } = parameter.mainProps.MasterDataSet
     const { purchaseOrderListByName } = parameter.mainProps.PurchaseOrderState
+    const { listOfBillingModel } = parameter.mainProps.BillingModelState
     const { GetPurchaseOrderListByName }=parameter.mainProps.PurchaseOrderAction
     let projectManagerOptions=structureOptions({options:ManagerList,keys: ['firstName','lastName'],idKey:'accountId'});
     let clientOptions= structureOptions({options:listOfClient,keys: ['clientName'],idKey:'id'});
     let purchaseOrderOptions= structureOptions({options :purchaseOrderListByName,keys: ['poNum'],idKey:'id'});
     let projectTypeOptions= structureOptions({options:Domains,keys: ['name'], idKey:'id'})
-    let projectBillingType=[
-        {title:"Milestone",id:1},
-        {title:"Fiexd Cost",id:2},
-        {title:"Payables",id:3},
-        {title:"Free Style",id:4}
-    ]
+    let projectBillingTypes=listOfBillingModel
     return <>
         <Field name="projectName" component={renderTextField} fullWidth label="Project Name" helperText="Ex. PRMS" />
         <Field name="projectType" component={renderAutocomplete} optionData={projectTypeOptions} label="Project Type" validate={[Required]} />
-        <Field name="projectBillingType" component={renderAutocompleteWithProps} onChange={(value)=> billingTypeChnage(value)} optionData={projectBillingType} label="Project Billing Type" validate={[Required]} />
+        <Field name="projectBillingType" component={renderAutocomplete} optionData={projectBillingTypes} label="Project Billing Type" validate={[Required]} />
         <Field name="clientName" component={renderAutocompleteWithProps} onChange={(value) => clientChange({value,change,GetPurchaseOrderListByName,authorization})}
             optionData={clientOptions} label="Client Name" validate={[Required]} />
         <Field name="clientId" component={renderTextHiddenField} />
@@ -124,19 +119,6 @@ const purchaseOrderChange=async(dataProps)=>{
     const { value, change}=dataProps
     await change('ProjectForm', 'purchaseOrder', value.title);
     await change('ProjectForm', 'purchaseOrderId', value.id);   
-}
-
-// this method will used for billing type change
-const billingTypeChnage=(dataValue)=>{
-    switch (dataValue.id) {
-        case 1:
-            console.log("MileStone")
-            break;
-    
-        default:
-            break;
-    }
-    console.log("Bill Type",dataValue)
 }
 
 // this method will used for the showing header information as per oprations
@@ -192,7 +174,7 @@ const GetPhotos = async (parameter) => {
 const SectionThree = (data) => {
     const { showTabs } = data.mainProps.stateData
     const tabsData = [
-        { label: "MileStones", component: MilestoneTab(data) },
+        { label: "Billing Model", component: LoadBillingModelTab(data) },
         { label: "Resources", component: Resources(data) },
         { label: "Expenses", component: Expenses(data) }
     ]
@@ -213,15 +195,26 @@ const Expenses = (data) => {
     return <ExpensesTable projectId={projectId} stateData={data.mainProps.stateData} />
 }
 
+const LoadBillingModelTab=(propsData)=>{
+    console.log("Data ",propsData)
+    const { values }=propsData.mainProps.form.ProjectForm
+    const { showTabs}=propsData.mainProps.stateData
+    switch ( showTabs && values && values.projectBillingType) {
+        case "Milestone":
+            return MilestoneTab(propsData)           
+        default:
+            return <h3>Select Proper Billing Type</h3>
+    }
+}
+
 const MilestoneTab=(propsData)=>{
-    console.log("MIT ",propsData)
-    const { dispatch, loadMessage }=propsData.mainProps
+    const { dispatch }=propsData.mainProps
     const [milestoneData, setMilestoneData] = useState([])
     return <MileStoneTabel
         dispatch={dispatch}
         data={milestoneData} 
         saveMileStone={setMilestoneData}
-        />
+    />
 }
 
 const validate=(values)=>{
