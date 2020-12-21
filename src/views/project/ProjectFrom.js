@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { reduxForm, Field, formValueSelector, change } from 'redux-form';
 import { connect } from 'react-redux';
 import { Button, Grid} from '@material-ui/core';
@@ -9,12 +9,10 @@ import { FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
 import * as FileAction from '../../redux/actions/FileAction'
 import * as PurchaseOrderAction from '../../redux/actions/PurchaseOrderAction';
-import ExpensesTable from '../Expenses/ExpensesTable';
-import ResourcesTable from '../resources/ResourcesTable';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
 import { loadMessage } from "../../redux/actions/ClientAction"
-import { MileStoneTabel, structureOptions } from './ProjectFormUtilites';
+import { structureOptions, LoadBillingModelTab, LoadResourcesTab, LoadExpensesTab } from './ProjectFormUtilites';
 
 
 // this is main component
@@ -174,47 +172,11 @@ const GetPhotos = async (parameter) => {
 const SectionThree = (data) => {
     const { showTabs } = data.mainProps.stateData
     const tabsData = [
-        { label: "Billing Model", component: LoadBillingModelTab(data) },
-        { label: "Resources", component: Resources(data) },
-        { label: "Expenses", component: Expenses(data) }
+        { label: "Billing Model", component: <LoadBillingModelTab props={data} /> },
+        { label: "Resources", component: <LoadResourcesTab props={data} />},
+        { label: "Expenses", component: <LoadExpensesTab props={data} />}
     ]
     return showTabs && <SimpleTabs tabData={tabsData} />
-}
-
-//this method will used for load the resource tab
-const Resources = (data) => {
-    const { initialValues } = data.mainProps
-    let projectId = initialValues ? initialValues.id : (data.mainProps.ProjectState.projectDetails && data.mainProps.ProjectState.projectDetails.Id)
-    return <ResourcesTable projectId={projectId} stateData={data.mainProps.stateData} />
-}
-
-// this method will used for the load the expense tab
-const Expenses = (data) => {
-    const { initialValues } = data.mainProps
-    let projectId = initialValues ? initialValues.id : (data.mainProps.ProjectState.projectDetails && data.mainProps.ProjectState.projectDetails.Id)
-    return <ExpensesTable projectId={projectId} stateData={data.mainProps.stateData} />
-}
-
-const LoadBillingModelTab=(propsData)=>{
-    console.log("Data ",propsData)
-    const { values }=propsData.mainProps.form.ProjectForm
-    const { showTabs}=propsData.mainProps.stateData
-    switch ( showTabs && values && values.projectBillingType) {
-        case "Milestone":
-            return MilestoneTab(propsData)           
-        default:
-            return <h3>Select Proper Billing Type</h3>
-    }
-}
-
-const MilestoneTab=(propsData)=>{
-    const { dispatch }=propsData.mainProps
-    const [milestoneData, setMilestoneData] = useState([])
-    return <MileStoneTabel
-        dispatch={dispatch}
-        data={milestoneData} 
-        saveMileStone={setMilestoneData}
-    />
 }
 
 const validate=(values)=>{

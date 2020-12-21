@@ -17,7 +17,7 @@ import { loadMessage } from "../../redux/actions/ClientAction";
 import moment from 'moment';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
-import { renderLoading } from '../utilites/FromUtilites';
+import { renderAutocompleteByName, renderLoading } from '../utilites/FromUtilites';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -38,11 +38,12 @@ const useStyles = makeStyles((theme) => ({
 const Transition = forwardRef(function Transition(props, ref) { return <Slide direction="up" ref={ref} {...props} />; });
 
 let ResourcesTable = (props) => {
-  const { projectId } = props
+  const { projectId, disableResourceModel } = props
   const { clientId } = (props.form && props.form.ProjectForm && props.form.ProjectForm.values) ? props.form.ProjectForm.values : ""
   const { GetEmployeeListByProjectId, EditEmployeeRecord, DeleteEmployeeRecord } = props.EmployeeAction
   const { GetClientDetailsById } = props.ClientAction
   const { operation } = props.stateData
+  const { EmployeeList, Domains, SkillCategory, SkillSet } = props.MasterDataSet
   const { authorization } = props.LoginState
   const { clientDataById } = props.ClientState
   const { employeeListByPojectId } = props.EmpolyeeState
@@ -51,7 +52,8 @@ let ResourcesTable = (props) => {
   const [countCallRateCard, setCountRateCardCall] = useState(0)
   const handleClickOpen = () => { setOpen(true) };
   const handleClose = () => { setOpen(false) };
-
+  let optionsEmployee = EmployeeList.length > 0 && EmployeeList.map((item, key) => { return { title: item.firstName + " " + item.lastName, id: item.accountId } });
+  console.log("RT ",disableResourceModel)
   const getEmployeeListProjectId = async () => {
     await setCountCall(countCall + 1)
     await GetEmployeeListByProjectId(0, 20, projectId, authorization);
@@ -78,12 +80,24 @@ let ResourcesTable = (props) => {
     { title: "", field: "accountId", hidden: true },
     { title: "", field: "emploeeMappedId", hidden: true },
     { title: "", field: "projectId", hidden: true },
-    { title: 'Employee\u00a0Id', field: 'employeeNumber', width: 15, editable: "never" },
-    { title: 'Name', field: 'name', editable: "never" },
-    { title: 'Domain', field: 'domain', editable: "never" },
-    { title: 'Category', field: 'category', editable: "never" },
-    { title: 'Experience', field: 'experience', editable: "never", width: 10 },
-    { title: 'Skill', field: 'skill', editable: "never", width: 10 },
+    { title: 'Id', field: 'employeeNumber', width: 15, editable: "never" },
+    { title: 'Name', 
+      field: 'name', 
+      editable: disableResourceModel ? "always" : "never", 
+      editComponent: props => {
+        return renderAutoComplete({name:"employeeName", label:"Select", optionData:optionsEmployee, propsData:props })
+      }
+    },
+    { title: 'Domain', 
+      field: 'domain', 
+      editable: disableResourceModel ?"always" : "never" 
+    },
+    { title: 'Category', 
+      field: 'category', 
+      editable: disableResourceModel ?"always" : "never" 
+    },
+    { title: 'Experience', field: 'experience', editable: disableResourceModel ?"always" : "never", width: 10 },
+    { title: 'Skill', field: 'skill', editable: disableResourceModel ?"always" : "never", width: 10 },
     {
       title: 'Onboarding\u00a0Date',
       width: 15,
@@ -125,10 +139,10 @@ let ResourcesTable = (props) => {
 
 
   return <> 
-  {LoadAddResourceModel({ open, handleClose, "mainProps": props })}
+  {!disableResourceModel && LoadAddResourceModel({ open, handleClose, "mainProps": props })}
     <div style={{ maxWidth: "100%" }}>
       <MaterialTable
-        title=""
+        title="Resource Managment"
         columns={columns}
         data={(data && data.length > 0) ? data[0] : []}
         options={{
@@ -136,15 +150,9 @@ let ResourcesTable = (props) => {
           search: false,
           actionsColumnIndex: -1
         }}
-        actions={[
-          {
-            icon: () => { return (operation && (operation === FromActions.ED || operation === FromActions.VIED)) ? <div><Button variant="contained" color="primary">Assign Resource</Button></div> : "" },
-            onClick: (event, rowData) => { handleClickOpen() },
-            isFreeAction: true,
-            tooltip: 'Assign Resource'
-          }
-        ]}
+        actions={[ {icon: () => LoadAddButtonAction({operation, disableResourceModel,handleClickOpen}), isFreeAction: true}]}
         icons={{
+          Add: () => disableResourceModel ? <Button variant="contained" color="secondary">Add</Button> :"",
           Edit: () => { return <CreateIcon variant="contained" color="primary" /> },
           Delete: () => { return <DeleteOutlineIcon variant="contained" color="secondary" /> }
         }}
@@ -153,6 +161,11 @@ let ResourcesTable = (props) => {
           isEditHidden: rowData => false,
           isDeletable: rowData => true,
           isDeleteHidden: rowData => false,
+          onRowAdd: newData => {
+            return new Promise(async (resolve, reject) => {
+
+            }
+          )},
           onRowUpdate: (newData, oldData) => {
             return new Promise(async (resolve, reject) => {
               const { id } = (clientDataById && clientDataById.rateCardDtos && clientDataById.rateCardDtos.length > 0) ? clientDataById.rateCardDtos[0] : ""
@@ -196,9 +209,19 @@ let ResourcesTable = (props) => {
   </>
 }
 
+const LoadAddButtonAction=(props)=>{
+  const { operation, disableResourceModel, handleClickOpen }=props
+  if(operation && (operation === FromActions.ED || operation === FromActions.VIED)){
+    if(disableResourceModel){
+      return <div><Button variant="contained" color="primary">Save Resources</Button></div>
+    }else{
+      return <div><Button variant="contained" color="primary" onClick={()=>handleClickOpen()}>Assign Resource</Button></div>
+    }
+  } 
+}
+
 // this method will used for the loading add resource model
 const LoadAddResourceModel = (propsData) => {
-  console.log("MD ", propsData)
   const classes = useStyles();
   const { open, handleClose } = propsData
   const [listOfEmployeeAccount, setEmployeeAccount] = useState([]);
@@ -275,6 +298,20 @@ const renderTextField = (props) => {
     InputLabelProps={{ shrink: true }}
     required={true}
   />
+}
+
+const renderAutoComplete=(props)=>{
+  const {name, optionData, propsData, label,helperText }=props
+  return <Autocomplete
+  id={name}
+  style={{marginTop:"-10px"}}
+  autoHighlight
+  options={(optionData && optionData.length >0) ? optionData: []}
+  getOptionLabel={option => option.title ? option.title :option}
+  getOptionSelected={(option, value) => option.id === value.id}
+  onChange={(event, value) =>{ value && propsData.onChange(value.title) }}
+  renderInput={(params) => ( <TextField {...params} error={!propsData.value} helperText={!propsData.value ? helperText:""} label={label} margin="normal"  /> )}
+/>
 }
 
 // this method will used for the loading employee list

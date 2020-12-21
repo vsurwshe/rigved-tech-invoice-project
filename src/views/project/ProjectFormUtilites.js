@@ -1,9 +1,11 @@
-import React from 'react';
+import React,{ useState } from 'react';
 import { Button } from '@material-ui/core';
 import MaterialTable from 'material-table';
 import { Field } from 'redux-form';
 import { loadMessage } from "../../redux/actions/ClientAction"
 import { renderMatiralCheckbox } from '../utilites/FromUtilites';
+import ResourcesTable from '../resources/ResourcesTable';
+import ExpensesTable from '../Expenses/ExpensesTable';
 
 const structureOptions=(propsData)=>{
     let resultOptions=[]
@@ -84,8 +86,51 @@ const PayablesCheckbox=(propsData)=>{
   </div>
 }
 
+//this method will used for load the resource tab
+const LoadResourcesTab = (propsData) => {
+  const { props }=propsData
+  const { initialValues } = props.mainProps
+  const { projectBillingType }=(props.mainProps.form.ProjectForm && props.mainProps.form.ProjectForm.values) ? props.mainProps.form.ProjectForm.values : ""
+  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
+  return <ResourcesTable projectId={projectId} disableResourceModel={projectBillingType === "Milestone"} stateData={props.mainProps.stateData} />
+}
+
+// this method will used for the load the expense tab
+const LoadExpensesTab = (propsData) => {
+  const { props }=propsData
+  const { initialValues } = props.mainProps
+  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
+  return <ExpensesTable projectId={projectId} stateData={props.mainProps.stateData} />
+}
+
+
+const LoadBillingModelTab=(propsData)=>{
+  const { props}=propsData
+  const { values }=props.mainProps.form.ProjectForm
+  const { showTabs}=props.mainProps.stateData
+  switch ( showTabs && values && values.projectBillingType) {
+      case "Milestone":
+          return MilestoneTab(props)           
+      default:
+          return <h3>Select Proper Billing Type</h3>
+  }
+}
+
+const MilestoneTab=(propsData)=>{
+  const { dispatch }=propsData.mainProps
+  const [milestoneData, setMilestoneData] = useState([])
+  return <MileStoneTabel
+      dispatch={dispatch}
+      data={milestoneData} 
+      saveMileStone={setMilestoneData}
+  />
+}
+
 export{
     structureOptions,
     MileStoneTabel,
-    PayablesCheckbox
+    PayablesCheckbox,
+    LoadResourcesTab,
+    LoadExpensesTab,
+    LoadBillingModelTab
 }
