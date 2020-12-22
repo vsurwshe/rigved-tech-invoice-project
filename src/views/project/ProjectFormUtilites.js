@@ -1,12 +1,12 @@
 import React,{ useState } from 'react';
-import { Button } from '@material-ui/core';
+import { Button, Grid } from '@material-ui/core';
 import MaterialTable from 'material-table';
 import Checkbox from '@material-ui/core/Checkbox';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
-import { Field } from 'redux-form';
+import { Field, reduxForm } from 'redux-form';
 import { loadMessage } from "../../redux/actions/ClientAction"
-import { renderMatiralCheckbox } from '../utilites/FromUtilites';
+import { renderDateTimePicker, renderMatiralCheckbox, renderTextField } from '../utilites/FromUtilites';
 import ResourcesTable from '../resources/ResourcesTable';
 import ExpensesTable from '../Expenses/ExpensesTable';
 import { CheckBox, CheckBoxOutlineBlankOutlined } from '@material-ui/icons';
@@ -222,7 +222,27 @@ const LoadExpensesTab = (propsData) => {
   return <ExpensesTable projectId={projectId} stateData={props.mainProps.stateData} />
 }
 
-// this method will used for the Loadbilling tab according to billing type
+let LoadFixedAmount=(propsData)=>{
+  const { SaveMethod, pristine, reset, submitting, handleSubmit, cancle, clearFile } = propsData
+  return<div>
+    <form onSubmit={handleSubmit((values)=>console.log("Data ",values))}>
+      <Grid container spacing={5}>
+        <Grid item xs={12} sm={9} style={{ paddingLeft: 30, paddingTop: 20 }}>
+        <Field name="projectFiexdCost" component={renderTextField} fullWidth label="Project monthly fixed cost" helperText="Ex. 20000" />
+        <Field name="projectStartDate" component={renderDateTimePicker} label="Start Date" helperText="Ex. 01/01/2000"/>
+        <Field name="projectEndDate" component={renderDateTimePicker} label="End Date" helperText="Ex. 01/01/2000" />
+        </Grid>
+      </Grid>
+      <center>
+        <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> SUBMIT </Button> &nbsp;&nbsp;
+        <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button>&nbsp;&nbsp;
+      </center>
+    </form>
+  </div>
+}
+
+LoadFixedAmount= reduxForm({form: 'FixedAmountForm'})(LoadFixedAmount)
+
 const LoadBillingModelTab=(propsData)=>{
   const { props }=propsData
   const { initialValues } = props.mainProps
@@ -231,7 +251,9 @@ const LoadBillingModelTab=(propsData)=>{
   let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
   switch ( showTabs && values && values.projectBillingType) {
       case "Mile Stone":
-          return  <MilestoneTab data={props} projectId={projectId} />           
+        return  <MilestoneTab data={props} projectId={projectId} />           
+      case "Fixed Rate":
+        return <LoadFixedAmount props={props}  />          
       default:
           return <h3>Select Proper Billing Type</h3>
   }
@@ -291,5 +313,6 @@ export{
     PayablesCheckbox,
     LoadResourcesTab,
     LoadExpensesTab,
-    LoadBillingModelTab
+    LoadBillingModelTab,
+    LoadFixedAmount
 }
