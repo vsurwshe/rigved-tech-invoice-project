@@ -33,8 +33,8 @@ class ProjectManagement extends Component {
         const { projectList }= this.props.ProjectState
         const { authorization }= this.props.LoginState
         const { purchaseOrderList }= this.props.PurchaseOrderState
-        const { Domains, ManagerList, ExpenseTypeList, EmployeeList, SkillCategory, SkillSet } = this.props.MasterDataSet;
-        const { GetDomains, GetManagerList, GetExpenseTypeList, GetEmployeeList, GetSkillSet, GetSkillCategory } = this.props.MasterDataAction;
+        const { Domains, ManagerList, ExpenseTypeList, EmployeeList, SkillCategory, SkillSet, projectBillingModelList } = this.props.MasterDataSet;
+        const { GetDomains, GetManagerList, GetExpenseTypeList, GetEmployeeList, GetSkillSet, GetSkillCategory, GetProjectBillingTypeList } = this.props.MasterDataAction;
         const { GetProjectList }= this.props.ProjectAction
         const { GetClientList } = this.props.ClientAction;
         const { GetPurchaseOrderList }= this.props.PurchaseOrderAction
@@ -46,6 +46,7 @@ class ProjectManagement extends Component {
         (ExpenseTypeList && ExpenseTypeList.length === 0) && await GetExpenseTypeList(0,20,authorization);
         (EmployeeList && EmployeeList.length === 0) && await GetEmployeeList(0,100,authorization);
         (listOfClient && listOfClient.length === 0) && await GetClientList(0,20,authorization);
+        (projectBillingModelList && projectBillingModelList.length === 0) && await GetProjectBillingTypeList(0,20,authorization);
         (purchaseOrderList && purchaseOrderList.length === 0) && await GetPurchaseOrderList(0,20,authorization);
         (projectList && projectList.length === 0) && await GetProjectList(0,20,authorization);
         await dispatch(loadMessage());

@@ -81,7 +81,7 @@ const LoadFields = (parameter) => {
     const { change } = parameter.mainProps
     const { authorization }=parameter.mainProps.LoginState
     const { listOfClient } = parameter.mainProps.ClientState
-    const { ManagerList, Domains } = parameter.mainProps.MasterDataSet
+    const { ManagerList, Domains, projectBillingModelList } = parameter.mainProps.MasterDataSet
     const { purchaseOrderListByName } = parameter.mainProps.PurchaseOrderState
     const { listOfBillingModel } = parameter.mainProps.BillingModelState
     const { GetPurchaseOrderListByName }=parameter.mainProps.PurchaseOrderAction
@@ -89,7 +89,7 @@ const LoadFields = (parameter) => {
     let clientOptions= structureOptions({options:listOfClient,keys: ['clientName'],idKey:'id'});
     let purchaseOrderOptions= structureOptions({options :purchaseOrderListByName,keys: ['poNum'],idKey:'id'});
     let projectTypeOptions= structureOptions({options:Domains,keys: ['name'], idKey:'id'})
-    let projectBillingTypes=listOfBillingModel
+    let projectBillingTypes=structureOptions({options:projectBillingModelList,keys: ['name'], idKey:'id'})
     return <>
         <Field name="projectName" component={renderTextField} fullWidth label="Project Name" helperText="Ex. PRMS" />
         <Field name="projectType" component={renderAutocomplete} optionData={projectTypeOptions} label="Project Type" validate={[Required]} />
@@ -171,7 +171,7 @@ const GetPhotos = async (parameter) => {
 // this method will used for the loading tabs into project from
 const SectionThree = (data) => {
     const { showTabs } = data.mainProps.stateData
-    const tabsData = [
+    let tabsData = showTabs && [
         { label: "Billing Model", component: <LoadBillingModelTab props={data} /> },
         { label: "Resources", component: <LoadResourcesTab props={data} />},
         { label: "Expenses", component: <LoadExpensesTab props={data} />}

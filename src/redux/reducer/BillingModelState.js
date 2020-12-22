@@ -1,9 +1,9 @@
 const initalState={
     listOfBillingModel:[ 
         {title:"Milestone",id:1}, 
-        {title:"Fiexd Cost",id:2}, 
-        {title:"Payables",id:3}, 
-        {title:"Free Style",id:4} 
+        {title:"Fixedamount",id:2}, 
+        {title:"Payable days",id:3}, 
+        {title:"Data provided by client",id:4} 
     ],
     milestoneData:[]
 }

@@ -7,6 +7,7 @@ import { renderMatiralCheckbox } from '../utilites/FromUtilites';
 import ResourcesTable from '../resources/ResourcesTable';
 import ExpensesTable from '../Expenses/ExpensesTable';
 
+// this method will used for autocomplete options structure configre into project 
 const structureOptions=(propsData)=>{
     let resultOptions=[]
     const { options, keys,idKey}=propsData
@@ -27,7 +28,7 @@ const MileStoneTabel=(propsData)=>{
     const columns = [
         { title: 'Milestone Name', field: 'mileStoneName',width:120 },
         { title: 'Work Completion(%)', field: 'workComplete', width:90 },
-        { title: 'Invoice Amount(%)', field: 'invoiceAmount', width:80 }
+        { title: 'Invoice(%)', field: 'invoiceAmount', width:80 }
     ]
     return <div style={{ maxWidth: "100%", marginBottom:"18px" }}>
     <MaterialTable
@@ -42,7 +43,7 @@ const MileStoneTabel=(propsData)=>{
       }}
       actions={[
         {
-          icon: () =><div><Button variant="contained" color="primary">Save MilesStone</Button></div>,
+          icon: () =><div><Button variant="contained" color="primary">Save MileStone</Button></div>,
           onClick: (event, rowData) => { 
               let totalWorkCompetion = data.length >0 && data.reduce((sum,item)=>{ return sum+ parseInt(item.workComplete); }, 0)
               let totalInvoiceAmount=data.length >0 && data.reduce((sum,item)=>{ return sum+ parseInt(item.invoiceAmount); }, 0)
@@ -91,8 +92,9 @@ const LoadResourcesTab = (propsData) => {
   const { props }=propsData
   const { initialValues } = props.mainProps
   const { projectBillingType }=(props.mainProps.form.ProjectForm && props.mainProps.form.ProjectForm.values) ? props.mainProps.form.ProjectForm.values : ""
+  console.log("DA ",projectBillingType)
   let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
-  return <ResourcesTable projectId={projectId} disableResourceModel={projectBillingType === "Milestone"} stateData={props.mainProps.stateData} />
+  return <ResourcesTable projectId={projectId} disableResourceModel={projectBillingType === "Mile Stone"} stateData={props.mainProps.stateData} />
 }
 
 // this method will used for the load the expense tab
@@ -109,15 +111,15 @@ const LoadBillingModelTab=(propsData)=>{
   const { values }=props.mainProps.form.ProjectForm
   const { showTabs}=props.mainProps.stateData
   switch ( showTabs && values && values.projectBillingType) {
-      case "Milestone":
-          return MilestoneTab(props)           
+      case "Mile Stone":
+          return  <MilestoneTab data={props} />           
       default:
           return <h3>Select Proper Billing Type</h3>
   }
 }
 
 const MilestoneTab=(propsData)=>{
-  const { dispatch }=propsData.mainProps
+  const { dispatch }=propsData.data.mainProps
   const [milestoneData, setMilestoneData] = useState([])
   return <MileStoneTabel
       dispatch={dispatch}

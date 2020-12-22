@@ -43,7 +43,7 @@ let ResourcesTable = (props) => {
   const { GetEmployeeListByProjectId, EditEmployeeRecord, DeleteEmployeeRecord } = props.EmployeeAction
   const { GetClientDetailsById } = props.ClientAction
   const { operation } = props.stateData
-  const { EmployeeList, Domains, SkillCategory, SkillSet } = props.MasterDataSet
+  const { EmployeeList } = props.MasterDataSet
   const { authorization } = props.LoginState
   const { clientDataById } = props.ClientState
   const { employeeListByPojectId } = props.EmpolyeeState
@@ -52,7 +52,7 @@ let ResourcesTable = (props) => {
   const [countCallRateCard, setCountRateCardCall] = useState(0)
   const handleClickOpen = () => { setOpen(true) };
   const handleClose = () => { setOpen(false) };
-  let optionsEmployee = EmployeeList.length > 0 && EmployeeList.map((item, key) => { return { title: item.firstName + " " + item.lastName, id: item.accountId } });
+  let optionsEmployee = EmployeeList.length > 0 && EmployeeList.map((item, key) => { return { title: item.firstName + " " + item.lastName, id: item.accountId, empId:item.employeeNumber } });
   console.log("RT ",disableResourceModel)
   const getEmployeeListProjectId = async () => {
     await setCountCall(countCall + 1)
@@ -85,19 +85,19 @@ let ResourcesTable = (props) => {
       field: 'name', 
       editable: disableResourceModel ? "always" : "never", 
       editComponent: props => {
-        return renderAutoComplete({name:"employeeName", label:"Select", optionData:optionsEmployee, propsData:props })
+        return renderAutoComplete({name:"employeeName", label:"Select", optionData:optionsEmployee, propsData:props, onChange:(value)=>{
+          var data = { ...props.rowData };
+          data.employeeNumber = value ? value.empId :"";
+          data.accountId = value ? value.id :"";
+          data.name = value ? value.title :"";
+          props.onRowDataChange(data);
+        } })
       }
     },
-    { title: 'Domain', 
-      field: 'domain', 
-      editable: disableResourceModel ?"always" : "never" 
-    },
-    { title: 'Category', 
-      field: 'category', 
-      editable: disableResourceModel ?"always" : "never" 
-    },
-    { title: 'Experience', field: 'experience', editable: disableResourceModel ?"always" : "never", width: 10 },
-    { title: 'Skill', field: 'skill', editable: disableResourceModel ?"always" : "never", width: 10 },
+    { title: 'Domain', field: 'domain', editable: "never" },
+    { title: 'Category', field: 'category', editable: "never" },
+    { title: 'Experience', field: 'experience', editable: "never", width: 10 },
+    { title: 'Skill', field: 'skill', editable: "never", width: 10 },
     {
       title: 'Onboarding\u00a0Date',
       width: 15,
@@ -163,7 +163,8 @@ let ResourcesTable = (props) => {
           isDeleteHidden: rowData => false,
           onRowAdd: newData => {
             return new Promise(async (resolve, reject) => {
-
+              console.log("Data ", newData);
+              resolve();
             }
           )},
           onRowUpdate: (newData, oldData) => {
@@ -301,7 +302,7 @@ const renderTextField = (props) => {
 }
 
 const renderAutoComplete=(props)=>{
-  const {name, optionData, propsData, label,helperText }=props
+  const {name, optionData, propsData, label,helperText,onChange }=props
   return <Autocomplete
   id={name}
   style={{marginTop:"-10px"}}
@@ -309,7 +310,7 @@ const renderAutoComplete=(props)=>{
   options={(optionData && optionData.length >0) ? optionData: []}
   getOptionLabel={option => option.title ? option.title :option}
   getOptionSelected={(option, value) => option.id === value.id}
-  onChange={(event, value) =>{ value && propsData.onChange(value.title) }}
+  onChange={(event, value) =>{ value && onChange(value) }}
   renderInput={(params) => ( <TextField {...params} error={!propsData.value} helperText={!propsData.value ? helperText:""} label={label} margin="normal"  /> )}
 />
 }
