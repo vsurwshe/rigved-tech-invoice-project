@@ -37,15 +37,6 @@ const SaveMileStoneDataArray=(mileStoneData,authroizationKey)=>{
         return Axios.all(urlList)
         .then(response=>{ console.log("RES ",response); SuccessFunction({ dispatch , "successMethod": saveMileStoneData, "loadMessage":loadMessage, response, "postMethod":true}) })
         .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
-        // CreateInstance()
-        // .post('/milestone/create',mileStoneData,{
-        //     headers: { 
-        //         'Content-Type': 'application/json',
-        //         Authorization: authroizationKey 
-        //     }
-        // })
-        // .then(response => { SuccessFunction({ dispatch , "successMethod": saveMileStoneData, "loadMessage":loadMessage, response, "postMethod":true}) })
-        // .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
 

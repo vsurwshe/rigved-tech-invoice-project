@@ -15,8 +15,7 @@ import { Link } from 'react-router-dom';
 import { loadMessage } from "../../redux/actions/ClientAction"
 import { structureOptions, LoadBillingModelTab, LoadResourcesTab, LoadExpensesTab } from './ProjectFormUtilites';
 
-
-// this is main component
+// this will help to load project form component
 let ProjectForm = (props) => {
     var classes = useStyles();
     const { SaveMethod, pristine, reset, submitting, handleSubmit, cancle, clearFile } = props
@@ -27,7 +26,7 @@ let ProjectForm = (props) => {
             <div className={classes.buttonStyle}>
                 <center>
                     {(operation === FromActions.CR || operation === FromActions.ED) && <>
-                        <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> SUBMIT </Button> &nbsp;&nbsp;
+                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> SUBMIT </Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button></>}&nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await clearFile(); await reset(); cancle() }}> Cancel</Button>
                 </center>
@@ -60,6 +59,7 @@ const LoadGird = (props) => {
     </>
 }
 
+// this method will help to show sanckbar
 const showMessage=(props)=>{
     const { common_message, color, dispatch }=props
     return <>
@@ -84,7 +84,6 @@ const LoadFields = (parameter) => {
     const { listOfClient } = parameter.mainProps.ClientState
     const { ManagerList, Domains, projectBillingModelList } = parameter.mainProps.MasterDataSet
     const { purchaseOrderListByName } = parameter.mainProps.PurchaseOrderState
-    const { listOfBillingModel } = parameter.mainProps.BillingModelState
     const { GetPurchaseOrderListByName }=parameter.mainProps.PurchaseOrderAction
     let projectManagerOptions=structureOptions({options:ManagerList,keys: ['firstName','lastName'],idKey:'accountId'});
     let clientOptions= structureOptions({options:listOfClient,keys: ['clientName'],idKey:'id'});
@@ -111,7 +110,6 @@ const clientChange=async (dataProps)=>{
     await change('ProjectForm', 'purchaseOrderId', value.id);   
     await GetPurchaseOrderListByName(0,20,value.id,authorization)
 }
-
 
 // this method will used for purchase order change
 const purchaseOrderChange=async(dataProps)=>{
@@ -180,6 +178,7 @@ const SectionThree = (data) => {
     return showTabs && <SimpleTabs tabData={tabsData} />
 }
 
+// this will help to validate project form
 const validate=(values)=>{
     const errors={}
     // this condtions check the project name
@@ -216,4 +215,3 @@ ProjectForm = connect(state => {
     return { ...state, purchaseOrder }
 }, mapDispatchToProps)(ProjectForm)
 export default reduxForm({ form: 'ProjectForm', validate })(ProjectForm);
-

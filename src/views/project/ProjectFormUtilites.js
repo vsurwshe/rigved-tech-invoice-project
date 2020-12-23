@@ -6,8 +6,9 @@ import { loadMessage } from "../../redux/actions/ClientAction"
 import { renderMatiralCheckbox } from '../utilites/FromUtilites';
 import ResourcesTable from '../resources/ResourcesTable';
 import ExpensesTable from '../Expenses/ExpensesTable';
-import { CheckBox, CheckBoxOutlineBlankOutlined } from '@material-ui/icons';
+import { CheckBox, CheckBoxOutlineBlankOutlined, TextFields } from '@material-ui/icons';
 import { API_EXE_TIME } from '../../assets/config/Config';
+import TextField from '@material-ui/core/TextField';
 
 // this method will used for autocomplete options structure configre into project 
 const structureOptions=(propsData)=>{
@@ -34,6 +35,21 @@ const MileStoneTabel=(propsData)=>{
         { title: 'Milestone Name', field: 'mileStoneDesc',width:120 },
         { title: 'Work Completion(%)', field: 'workComPer', width:90 },
         { title: 'Invoice(%)', field: 'invoicePer', width:80 },
+        { title: 'Expected of Completion Date', 
+          field: 'expComDate', 
+          width:80 ,
+          editComponent: props => {
+            return renderTextField({ name: "expComDate", label: "", type: "date", action: { props } })
+          }
+        },
+        { title: 'Actual Complete Date', 
+          field: 'actualComDate', 
+          editable:'onUpdate',
+          width:80 ,
+          editComponent: props => {
+            return renderTextField({ name: "actualComDate", label: "", type: "date", action: { props } })
+          }
+        },
         {
           title: "",
           width:8,
@@ -94,7 +110,6 @@ const onTabelRowAdd=(props)=>{
 
 // this method will used for the create mile stone 
 const saveMileStoneRecord=(props)=>{
-  console.log("PROP ",props)
   const { data, dispatch, setLoad }=props
   const { GetMileStoneList, SaveMileStoneDataArray}=props.mainProps.BillingModelAction
   const { authorization }=props.mainProps.LoginState
@@ -156,6 +171,19 @@ const LoadBillingModelTab=(propsData)=>{
       default:
           return <h3>Select Proper Billing Type</h3>
   }
+}
+
+// this is render the text fileds in tables
+const renderTextField = (props) => {
+  const { name, label, type, action } = props
+  return <TextField
+    id={name}
+    label={label}
+    type={type}
+    onChange={e => action.props.onChange(e.target.value)}
+    InputLabelProps={{ shrink: true }}
+    required={true}
+  />
 }
 
 // this method will used for the loading milestone tab
