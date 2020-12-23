@@ -17,7 +17,7 @@ import { loadMessage } from "../../redux/actions/ClientAction";
 import moment from 'moment';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
-import { renderAutocompleteByName, renderLoading } from '../utilites/FromUtilites';
+import { renderLoading } from '../utilites/FromUtilites';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -53,7 +53,6 @@ let ResourcesTable = (props) => {
   const handleClickOpen = () => { setOpen(true) };
   const handleClose = () => { setOpen(false) };
   let optionsEmployee = EmployeeList.length > 0 && EmployeeList.map((item, key) => { return { title: item.firstName + " " + item.lastName, id: item.accountId, empId:item.employeeNumber } });
-  console.log("RT ",disableResourceModel)
   const getEmployeeListProjectId = async () => {
     await setCountCall(countCall + 1)
     await GetEmployeeListByProjectId(0, 20, projectId, authorization);
@@ -139,7 +138,7 @@ let ResourcesTable = (props) => {
 
 
   return <> 
-  {!disableResourceModel && LoadAddResourceModel({ open, handleClose, "mainProps": props })}
+  {!disableResourceModel && <LoadAddResourceModel open={open} handleClose={handleClose} mainProps={props }/>}
     <div style={{ maxWidth: "100%" }}>
       <MaterialTable
         title="Resource Managment"
@@ -161,12 +160,7 @@ let ResourcesTable = (props) => {
           isEditHidden: rowData => false,
           isDeletable: rowData => true,
           isDeleteHidden: rowData => false,
-          onRowAdd: newData => {
-            return new Promise(async (resolve, reject) => {
-              console.log("Data ", newData);
-              resolve();
-            }
-          )},
+          onRowAdd: newData => saveResourceTableRecord({newData,projectId,"mainProps":props}),
           onRowUpdate: (newData, oldData) => {
             return new Promise(async (resolve, reject) => {
               const { id } = (clientDataById && clientDataById.rateCardDtos && clientDataById.rateCardDtos.length > 0) ? clientDataById.rateCardDtos[0] : ""
@@ -210,6 +204,30 @@ let ResourcesTable = (props) => {
   </>
 }
 
+const saveResourceTableRecord=(props)=>{
+  console.log("Props ",props)
+  const {newData , projectId }=props
+  const { authorization } = props.mainProps.LoginState
+  const { SaveEmployeeRecord, GetEmployeeListByProjectId } = props.mainProps.EmployeeAction
+  return new Promise(async (resolve, reject) => {
+    if(newData){
+      let modifyData={
+        "active": 1,
+        "employeeList": [{ ...newData, "rateCardId": "NA"}],
+        "projectId": projectId
+      }
+      SaveEmployeeRecord(modifyData,authorization);
+      setTimeout(async()=>{
+        await GetEmployeeListByProjectId(0,100,projectId,authorization);
+        await resolve();
+      },API_EXE_TIME)
+    }else{
+      reject();
+    }
+  })
+}
+
+// this method will used for the loading action button top right side table
 const LoadAddButtonAction=(props)=>{
   const { operation, disableResourceModel, handleClickOpen }=props
   if(operation && (operation === FromActions.ED || operation === FromActions.VIED)){

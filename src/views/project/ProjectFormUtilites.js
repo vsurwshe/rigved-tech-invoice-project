@@ -23,6 +23,7 @@ const structureOptions=(propsData)=>{
     return resultOptions;
 }
 
+// this method will used for the load milestone table
 const MileStoneTabel=(propsData)=>{
     const { data,saveMileStone, dispatch }=propsData
     const columns = [
@@ -81,6 +82,7 @@ const MileStoneTabel=(propsData)=>{
   </div>
 }
 
+// this method will used for the load payables checkbox
 const PayablesCheckbox=(propsData)=>{
   return <div style={{ maxWidth: "100%", marginBottom:"18px" }}>
     <Field name="employed" component={renderMatiralCheckbox} label="Employed"/>
@@ -91,10 +93,16 @@ const PayablesCheckbox=(propsData)=>{
 const LoadResourcesTab = (propsData) => {
   const { props }=propsData
   const { initialValues } = props.mainProps
+  const [resource, setResource] = useState([]);
   const { projectBillingType }=(props.mainProps.form.ProjectForm && props.mainProps.form.ProjectForm.values) ? props.mainProps.form.ProjectForm.values : ""
-  console.log("DA ",projectBillingType)
   let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
-  return <ResourcesTable projectId={projectId} disableResourceModel={projectBillingType === "Mile Stone"} stateData={props.mainProps.stateData} />
+  return <ResourcesTable 
+      projectId={projectId} 
+      disableResourceModel={projectBillingType === "Mile Stone"} 
+      stateData={props.mainProps.stateData} 
+      resource={resource}
+      setResource={setResource}
+  />
 }
 
 // this method will used for the load the expense tab
@@ -105,7 +113,7 @@ const LoadExpensesTab = (propsData) => {
   return <ExpensesTable projectId={projectId} stateData={props.mainProps.stateData} />
 }
 
-
+// this method will used for the Loadbilling tab according to billing type
 const LoadBillingModelTab=(propsData)=>{
   const { props}=propsData
   const { values }=props.mainProps.form.ProjectForm
@@ -118,6 +126,7 @@ const LoadBillingModelTab=(propsData)=>{
   }
 }
 
+// this method will used for the loading milestone tab
 const MilestoneTab=(propsData)=>{
   const { dispatch }=propsData.data.mainProps
   const [milestoneData, setMilestoneData] = useState([])
