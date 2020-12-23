@@ -9,6 +9,7 @@ import { FromActions } from '../../assets/config/Config';
 import SimpleTabs from '../client/TabPanleUtilites';
 import * as FileAction from '../../redux/actions/FileAction'
 import * as PurchaseOrderAction from '../../redux/actions/PurchaseOrderAction';
+import * as BillingModelAction from '../../redux/actions/BillingModelAction';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
 import { loadMessage } from "../../redux/actions/ClientAction"
@@ -204,6 +205,7 @@ const validate=(values)=>{
 const selector = formValueSelector('ProjectForm')
 const mapDispatchToProps = (dispatch) => ({
     dispatch,
+    BillingModelAction:bindActionCreators(BillingModelAction,dispatch),
     FileAction: bindActionCreators(FileAction, dispatch),
     PurchaseOrderAction: bindActionCreators(PurchaseOrderAction,dispatch),
     change: bindActionCreators(change, dispatch)

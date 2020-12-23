@@ -6,6 +6,8 @@ import { loadMessage } from "../../redux/actions/ClientAction"
 import { renderMatiralCheckbox } from '../utilites/FromUtilites';
 import ResourcesTable from '../resources/ResourcesTable';
 import ExpensesTable from '../Expenses/ExpensesTable';
+import { CheckBox, CheckBoxOutlineBlankOutlined } from '@material-ui/icons';
+import { API_EXE_TIME } from '../../assets/config/Config';
 
 // this method will used for autocomplete options structure configre into project 
 const structureOptions=(propsData)=>{
@@ -25,17 +27,29 @@ const structureOptions=(propsData)=>{
 
 // this method will used for the load milestone table
 const MileStoneTabel=(propsData)=>{
-    const { data,saveMileStone, dispatch }=propsData
+    const { data,saveMileStone, dispatch, mainProps, projectId }=propsData
+    const [load, setLoad] = useState(false)
     const columns = [
-        { title: 'Milestone Name', field: 'mileStoneName',width:120 },
-        { title: 'Work Completion(%)', field: 'workComplete', width:90 },
-        { title: 'Invoice(%)', field: 'invoiceAmount', width:80 }
+        { title: "", field: "id", hidden: true },
+        { title: 'Milestone Name', field: 'mileStoneDesc',width:120 },
+        { title: 'Work Completion(%)', field: 'workComPer', width:90 },
+        { title: 'Invoice(%)', field: 'invoicePer', width:80 },
+        {
+          title: "",
+          width:8,
+          editable: "never",
+          render: (rowData)=> {
+            const { compFlag }=rowData
+            return (compFlag ) ? <CheckBox variant="contained" color="primary" />:<CheckBoxOutlineBlankOutlined  variant="contained" color="secondary" onClick={()=>console.log(rowData)} />;
+          }
+        }
     ]
     return <div style={{ maxWidth: "100%", marginBottom:"18px" }}>
     <MaterialTable
       title="Milestone Managment"
       columns={columns}
       data={data.length > 0 ? data : []}
+      isLoading={load}
       options={{
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
         pageSize:5,
@@ -43,20 +57,11 @@ const MileStoneTabel=(propsData)=>{
         actionsColumnIndex:-1,
       }}
       actions={[
-        {
-          icon: () =><div><Button variant="contained" color="primary">Save MileStone</Button></div>,
-          onClick: (event, rowData) => { 
-              let totalWorkCompetion = data.length >0 && data.reduce((sum,item)=>{ return sum+ parseInt(item.workComplete); }, 0)
-              let totalInvoiceAmount=data.length >0 && data.reduce((sum,item)=>{ return sum+ parseInt(item.invoiceAmount); }, 0)
-              if(totalInvoiceAmount === 100 && totalWorkCompetion === 100){
-                console.log("result = ",totalWorkCompetion,totalInvoiceAmount);
-              }else{
-                dispatch(loadMessage("error","Please check total of milestone configrations"))
-              }
-            },
-            isFreeAction: true,
-            tooltip: 'Save MileStone'
-          }
+        { icon: () =><div><Button variant="contained" color="primary">Save MileStone</Button></div>,
+          onClick: (event, rowData) => saveMileStoneRecord({event, rowData,data, dispatch, "mainProps":mainProps, setLoad}),
+          isFreeAction: true,
+          tooltip: 'Save MileStone'
+        }
       ]}
       icons={{  Add: () => <Button variant="contained" color="secondary">Add</Button> }}
       editable={{
@@ -64,22 +69,47 @@ const MileStoneTabel=(propsData)=>{
         isEditHidden: rowData => true,
         isDeletable: rowData => false,
         isDeleteHidden: rowData => true,
-        onRowAdd: newData => {
-          return new Promise(async (resolve, reject) => {
-            if (newData && (Object.keys(newData).length > 1 && newData.constructor === Object)) {
-              await saveMileStone([...data,newData])
-              await resolve();
-            } else {
-              dispatch(loadMessage("error","Please check the provided fileds"))
-              reject();
-            }
-          })
-        },
+        onRowAdd: newData => onTabelRowAdd({data, newData, dispatch, saveMileStone, projectId}),
         onRowUpdate: (newData, oldData) => { },
         onRowDelete: oldData => { }
       }}
     />
   </div>
+}
+
+// this method will used for the add row in table
+const onTabelRowAdd=(props)=>{
+  const { data, newData, dispatch, saveMileStone, projectId }=props
+  return new Promise(async (resolve, reject) => {
+    if (newData && (Object.keys(newData).length > 1 && newData.constructor === Object)) {
+      let modifyNewData={...newData,projectId}
+      await saveMileStone([...data,modifyNewData])
+      await resolve();
+    } else {
+      dispatch(loadMessage("error","Please check the provided fileds"))
+      reject();
+    }
+  })
+}
+
+// this method will used for the create mile stone 
+const saveMileStoneRecord=(props)=>{
+  console.log("PROP ",props)
+  const { data, dispatch, setLoad }=props
+  const { GetMileStoneList, SaveMileStoneDataArray}=props.mainProps.BillingModelAction
+  const { authorization }=props.mainProps.LoginState
+  let totalWorkCompetion = data.length >0 && data.reduce((sum,item)=>{ return sum+ parseInt(item.workComPer); }, 0)
+  let totalInvoiceAmount=data.length >0 && data.reduce((sum,item)=>{ return sum+ parseInt(item.invoicePer); }, 0)
+  if(totalInvoiceAmount === 100 && totalWorkCompetion === 100){
+    setLoad(true);
+    SaveMileStoneDataArray(data,authorization);
+    setTimeout(async()=>{
+      // await GetMileStoneList(0,100,authorization)
+      setLoad(false);
+    },API_EXE_TIME)
+  }else{
+    dispatch(loadMessage("error","Please check total of milestone configrations"))
+  }
 }
 
 // this method will used for the load payables checkbox
@@ -116,11 +146,13 @@ const LoadExpensesTab = (propsData) => {
 // this method will used for the Loadbilling tab according to billing type
 const LoadBillingModelTab=(propsData)=>{
   const { props}=propsData
+  const { initialValues } = props.mainProps
   const { values }=props.mainProps.form.ProjectForm
   const { showTabs}=props.mainProps.stateData
+  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
   switch ( showTabs && values && values.projectBillingType) {
       case "Mile Stone":
-          return  <MilestoneTab data={props} />           
+          return  <MilestoneTab data={props} projectId={projectId} />           
       default:
           return <h3>Select Proper Billing Type</h3>
   }
@@ -128,12 +160,15 @@ const LoadBillingModelTab=(propsData)=>{
 
 // this method will used for the loading milestone tab
 const MilestoneTab=(propsData)=>{
+  const { projectId }=propsData
   const { dispatch }=propsData.data.mainProps
   const [milestoneData, setMilestoneData] = useState([])
   return <MileStoneTabel
       dispatch={dispatch}
       data={milestoneData} 
       saveMileStone={setMilestoneData}
+      projectId={projectId}
+      mainProps={propsData.data.mainProps}
   />
 }
 
