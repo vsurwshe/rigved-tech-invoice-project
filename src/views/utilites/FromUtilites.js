@@ -219,10 +219,39 @@ const renderContact = ({ classes, open, handleClickOpen, handleClose, fields, in
   </span>
 }
 
-// this method will used for render loading
+// this will render checkbox and input text
+const renderCheckboxInputFileds=({ label,name,helperText, placeholder, input, meta: { touched, invalid, error }, ...custom})=>{
+  return <div style={{ display:"flex", flexDirection:"row"}}>
+    <label for="myCheck">{label}</label> 
+    <input type="checkbox" id="myCheck" onClick={()=>myFunction('myCheck','text')} />
+    <input 
+      id="text" 
+      type="text" 
+      style={{display:"none"}}
+      placeholder={placeholder}
+      {...input}
+      {...custom}
+    />
+  </div>
+}
+
+const myFunction=(checkboxId, textfiledId)=>{
+  console.log("MY ", checkboxId,textfiledId)
+  var checkBox = document.getElementById(checkboxId);
+  var text = document.getElementById(textfiledId);
+  if (checkBox.checked == true){
+    text.style.display = "block";
+  } else {
+     text.style.display = "none";
+  }
+}
+
+// this will used for the loading icons show
 const renderLoading=({message , size})=>{
   return <center> <h3>{message}</h3> <CircularProgress size={size} /> </center>
 }
+
+
 
 // this method will used for the download the invoice table as pdf
 const dwonloadInvoice = () => {
@@ -268,6 +297,7 @@ export{
     renderAutocompleteWithProps,
     renderPasswordTextField,
     renderContact,
+    renderCheckboxInputFileds,
     renderLoading,
     dwonloadInvoice,
     renderMatiralCheckbox,

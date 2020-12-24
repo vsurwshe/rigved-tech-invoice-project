@@ -6,7 +6,7 @@ import CreateIcon from '@material-ui/icons/Create';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import { Field, reduxForm } from 'redux-form';
 import { loadMessage } from "../../redux/actions/ClientAction"
-import { renderDateTimePicker, renderMatiralCheckbox } from '../utilites/FromUtilites';
+import { renderCheckboxInputFileds, renderDateTimePicker, renderMatiralCheckbox } from '../utilites/FromUtilites';
 import ResourcesTable from '../resources/ResourcesTable';
 import ExpensesTable from '../Expenses/ExpensesTable';
 import { CheckBox, CheckBoxOutlineBlankOutlined } from '@material-ui/icons';
@@ -453,7 +453,13 @@ const getMileStoneListByProjectId=async({authorization,projectId,callMileStoneCo
 // this method will used for the load payables checkbox
 const PayablesCheckbox=(propsData)=>{
   return <div style={{ maxWidth: "100%", marginBottom:"18px" }}>
-    <Field name="employed" component={renderMatiralCheckbox} label="Employed"/>
+    <Field name="DP" component={renderCheckboxInputFileds} label="Days Present"/>
+    <Field name="WO" component={renderCheckboxInputFileds} label="Weekly Off"/>
+    <Field name="PL" component={renderCheckboxInputFileds} label="Paid Leave"/>
+    <Field name="PH" component={renderCheckboxInputFileds} label="Paid Holiday"/>
+    <Field name="PHP" component={renderCheckboxInputFileds} label="Paid Holiday Present"/>
+    <Field name="WOP" component={renderCheckboxInputFileds} label="Weekly Off Present"/>
+    <Field name="LWP" component={renderCheckboxInputFileds} label="Leave without Pay"/>
   </div>
 }
 
@@ -554,6 +560,8 @@ const LoadBillingModelTab=(propsData)=>{
         return <MilestoneTab data={props} projectId={projectId} />           
       case "Fixed Rate":
         return <FixedTypeTab data={props} projectId={projectId} />          
+      case "Payable Days":
+        return <PayablesCheckbox props={props}  />          
       default:
           return <h3>Select Proper Billing Type</h3>
   }
