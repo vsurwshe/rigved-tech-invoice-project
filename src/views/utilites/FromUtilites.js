@@ -219,6 +219,7 @@ const renderContact = ({ classes, open, handleClickOpen, handleClose, fields, in
   </span>
 }
 
+// this method will used for render loading
 const renderLoading=({message , size})=>{
   return <center> <h3>{message}</h3> <CircularProgress size={size} /> </center>
 }

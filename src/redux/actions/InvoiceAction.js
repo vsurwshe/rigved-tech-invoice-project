@@ -3,7 +3,6 @@ import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
 import { loadMessage } from "../actions/ClientAction";
 import { SuccessFunction, ErrorFunction } from "./CommonAction"
 import { InvoiceError } from '../../assets/config/ErrorStringFile';
-import { prototype } from 'apexcharts';
 
 const GetInvoiceUserList = (firstIndex, lastIndex, invoiceId, authroizationKey) => {
     return (dispatch) => {
@@ -15,7 +14,6 @@ const GetInvoiceUserList = (firstIndex, lastIndex, invoiceId, authroizationKey) 
 }
 
 const GenerateInvoice = (invoiceData, authroizationKey, projectType) => {
-    console.log("TY ", projectType)
     return (dispatch) => {
         return CreateInstance()
             .post('/innvoice/create/',invoiceData,{headers: { 
