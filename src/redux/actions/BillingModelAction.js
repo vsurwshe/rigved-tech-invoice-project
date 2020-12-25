@@ -29,7 +29,7 @@ const SaveMileStoneData=(mileStoneData,authroizationKey)=>{
                 Authorization: authroizationKey 
             }
         })
-        .then(response => { SuccessFunction({ dispatch , "successMethod": saveMileStoneData, "loadMessage":loadMessage, response, "postMethod":true}) })
+        .then(response => { SuccessFunction({ dispatch , "successMethod": saveMileStoneRecordData, "loadMessage":loadMessage, response, "postMethod":true}) })
         .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
@@ -43,7 +43,7 @@ const udpateMileStoneData=(mileStoneData,authroizationKey)=>{
                 Authorization: authroizationKey 
             }
         })
-        .then(response=>{ SuccessFunction({ dispatch , "successMethod": updateMileStoneData, "loadMessage":loadMessage, response, "postMethod":true}) })
+        .then(response=>{ SuccessFunction({ dispatch , "successMethod": updateMileStoneRecordData, "loadMessage":loadMessage, response, "postMethod":true}) })
         .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
@@ -64,14 +64,14 @@ export function saveMileStoneListProjectId(mileStoneList) {
     }
 }
 
-export function saveMileStoneData(mileStoneData) {
+export function saveMileStoneRecordData(mileStoneData) {
     return {
         type:"SAVE_MILE_STONE_DATA",
         mileStoneData
     }
 }
 
-export function updateMileStoneData(mileStoneData) {
+export function updateMileStoneRecordData(mileStoneData) {
     return {
         type:"UPDATE_MILE_STONE_DATA",
         mileStoneData

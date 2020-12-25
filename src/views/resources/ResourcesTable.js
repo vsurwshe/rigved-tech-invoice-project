@@ -59,6 +59,7 @@ let ResourcesTable = (props) => {
     exitsEmployeeListByPojectId = await (employeeListByPojectId && employeeListByPojectId.length > 0) && employeeListByPojectId.filter(item => item.projectId === projectId);
   }
 
+  // this variable checking empolyeeList with projectId
   let exitsEmployeeListByPojectId = (employeeListByPojectId && employeeListByPojectId.length > 0) && employeeListByPojectId.filter(item => item.projectId === projectId);
 
   // this codition will check the passed project id realted employee is there or not
@@ -134,7 +135,6 @@ let ResourcesTable = (props) => {
     })
     return (tempData && tempData.length > 0) ? tempData : [];
   });
-
 
   return <> 
   {!disableResourceModel && <LoadAddResourceModel open={open} handleClose={handleClose} mainProps={props }/>}

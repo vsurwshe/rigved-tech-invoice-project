@@ -1,6 +1,8 @@
 import React,{ useState, useEffect } from 'react';
 import { Button } from '@material-ui/core';
 import MaterialTable from 'material-table';
+import Checkbox from '@material-ui/core/Checkbox';
+import CreateIcon from '@material-ui/icons/Create';
 import { Field } from 'redux-form';
 import { loadMessage } from "../../redux/actions/ClientAction"
 import { renderMatiralCheckbox } from '../utilites/FromUtilites';
@@ -9,6 +11,7 @@ import ExpensesTable from '../Expenses/ExpensesTable';
 import { CheckBox, CheckBoxOutlineBlankOutlined, TextFields } from '@material-ui/icons';
 import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
 import TextField from '@material-ui/core/TextField';
+import moment from 'moment';
 
 // this method will used for autocomplete options structure configre into project 
 const structureOptions=(propsData)=>{
@@ -33,28 +36,37 @@ const MileStoneTabel=(propsData)=>{
     const [load, setLoad] = useState(false)
     const columns = [
         { title: "", field: "id", hidden: true },
-        { title: 'Milestone Name', field: 'mileStoneDesc',width:120 },
-        { title: 'Work Completion(%)', field: 'workComPer', width:90 },
-        { title: 'Invoice(%)', field: 'invoicePer', width:80 },
-        { title: 'Expected of Completion Date', 
-          field: 'expComDate', 
+        { title: 'Milestone\u00a0Name', field: 'mileStoneDesc' },
+        { title: 'Work\u00a0Completion(%)', field: 'workComPer' },
+        { title: 'Invoice(%)', field: 'invoicePer'},
+        { title: 'Expected\u00a0of\u00a0Completion Date', 
+          field: 'expComDateModify', 
+          editable:'onAdd',
           width:80 ,
           editComponent: props => {
             return renderTextField({ name: "expComDate", label: "", type: "date", action: { props } })
           }
         },
-        { title: 'Actual Complete Date', 
-          field: 'actualComDate', 
+        { title: 'Actual\u00a0Complete\u00a0Date', 
+          field: 'actualComDateModify', 
           editable:'onUpdate',
-          width:80 ,
           editComponent: props => {
             return renderTextField({ name: "actualComDate", label: "", type: "date", action: { props } })
           }
         },
         {
-          title: "",
-          width:8,
-          editable: "never",
+          title: "Milestone\u00a0Complete",
+          field: 'compFlag', 
+          editable: "onUpdate",
+          editComponent: props => {
+            const { compFlag }=props.rowData
+            return  <Checkbox checked={compFlag} inputProps={{ 'aria-label': 'primary checkbox' }}
+              onChange={(event)=>{
+                var data = { ...props.rowData };
+                data.compFlag=event.target.checked;
+                props.onRowDataChange(data);
+              }}/>
+          },
           render: (rowData)=> {
             const { compFlag }=rowData
             return (compFlag ) ? <CheckBox variant="contained" color="primary" />:<CheckBoxOutlineBlankOutlined  variant="contained" color="secondary" onClick={()=>console.log(rowData)} />;
@@ -77,16 +89,18 @@ const MileStoneTabel=(propsData)=>{
         { icon: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="primary">Save MileStone</Button>:"",
           onClick: (event, rowData) => saveMileStoneRecord({event, rowData,data, dispatch, "mainProps":mainProps, setLoad, projectId}),
           isFreeAction: true,
-          tooltip: 'Save MileStone'
-        }
+          tooltip: 'Save MileStone'}
       ]}
-      icons={{  Add: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="secondary">Add</Button>:"" }}
+      icons={{  
+        Add: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="secondary">Add</Button>:"", 
+        Edit: () => { return <CreateIcon variant="contained" color="primary" /> },
+      }}
       editable={{
         isEditable: rowData => true,
         isDeletable: rowData => false,
         isDeleteHidden: rowData => true,
         onRowAdd: newData => onTabelRowAdd({data, newData, dispatch, saveMileStone, projectId}),
-        onRowUpdate: (newData, oldData) => ({newData,oldData,"mainProps":propsData}),
+        onRowUpdate: (newData, oldData) => updateMileStoneTabelRecord({newData,oldData,dispatch,"mainProps":propsData.mainProps}),
         onRowDelete: oldData => { }
       }}
     />
@@ -98,7 +112,13 @@ const onTabelRowAdd=(props)=>{
   const { data, newData, dispatch, saveMileStone, projectId }=props
   return new Promise(async (resolve, reject) => {
     if (newData && (Object.keys(newData).length > 1 && newData.constructor === Object)) {
-      let modifyNewData={...newData,projectId,compFlag:false}
+      let modifyNewData={
+        ...newData,
+        projectId,
+        compFlag:false, 
+        "active": true,
+        "expComDate": new moment(newData.expComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
+      }
       await saveMileStone([...data,modifyNewData])
       await resolve();
     } else {
@@ -109,8 +129,25 @@ const onTabelRowAdd=(props)=>{
 }
 
 // this method will help to update milestone table single record
-const updateMileStoneTabelRecord=(props)=>{
-
+const updateMileStoneTabelRecord=(propsData)=>{
+  const { newData, dispatch }=propsData
+  const { udpateMileStoneData, GetMileStoneListProjectId }=propsData.mainProps.BillingModelAction
+  const { authorization }=propsData.mainProps.LoginState
+  return new Promise(async (resolve, reject) => {
+    if (newData) {
+      let modifyNewData={
+        ...newData,
+        "active": true,
+        "expComDate": new moment(newData.expComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x'),
+        "actualComDate": new moment(newData.actualComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
+      }
+      await udpateMileStoneData(modifyNewData, authorization);
+      setTimeout(async () => {
+        await GetMileStoneListProjectId(0, 20, newData.projectId, authorization);
+        resolve();
+      }, API_EXE_TIME)
+    } else { dispatch(loadMessage("error","Please check the provided fileds")); reject(); }
+  })
 }
 
 // this method will used for the create mile stone 
@@ -199,9 +236,17 @@ const MilestoneTab=(propsData)=>{
   const { mileStoneListProjectId }= propsData.data.mainProps.BillingModelState ? propsData.data.mainProps.BillingModelState :[]
   const { GetMileStoneListProjectId }= propsData.data.mainProps.BillingModelAction ? propsData.data.mainProps.BillingModelAction :[]
   const [milestoneData, setMilestoneData] = useState([])
-  if(mileStoneListProjectId && mileStoneListProjectId.length <=0){
-      GetMileStoneListProjectId(0,100,projectId,authorization)
-      // saveMileStoneData(mileStoneListProjectId);
+  const [callMileStoneCount, setCallMileStoneCount] = useState(0)
+  let extisMileStoneByProjectId= (mileStoneListProjectId && mileStoneListProjectId.length >0) && mileStoneListProjectId.filter(item=> item.projectId === projectId)
+  if((extisMileStoneByProjectId === false || extisMileStoneByProjectId.length <= 0) && callMileStoneCount === 0){
+    getMileStoneListByProjectId({authorization,projectId,setCallMileStoneCount,callMileStoneCount,setMilestoneData,GetMileStoneListProjectId, mileStoneListProjectId})
+  }else if(milestoneData.length <=0 && extisMileStoneByProjectId.length >0){ 
+    let modifyExtisMileStoneByProjectId=extisMileStoneByProjectId.map(item=>{
+      return {...item, 
+        expComDateModify: item.expComDate ? new moment(item.expComDate).format('YYYY-MM-DD'):"",
+        actualComDateModify :item.actualComDate ? new moment(item.actualComDate).format('YYYY-MM-DD'):"",
+      }})
+    setMilestoneData(modifyExtisMileStoneByProjectId)
   }
   return <MileStoneTabel
       dispatch={dispatch}
@@ -212,6 +257,12 @@ const MilestoneTab=(propsData)=>{
   />
 }
 
+const getMileStoneListByProjectId=async({authorization,projectId,callMileStoneCount,setCallMileStoneCount,setMilestoneData,GetMileStoneListProjectId, mileStoneListProjectId})=>{
+  await setCallMileStoneCount(callMileStoneCount + 1)
+  await GetMileStoneListProjectId(0, 100, projectId, authorization);
+  (mileStoneListProjectId && mileStoneListProjectId.length > 0) && await setMilestoneData(mileStoneListProjectId.filter(item => item.projectId === projectId))
+  return "";
+}
 export{
     structureOptions,
     MileStoneTabel,
