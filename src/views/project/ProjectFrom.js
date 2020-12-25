@@ -106,8 +106,8 @@ const LoadFields = (parameter) => {
 // this method will used for purchase order change
 const clientChange=async (dataProps)=>{
     const { value, change, GetPurchaseOrderListByName,authorization}=dataProps
-    await change('ProjectForm', 'purchaseOrder', value.title);
-    await change('ProjectForm', 'purchaseOrderId', value.id);   
+    await change('ProjectForm', 'clientId', value.id);
+    await change('ProjectForm', 'clientName', value.title);
     await GetPurchaseOrderListByName(0,20,value.id,authorization)
 }
 

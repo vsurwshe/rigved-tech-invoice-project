@@ -5,13 +5,16 @@ const initialState = {
     invoiceEmployeeData:[],
     genratedInvoiceData:[],
     pdfInvoiceData:[],
-    viewPDFInvoiceData:[]
+    viewPDFInvoiceData:[],
+    preInvoiceMileStonesData:[]
 }
 
 const InvoiceState=(state=initialState,action)=>{
     switch (action.type) {
         case "SAVE_INVOICE_LIST":
             return {...state,invoiceList:action.invoiceList}
+        case "SAVE_MILESTONE_PRE_INVOICE_DATA":
+            return {...state,preInvoiceMileStonesData:action.mileStones}
         case "SAVE_INVOICE_PDF_LIST":
             return {...state,invoiceList:action.invoiceList}
         case "SAVE_INVOICE_USER_LIST":
