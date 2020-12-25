@@ -1,13 +1,20 @@
-import Axios from 'axios';
 import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
-import { API_URL } from '../../assets/config/Config';
 import { loadMessage } from './ClientAction';
 import { ErrorFunction, SuccessFunction } from './CommonAction';
 
-const GetMileStoneList=(firstIndex, lastIndex,authroizationKey)=>{
+const GetMileStoneListProjectId=(firstIndex, lastIndex, projectId, authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
-            .get('/client/clientList/'+firstIndex+'/'+lastIndex,HeaderConfig(authroizationKey))
+            .get('/milestone/getMileStoneList/'+firstIndex+'/'+lastIndex+'/'+projectId,HeaderConfig(authroizationKey))
+            .then(response => { SuccessFunction({ dispatch , "successMethod": saveMileStoneListProjectId, "loadMessage":loadMessage, response}) })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
+const GetAllMileStoneList=(firstIndex, lastIndex, authroizationKey)=>{
+    return(dispatch)=>{
+        return CreateInstance()
+            .get('/milestone/getMileStoneList/'+firstIndex+'/'+lastIndex,HeaderConfig(authroizationKey))
             .then(response => { SuccessFunction({ dispatch , "successMethod": saveMileStoneList, "loadMessage":loadMessage, response}) })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
@@ -16,7 +23,7 @@ const GetMileStoneList=(firstIndex, lastIndex,authroizationKey)=>{
 const SaveMileStoneData=(mileStoneData,authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
-        .post('/milestone/create',mileStoneData,{
+        .post('/milestone/createAll/',mileStoneData,{
             headers: { 
                 'Content-Type': 'application/json',
                 Authorization: authroizationKey 
@@ -27,15 +34,16 @@ const SaveMileStoneData=(mileStoneData,authroizationKey)=>{
     }
 }
 
-const SaveMileStoneDataArray=(mileStoneData,authroizationKey)=>{
+const udpateMileStoneData=(mileStoneData,authroizationKey)=>{
     return(dispatch)=>{
-        let urlList= mileStoneData.length>0 && mileStoneData.map((item)=>{
-            let modifyData={...item, "active": true}
-            return Axios.post(API_URL+'/milestone/create',modifyData,{ headers: {  'Content-Type': 'application/json', Authorization: authroizationKey }})
+        return  CreateInstance()
+        .post('/milestone/create/',mileStoneData,{
+            headers: { 
+                'Content-Type': 'application/json',
+                Authorization: authroizationKey 
+            }
         })
-        console.log("URL ",urlList)
-        return Axios.all(urlList)
-        .then(response=>{ console.log("RES ",response); SuccessFunction({ dispatch , "successMethod": saveMileStoneData, "loadMessage":loadMessage, response, "postMethod":true}) })
+        .then(response=>{ SuccessFunction({ dispatch , "successMethod": updateMileStoneData, "loadMessage":loadMessage, response, "postMethod":true}) })
         .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
@@ -49,6 +57,13 @@ export function saveMileStoneList(mileStoneList) {
     }
 }
 
+export function saveMileStoneListProjectId(mileStoneList) {
+    return {
+        type:"SAVE_MILE_STONE_LIST_PROJECT_ID",
+        mileStoneList
+    }
+}
+
 export function saveMileStoneData(mileStoneData) {
     return {
         type:"SAVE_MILE_STONE_DATA",
@@ -56,8 +71,16 @@ export function saveMileStoneData(mileStoneData) {
     }
 }
 
+export function updateMileStoneData(mileStoneData) {
+    return {
+        type:"UPDATE_MILE_STONE_DATA",
+        mileStoneData
+    }
+}
+
 export{
-    GetMileStoneList,
+    GetAllMileStoneList,
+    GetMileStoneListProjectId,
     SaveMileStoneData,
-    SaveMileStoneDataArray   
+    udpateMileStoneData   
 }

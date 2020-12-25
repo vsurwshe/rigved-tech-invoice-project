@@ -127,8 +127,9 @@ const LoadHeader = (parameter) => {
         <h2>{initialValues.projectName}</h2>
         <h4>Client Name: {initialValues.clientName}</h4>
         <h4>Project Manager: {initialValues.projectManager}</h4>
+        <h4>Project Billing type: {initialValues.projectBillingType}</h4>
         <h4>Purchase Order: {initialValues.purchaseOrder}&nbsp;&nbsp;&nbsp;
-            <Button component={Link} to={{ pathname: '/purchaseOrder', purchaseOrderDetails }} color="secondary" variant="contained">View PO</Button>
+        <Button component={Link} to={{ pathname: '/purchaseOrder', purchaseOrderDetails }} color="secondary" variant="contained">View PO</Button>
         </h4>
     </>
 }

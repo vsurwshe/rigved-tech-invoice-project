@@ -1,4 +1,4 @@
-import React,{ useState } from 'react';
+import React,{ useState, useEffect } from 'react';
 import { Button } from '@material-ui/core';
 import MaterialTable from 'material-table';
 import { Field } from 'redux-form';
@@ -7,7 +7,7 @@ import { renderMatiralCheckbox } from '../utilites/FromUtilites';
 import ResourcesTable from '../resources/ResourcesTable';
 import ExpensesTable from '../Expenses/ExpensesTable';
 import { CheckBox, CheckBoxOutlineBlankOutlined, TextFields } from '@material-ui/icons';
-import { API_EXE_TIME } from '../../assets/config/Config';
+import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
 import TextField from '@material-ui/core/TextField';
 
 // this method will used for autocomplete options structure configre into project 
@@ -29,6 +29,7 @@ const structureOptions=(propsData)=>{
 // this method will used for the load milestone table
 const MileStoneTabel=(propsData)=>{
     const { data,saveMileStone, dispatch, mainProps, projectId }=propsData
+    const { operation }=propsData.mainProps.stateData
     const [load, setLoad] = useState(false)
     const columns = [
         { title: "", field: "id", hidden: true },
@@ -73,20 +74,19 @@ const MileStoneTabel=(propsData)=>{
         actionsColumnIndex:-1,
       }}
       actions={[
-        { icon: () =><div><Button variant="contained" color="primary">Save MileStone</Button></div>,
-          onClick: (event, rowData) => saveMileStoneRecord({event, rowData,data, dispatch, "mainProps":mainProps, setLoad}),
+        { icon: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="primary">Save MileStone</Button>:"",
+          onClick: (event, rowData) => saveMileStoneRecord({event, rowData,data, dispatch, "mainProps":mainProps, setLoad, projectId}),
           isFreeAction: true,
           tooltip: 'Save MileStone'
         }
       ]}
-      icons={{  Add: () => <Button variant="contained" color="secondary">Add</Button> }}
+      icons={{  Add: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="secondary">Add</Button>:"" }}
       editable={{
-        isEditable: rowData => false,
-        isEditHidden: rowData => true,
+        isEditable: rowData => true,
         isDeletable: rowData => false,
         isDeleteHidden: rowData => true,
         onRowAdd: newData => onTabelRowAdd({data, newData, dispatch, saveMileStone, projectId}),
-        onRowUpdate: (newData, oldData) => { },
+        onRowUpdate: (newData, oldData) => ({newData,oldData,"mainProps":propsData}),
         onRowDelete: oldData => { }
       }}
     />
@@ -98,7 +98,7 @@ const onTabelRowAdd=(props)=>{
   const { data, newData, dispatch, saveMileStone, projectId }=props
   return new Promise(async (resolve, reject) => {
     if (newData && (Object.keys(newData).length > 1 && newData.constructor === Object)) {
-      let modifyNewData={...newData,projectId}
+      let modifyNewData={...newData,projectId,compFlag:false}
       await saveMileStone([...data,modifyNewData])
       await resolve();
     } else {
@@ -108,18 +108,23 @@ const onTabelRowAdd=(props)=>{
   })
 }
 
+// this method will help to update milestone table single record
+const updateMileStoneTabelRecord=(props)=>{
+
+}
+
 // this method will used for the create mile stone 
 const saveMileStoneRecord=(props)=>{
-  const { data, dispatch, setLoad }=props
-  const { GetMileStoneList, SaveMileStoneDataArray}=props.mainProps.BillingModelAction
+  const { data, dispatch, setLoad, projectId }=props
+  const { GetMileStoneListProjectId, SaveMileStoneData}=props.mainProps.BillingModelAction
   const { authorization }=props.mainProps.LoginState
   let totalWorkCompetion = data.length >0 && data.reduce((sum,item)=>{ return sum+ parseInt(item.workComPer); }, 0)
   let totalInvoiceAmount=data.length >0 && data.reduce((sum,item)=>{ return sum+ parseInt(item.invoicePer); }, 0)
   if(totalInvoiceAmount === 100 && totalWorkCompetion === 100){
     setLoad(true);
-    SaveMileStoneDataArray(data,authorization);
+    SaveMileStoneData(data,authorization);
     setTimeout(async()=>{
-      // await GetMileStoneList(0,100,authorization)
+      await GetMileStoneListProjectId(0,100,projectId,authorization)
       setLoad(false);
     },API_EXE_TIME)
   }else{
@@ -160,7 +165,7 @@ const LoadExpensesTab = (propsData) => {
 
 // this method will used for the Loadbilling tab according to billing type
 const LoadBillingModelTab=(propsData)=>{
-  const { props}=propsData
+  const { props }=propsData
   const { initialValues } = props.mainProps
   const { values }=props.mainProps.form.ProjectForm
   const { showTabs}=props.mainProps.stateData
@@ -190,7 +195,14 @@ const renderTextField = (props) => {
 const MilestoneTab=(propsData)=>{
   const { projectId }=propsData
   const { dispatch }=propsData.data.mainProps
+  const { authorization }= propsData.data.mainProps.LoginState ? propsData.data.mainProps.LoginState :[]
+  const { mileStoneListProjectId }= propsData.data.mainProps.BillingModelState ? propsData.data.mainProps.BillingModelState :[]
+  const { GetMileStoneListProjectId }= propsData.data.mainProps.BillingModelAction ? propsData.data.mainProps.BillingModelAction :[]
   const [milestoneData, setMilestoneData] = useState([])
+  if(mileStoneListProjectId && mileStoneListProjectId.length <=0){
+      GetMileStoneListProjectId(0,100,projectId,authorization)
+      // saveMileStoneData(mileStoneListProjectId);
+  }
   return <MileStoneTabel
       dispatch={dispatch}
       data={milestoneData} 
