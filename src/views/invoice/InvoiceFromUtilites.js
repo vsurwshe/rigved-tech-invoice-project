@@ -97,6 +97,7 @@ const GenratePDFInvoice=async (propsData)=>{
     const { modifyGenrateInvoiceData, setLoading, setViewInvoice, props }=propsData
     const { authorization }=props.LoginState
     const { loadMessage } = props.ClientAction
+    const { invoiceEmployeeData } = props.InvoiceState
     const { GenerateInvoicePDF, SaveGenratedInvoiceData, getPDFInvoiceList}=props.InvoiceAction
     await setLoading(true);
     // await SaveGenratedInvoiceData([]);
@@ -106,7 +107,7 @@ const GenratePDFInvoice=async (propsData)=>{
         // await GetBillingData(authorization,{});
         await getPDFInvoiceList(0,100,authorization);
         await setLoading(false);
-        // await setViewInvoice(true);
+        (invoiceEmployeeData && invoiceEmployeeData.length !==0) && await setViewInvoice(true);
     }, API_EXE_TIME)
 }
 

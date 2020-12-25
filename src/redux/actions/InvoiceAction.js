@@ -69,7 +69,7 @@ const GenerateInvoicePDF = (invoiceData, authroizationKey) => {
                     case "INTERNAL_SERVER_ERROR":
                         return dispatch(loadMessage(AlertColor.danger, InvoiceError.INTERNAL_SERVER_ERROR));
                     default:
-                        return SuccessFunction({ dispatch , "successMethod": SaveGenratedInvoiceData, "loadMessage":loadMessage, response}) 
+                        return SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) 
                 }
             })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
