@@ -2,6 +2,7 @@ import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
 import { loadMessage } from './ClientAction';
 import { ErrorFunction, SuccessFunction } from './CommonAction';
 
+// this action will help to get milestone list according to project
 const GetMileStoneListProjectId=(firstIndex, lastIndex, projectId, authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
@@ -11,6 +12,7 @@ const GetMileStoneListProjectId=(firstIndex, lastIndex, projectId, authroization
     }
 }
 
+// this action will help to get all milestone list
 const GetAllMileStoneList=(firstIndex, lastIndex, authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
@@ -20,6 +22,7 @@ const GetAllMileStoneList=(firstIndex, lastIndex, authroizationKey)=>{
     }
 }
 
+// this action will help to save mile stone details with array list
 const SaveMileStoneData=(mileStoneData,authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
@@ -34,6 +37,7 @@ const SaveMileStoneData=(mileStoneData,authroizationKey)=>{
     }
 }
 
+// this action will help to update mile stone details
 const udpateMileStoneData=(mileStoneData,authroizationKey)=>{
     return(dispatch)=>{
         return  CreateInstance()
@@ -44,6 +48,41 @@ const udpateMileStoneData=(mileStoneData,authroizationKey)=>{
             }
         })
         .then(response=>{ SuccessFunction({ dispatch , "successMethod": updateMileStoneRecordData, "loadMessage":loadMessage, response, "postMethod":true}) })
+        .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
+// this action will help to get fixed type billing model list according to project
+const getFixedTypeListProjectId=(firstIndex, lastIndex, projectId, authroizationKey)=>{
+    return(dispatch)=>{
+        return CreateInstance()
+            .get('/billingTypeDetail/getBillTypeDetailsList/'+firstIndex+'/'+lastIndex+'/'+projectId,HeaderConfig(authroizationKey))
+            .then(response => { SuccessFunction({ dispatch , "successMethod": saveFixedTypeListProjectId, "loadMessage":loadMessage, response}) })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
+// this action will help to get all fixed type billing model list
+const getAllFixedTypeList=(firstIndex, lastIndex, authroizationKey)=>{
+    return(dispatch)=>{
+        return CreateInstance()
+            .get('billingTypeDetail/getBillTypeDetailsList/'+firstIndex+'/'+lastIndex,HeaderConfig(authroizationKey))
+            .then(response => { SuccessFunction({ dispatch , "successMethod": saveFixedTypeList, "loadMessage":loadMessage, response}) })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
+// this action will help to save fixed type billing model details
+const saveFixedTypeData=(fixedTypeData,authroizationKey)=>{
+    return(dispatch)=>{
+        return CreateInstance()
+        .post('/billingTypeDetail/create',fixedTypeData,{
+            headers: { 
+                'Content-Type': 'application/json',
+                Authorization: authroizationKey 
+            }
+        })
+        .then(response => { SuccessFunction({ dispatch , "successMethod": saveFixedTypeRecordData, "loadMessage":loadMessage, response, "postMethod":true}) })
         .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
@@ -64,10 +103,31 @@ export function saveMileStoneListProjectId(mileStoneList) {
     }
 }
 
+export function saveFixedTypeList(fixedTypeList) {
+    return {
+        type:"SAVE_FIXED_TYPE_LIST",
+        fixedTypeList
+    }
+}
+
+export function saveFixedTypeListProjectId(fixedTypeList) {
+    return {
+        type:"SAVE_FIXED_TYPE_LIST_PROJECT_ID",
+        fixedTypeList
+    }
+}
+
 export function saveMileStoneRecordData(mileStoneData) {
     return {
         type:"SAVE_MILE_STONE_DATA",
         mileStoneData
+    }
+}
+
+export function saveFixedTypeRecordData(fixedTypeData) {
+    return {
+        type:"SAVE_FIXED_TYPE_DATA",
+        fixedTypeData
     }
 }
 
@@ -82,5 +142,8 @@ export{
     GetAllMileStoneList,
     GetMileStoneListProjectId,
     SaveMileStoneData,
-    udpateMileStoneData   
+    udpateMileStoneData,
+    getFixedTypeListProjectId,
+    getAllFixedTypeList,
+    saveFixedTypeData
 }

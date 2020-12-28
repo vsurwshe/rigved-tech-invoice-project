@@ -99,13 +99,11 @@ const GenratePDFInvoice=async (propsData)=>{
     const { authorization }=props.LoginState
     const { loadMessage } = props.ClientAction
     const { invoiceEmployeeData } = props.InvoiceState
-    const { GenerateInvoicePDF, SaveGenratedInvoiceData, getPDFInvoiceList}=props.InvoiceAction
+    const { GenerateInvoicePDF, getPDFInvoiceList}=props.InvoiceAction
     await setLoading(true);
-    // await SaveGenratedInvoiceData([]);
     await GenerateInvoicePDF(modifyGenrateInvoiceData, authorization);
     setTimeout(async () => {
         await loadMessage();
-        // await GetBillingData(authorization,{});
         await getPDFInvoiceList(0,100,authorization);
         await setLoading(false);
         (invoiceEmployeeData && invoiceEmployeeData.length !==0) && await setViewInvoice(true);

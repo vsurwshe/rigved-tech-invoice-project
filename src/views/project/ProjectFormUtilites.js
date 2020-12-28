@@ -109,7 +109,7 @@ const MileStoneTabel=(propsData)=>{
       editable={{
         isEditable: rowData => true,
         isDeletable: rowData => true,
-        onRowAdd: newData => onTabelRowAdd({data, newData, dispatch, saveMileStone, projectId}),
+        onRowAdd: newData => onMileStoneTabelRowAdd({data, newData, dispatch, saveMileStone, projectId}),
         onRowUpdate: (newData, oldData) => updateMileStoneTabelRecord({newData,oldData,dispatch,"mainProps":propsData.mainProps}),
         onRowDelete: oldData => deleteMileStoneTabelRecord({oldData, data, saveMileStone})
       }}
@@ -118,7 +118,7 @@ const MileStoneTabel=(propsData)=>{
 }
 
 // this method will used for the add row in table
-const onTabelRowAdd=(props)=>{
+const onMileStoneTabelRowAdd=(props)=>{
   const { data, newData, dispatch, saveMileStone, projectId }=props
   return new Promise(async (resolve, reject) => {
     if (newData && (Object.keys(newData).length >= 4 && newData.constructor === Object)) {
@@ -191,86 +191,100 @@ const saveMileStoneRecord=(props)=>{
   }
 }
 
-// this method will used for the load payables checkbox
-const PayablesCheckbox=(propsData)=>{
+// this method will used for the load milestone table
+const FixedTypeTabel=(propsData)=>{
+  const { data,saveMileStone, dispatch, mainProps, projectId, load }=propsData
+  const { operation }=propsData.mainProps.stateData
+  // this list of colums
+  const columns = [
+      { title: "", field: "id", hidden: true },
+      { title: 'Project\u00a0Amount', field: 'amount' },
+      { title: 'Expected\u00a0of\u00a0Completion Date', 
+        field: 'startDate', 
+        width:80 ,
+        editComponent: props => {
+          return renderTextField({ name: "expComDate", label: "", type: "date", action: { props } })
+        }
+      }
+  ]
   return <div style={{ maxWidth: "100%", marginBottom:"18px" }}>
-    <Field name="employed" component={renderMatiralCheckbox} label="Employed"/>
-  </div>
-}
-
-//this method will used for load the resource tab
-const LoadResourcesTab = (propsData) => {
-  const { props }=propsData
-  const { initialValues } = props.mainProps
-  const [resource, setResource] = useState([]);
-  const { projectBillingType }=(props.mainProps.form.ProjectForm && props.mainProps.form.ProjectForm.values) ? props.mainProps.form.ProjectForm.values : ""
-  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
-  return <ResourcesTable 
-      projectId={projectId} 
-      disableResourceModel={projectBillingType === "Mile Stone"} 
-      stateData={props.mainProps.stateData} 
-      resource={resource}
-      setResource={setResource}
+  <MaterialTable
+    title="Fiexd Type Managment"
+    columns={columns}
+    data={data.length > 0 ? data : []}
+    isLoading={load}
+    options={{
+      headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
+      pageSize:5,
+      search: false,
+      actionsColumnIndex:-1,
+    }}
+    // actions={[
+    //   { icon: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="primary">Save MileStone</Button>:"",
+    //     onClick: (event, rowData) => saveMileStoneRecord({event, rowData,data, dispatch, "mainProps":mainProps, setLoad, projectId}),
+    //     isFreeAction: true,
+    //     tooltip: 'Save MileStone'}
+    // ]}
+    icons={{  
+      Add: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="secondary">Add</Button>:"", 
+      Edit: () => { return <CreateIcon variant="contained" color="primary" /> },
+    }}
+    editable={{
+      isEditable: rowData => true,
+      isDeletable: rowData => false,
+      isDeleteHidden: rowData => true,
+      onRowAdd: newData => onFixedTypeTabelRowAdd({data, newData, dispatch, saveMileStone, projectId}),
+      onRowUpdate: (newData, oldData) => updateFixedTypeTabelRecord({newData,oldData,dispatch,"mainProps":propsData.mainProps}),
+      onRowDelete: oldData => { }
+    }}
   />
+</div>
 }
 
-// this method will used for the load the expense tab
-const LoadExpensesTab = (propsData) => {
-  const { props }=propsData
-  const { initialValues } = props.mainProps
-  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
-  return <ExpensesTable projectId={projectId} stateData={props.mainProps.stateData} />
+// this method will used for the add row in table
+const onFixedTypeTabelRowAdd=(props)=>{
+  const { data, newData, dispatch, saveMileStone, projectId }=props
+  return new Promise(async (resolve, reject) => {
+    if (newData && (Object.keys(newData).length > 1 && newData.constructor === Object)) {
+      let modifyNewData={
+        ...newData,
+        projectId,
+        compFlag:false, 
+        "active": true,
+        "expComDate": new moment(newData.expComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
+      }
+      await saveMileStone([...data,modifyNewData])
+      await resolve();
+    } else {
+      dispatch(loadMessage("error","Please check the provided fileds"))
+      reject();
+    }
+  })
 }
 
-let LoadFixedAmount=(propsData)=>{
-  const { SaveMethod, pristine, reset, submitting, handleSubmit, cancle, clearFile } = propsData
-  return<div>
-    <form onSubmit={handleSubmit((values)=>console.log("Data ",values))}>
-      <Grid container spacing={5}>
-        <Grid item xs={12} sm={9} style={{ paddingLeft: 30, paddingTop: 20 }}>
-        <Field name="projectFiexdCost" component={renderTextField} fullWidth label="Project monthly fixed cost" helperText="Ex. 20000" />
-        <Field name="projectStartDate" component={renderDateTimePicker} label="Start Date" helperText="Ex. 01/01/2000"/>
-        <Field name="projectEndDate" component={renderDateTimePicker} label="End Date" helperText="Ex. 01/01/2000" />
-        </Grid>
-      </Grid>
-      <center>
-        <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> SUBMIT </Button> &nbsp;&nbsp;
-        <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button>&nbsp;&nbsp;
-      </center>
-    </form>
-  </div>
+// this method will help to update milestone table single record
+const updateFixedTypeTabelRecord=(propsData)=>{
+  const { newData, dispatch }=propsData
+  const { udpateMileStoneData, GetMileStoneListProjectId }=propsData.mainProps.BillingModelAction
+  const { authorization }=propsData.mainProps.LoginState
+  return new Promise(async (resolve, reject) => {
+    if (newData) {
+      let modifyNewData={
+        ...newData,
+        "active": true,
+        "expComDate": new moment(newData.expComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x'),
+        "actualComDate": new moment(newData.actualComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
+      }
+      await udpateMileStoneData(modifyNewData, authorization);
+      setTimeout(async () => {
+        await GetMileStoneListProjectId(0, 20, newData.projectId, authorization);
+        resolve();
+      }, API_EXE_TIME)
+    } else { dispatch(loadMessage("error","Please check the provided fileds")); reject(); }
+  })
 }
 
-LoadFixedAmount= reduxForm({form: 'FixedAmountForm'})(LoadFixedAmount)
-
-const LoadBillingModelTab=(propsData)=>{
-  const { props }=propsData
-  const { initialValues } = props.mainProps
-  const { values }=props.mainProps.form.ProjectForm
-  const { showTabs}=props.mainProps.stateData
-  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
-  switch ( showTabs && values && values.projectBillingType) {
-      case "Mile Stone":
-        return  <MilestoneTab data={props} projectId={projectId} />           
-      case "Fixed Rate":
-        return <LoadFixedAmount props={props}  />          
-      default:
-          return <h3>Select Proper Billing Type</h3>
-  }
-}
-
-// this is render the text fileds in tables
-const renderTextField = (props) => {
-  const { name, label, type, action } = props
-  return <TextField
-    id={name}
-    label={label}
-    type={type}
-    onChange={e => action.props.onChange(e.target.value)}
-    InputLabelProps={{ shrink: true }}
-    required={true}
-  />
-}
+// ----------------------------------------------------------------------------
 
 // this method will used for the loading milestone tab
 const MilestoneTab=(propsData)=>{
@@ -301,18 +315,117 @@ const MilestoneTab=(propsData)=>{
   />
 }
 
+// this method will help to get milestone accroding to project id
 const getMileStoneListByProjectId=async({authorization,projectId,callMileStoneCount,setCallMileStoneCount,setMilestoneData,GetMileStoneListProjectId, mileStoneListProjectId})=>{
   await setCallMileStoneCount(callMileStoneCount + 1)
   await GetMileStoneListProjectId(0, 100, projectId, authorization);
   (mileStoneListProjectId && mileStoneListProjectId.length > 0) && await setMilestoneData(mileStoneListProjectId.filter(item => item.projectId === projectId))
   return "";
 }
+
+// this method will used for the load payables checkbox
+const PayablesCheckbox=(propsData)=>{
+  return <div style={{ maxWidth: "100%", marginBottom:"18px" }}>
+    <Field name="employed" component={renderMatiralCheckbox} label="Employed"/>
+  </div>
+}
+
+//this method will used for load the resource tab
+const LoadResourcesTab = (propsData) => {
+  const { props }=propsData
+  const { initialValues } = props.mainProps
+  const [resource, setResource] = useState([]);
+  const { projectBillingType }=(props.mainProps.form.ProjectForm && props.mainProps.form.ProjectForm.values) ? props.mainProps.form.ProjectForm.values : ""
+  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
+  return <ResourcesTable 
+      projectId={projectId} 
+      disableResourceModel={projectBillingType === "Mile Stone" || projectBillingType === "Fixed Rate"} 
+      stateData={props.mainProps.stateData} 
+      resource={resource}
+      setResource={setResource}
+  />
+}
+
+// this method will used for the load the expense tab
+const LoadExpensesTab = (propsData) => {
+  const { props }=propsData
+  const { initialValues } = props.mainProps
+  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
+  return <ExpensesTable projectId={projectId} stateData={props.mainProps.stateData} />
+}
+
+// this will load the fixed type billing model
+let FixedTypeTab=(propsData)=>{
+  const { projectId }=propsData
+  const { dispatch }=propsData.data.mainProps
+  const { authorization }= propsData.data.mainProps.LoginState ? propsData.data.mainProps.LoginState :[]
+  const { fixedTypeListProjectId }= propsData.data.mainProps.BillingModelState ? propsData.data.mainProps.BillingModelState :[]
+  const { getFixedTypeListProjectId }= propsData.data.mainProps.BillingModelAction ? propsData.data.mainProps.BillingModelAction :[]
+  const [load, setLoad] = useState(false)
+  const [callFixedTypeCount, setCallFixedTypeCount] = useState(0)
+  const [fixedTypeData, setFixedTypeData] = useState([])
+  setFixedTypeData(getFixedTypeListByProjectId({ authorization, projectId, callFixedTypeCount, setCallFixedTypeCount, getFixedTypeListProjectId, fixedTypeListProjectId, setLoad }))
+  return <FixedTypeTabel
+      dispatch={dispatch}
+      data={fixedTypeData} 
+      projectId={projectId}
+      mainProps={propsData.data.mainProps}
+      load={load}
+  />
+}
+
+// this method will help to get fixed type accrdoing to project id
+const getFixedTypeListByProjectId=async({authorization, projectId, callFixedTypeCount, setCallFixedTypeCount, getFixedTypeListProjectId, fixedTypeListProjectId, setLoad})=>{
+  let exitsFixedTypeProjectList= (fixedTypeListProjectId && fixedTypeListProjectId.length >0) && fixedTypeListProjectId.filter(item=> item.projectId === projectId)
+  if((exitsFixedTypeProjectList === false || exitsFixedTypeProjectList.length <= 0) && callFixedTypeCount === 0){
+    console.log("COUNT ",callFixedTypeCount)
+    await setLoad(true);
+    await setCallFixedTypeCount(callFixedTypeCount+1);
+    await getFixedTypeListProjectId(0,100,projectId, authorization)
+    await setLoad(false);
+    let filterFixedTypeList= (fixedTypeListProjectId && fixedTypeListProjectId.length >0)&& fixedTypeListProjectId.map(item=>{return {...item,  startDate :item.startDate ? new moment(item.startDate).format('YYYY-MM-DD'):"" }});
+    return filterFixedTypeList;
+  }else{ 
+    return exitsFixedTypeProjectList.map(item=>{return {...item,  startDate :item.startDate ? new moment(item.startDate).format('YYYY-MM-DD'):"" }});
+  }
+}
+
+// this method will used for the load billing model accroding to project type
+const LoadBillingModelTab=(propsData)=>{
+  const { props }=propsData
+  const { initialValues } = props.mainProps
+  const { values }=props.mainProps.form.ProjectForm
+  const { showTabs}=props.mainProps.stateData
+  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
+  switch ( showTabs && values && values.projectBillingType) {
+      case "Mile Stone":
+        return <MilestoneTab data={props} projectId={projectId} />           
+      case "Fixed Rate":
+        return <FixedTypeTab data={props} projectId={projectId} />          
+      default:
+          return <h3>Select Proper Billing Type</h3>
+  }
+}
+
+// this is render the text fileds in tables
+const renderTextField = (props) => {
+  const { name, label, type, action } = props
+  return <TextField
+    id={name}
+    label={label}
+    type={type}
+    onChange={e => action.props.onChange(e.target.value)}
+    InputLabelProps={{ shrink: true }}
+    required={true}
+  />
+}
+
+
 export{
     structureOptions,
     MileStoneTabel,
     PayablesCheckbox,
     LoadResourcesTab,
     LoadExpensesTab,
-    LoadBillingModelTab,
-    LoadFixedAmount
+    LoadBillingModelTab
 }
