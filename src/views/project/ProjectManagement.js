@@ -165,12 +165,12 @@ class ProjectManagement extends Component {
             "contractAttachmentUrl":(projectContractFileUrl === "" || projectContractFileUrl === undefined) ? sendUserValues.contractAttachmentUrl  : projectContractFileUrl,
             "active": true,
         }
-        await SaveProjectRecord(newProjectData, authorization)
-        setTimeout(async () => {
-            await dispatch(loadMessage());
-            await GetProjectList(0, 20, authorization);
+        // await SaveProjectRecord(newProjectData, authorization)
+        // setTimeout(async () => {
+        //     await dispatch(loadMessage());
+        //     await GetProjectList(0, 20, authorization);
             this.handleShowTabs(FromActions.VIED);
-        }, API_EXE_TIME)
+        // }, API_EXE_TIME)
     }
 
     DeleteProject = async (projectId) => {

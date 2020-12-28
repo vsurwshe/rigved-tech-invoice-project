@@ -141,11 +141,19 @@ const GenratePDFInvoice=async (propsData)=>{
     const { dispatch }=props
     const { authorization }=props.LoginState
     const { loadMessage } = props.ClientAction
+<<<<<<< HEAD
+=======
+    const { invoiceEmployeeData } = props.InvoiceState
+>>>>>>> 0.16.3: modifyed loadfixed form to table
     const { GenerateInvoicePDF, getPDFInvoiceList}=props.InvoiceAction
     await setLoading(true);
     await GenerateInvoicePDF(modifyGenrateInvoiceData, authorization);
     setTimeout(async () => {
+<<<<<<< HEAD
         await dispatch(loadMessage());
+=======
+        await loadMessage();
+>>>>>>> 0.16.3: modifyed loadfixed form to table
         await getPDFInvoiceList(0,100,authorization);
         await setViewInvoice(true);
         await setLoading(false);
