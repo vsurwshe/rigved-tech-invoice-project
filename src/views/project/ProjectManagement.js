@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import ProjectTable from "./ProjectTable";
 import ProjectForm from "./ProjectFrom";
-import {Card, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
+import {Card, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
 import * as ProjectAction from "../../redux/actions/ProjectAction"
 import * as MasterDataAction from "../../redux/actions/MasterDataAction"
 import * as ClientAction from "../../redux/actions/ClientAction"
@@ -13,6 +13,7 @@ import { API_EXE_TIME } from '../../assets/config/Config';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import { FromActions } from '../../assets/config/Config';
+import { renderLoading } from '../utilites/FromUtilites';
 
 class ProjectManagement extends Component {
     state = { 
@@ -32,17 +33,20 @@ class ProjectManagement extends Component {
         const { projectList }= this.props.ProjectState
         const { authorization }= this.props.LoginState
         const { purchaseOrderList }= this.props.PurchaseOrderState
-        const { Domains, ManagerList, ExpenseTypeList, EmployeeList } = this.props.MasterDataSet;
-        const { GetDomains, GetManagerList, GetExpenseTypeList, GetEmployeeList } = this.props.MasterDataAction;
+        const { Domains, ManagerList, ExpenseTypeList, EmployeeList, SkillCategory, SkillSet, projectBillingModelList } = this.props.MasterDataSet;
+        const { GetDomains, GetManagerList, GetExpenseTypeList, GetEmployeeList, GetSkillSet, GetSkillCategory, GetProjectBillingTypeList } = this.props.MasterDataAction;
         const { GetProjectList }= this.props.ProjectAction
         const { GetClientList } = this.props.ClientAction;
         const { GetPurchaseOrderList }= this.props.PurchaseOrderAction
         await this.handleLoadProjectList();
         (Domains && Domains.length === 0) && await GetDomains(0, 10, authorization);
+        (SkillCategory && SkillCategory.length ===0) && GetSkillCategory(0,10,authorization);
+        (SkillSet && SkillSet.length ===0) && GetSkillSet(0,10,authorization);
         (ManagerList && ManagerList.length === 0) && await GetManagerList(0,10,authorization);
         (ExpenseTypeList && ExpenseTypeList.length === 0) && await GetExpenseTypeList(0,20,authorization);
         (EmployeeList && EmployeeList.length === 0) && await GetEmployeeList(0,100,authorization);
         (listOfClient && listOfClient.length === 0) && await GetClientList(0,20,authorization);
+        (projectBillingModelList && projectBillingModelList.length === 0) && await GetProjectBillingTypeList(0,20,authorization);
         (purchaseOrderList && purchaseOrderList.length === 0) && await GetPurchaseOrderList(0,20,authorization);
         (projectList && projectList.length === 0) && await GetProjectList(0,20,authorization);
         await dispatch(loadMessage());
@@ -116,7 +120,7 @@ class ProjectManagement extends Component {
     // this method main framework which calling load PurchaseOrder table method
     loadProjectTable = () => {
         const { loadProjectList } = this.state
-        return < div style={{ paddingRight: 10 }}>  {loadProjectList ? this.loadingCircle() :this.loadingProjectTable()} </div>
+        return < div style={{ paddingRight: 10 }}>  {loadProjectList ? renderLoading({message:"Project Management", size:80}):this.loadingProjectTable()} </div>
     }
 
     // this method used for load the client table
@@ -131,10 +135,8 @@ class ProjectManagement extends Component {
         />
     </>
     }
-    
-    // this method used for the show circular progress bar 
-    loadingCircle = () => <center> <h3>Project Management</h3> <CircularProgress size={80} /> </center>
 
+    // this method will used for the delete project model
     loadDeleteModel = () => {
         const { deleteModel, projectData } = this.state
         const { id, projectName } = projectData  ? projectData : ''
@@ -154,18 +156,18 @@ class ProjectManagement extends Component {
     // this method used for the call the save project api
     SaveProject=async(sendUserValues)=>{
         const { projectContractFileUrl }=this.state
+        const { dispatch }=this.props
         const { SaveProjectRecord, GetProjectList } = this.props.ProjectAction;
         const { authorization } = this.props.LoginState
         const newProjectData = {
             ...sendUserValues,
             "purchaseOrder":sendUserValues.purchaseOrder && sendUserValues.purchaseOrder.title,
-            "clientName":sendUserValues.clientName && sendUserValues.clientName.title,
             "contractAttachmentUrl":(projectContractFileUrl === "" || projectContractFileUrl === undefined) ? sendUserValues.contractAttachmentUrl  : projectContractFileUrl,
             "active": true,
         }
         await SaveProjectRecord(newProjectData, authorization)
         setTimeout(async () => {
-            await loadMessage()
+            await dispatch(loadMessage());
             await GetProjectList(0, 20, authorization);
             this.handleShowTabs(FromActions.VIED);
         }, API_EXE_TIME)

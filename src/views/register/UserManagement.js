@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, Button } from "@material-ui/core";
+import { Card, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, Button } from "@material-ui/core";
 import { Alert } from '@material-ui/lab';
 import RegsiterForm from './RegsiterForm';
 import { connect } from 'react-redux';
@@ -11,7 +11,7 @@ import { API_EXE_TIME } from '../../assets/config/Config';
 import { bindActionCreators } from 'redux';
 import RegisterTable from './RegisterTable';
 import { Field, formValueSelector, reduxForm, reset } from 'redux-form';
-import { renderDateTimePicker } from '../utilites/FromUtilites';
+import { renderDateTimePicker, renderLoading } from '../utilites/FromUtilites';
 
 class UserManagement extends Component {
     constructor(props) {
@@ -117,7 +117,7 @@ class UserManagement extends Component {
                     attendanceUrl={attendanceUrl}
                     attendanceUpload={attendanceUpload}
                     loadAttendanceUrl={this.loadAttendanceUrl}
-                    loadingCircle={this.loadingCircle}
+                    loadingCircle={renderLoading}
                     loadFileUrlName={this.loadFileUrlName}
                     mainProps={this.props}
                 />
@@ -131,7 +131,7 @@ class UserManagement extends Component {
             <DialogTitle id="alert-dialog-slide-title">{'Upload bulk of employees excel file'}</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
-                    {(bulkEmployeeUrl === "" || bulkEmployeeUrl === undefined) ? (bulkEmployeeUpload ? this.loadingCircle("Uploading") : this.loadBulkEmployeeUrl())
+                    {(bulkEmployeeUrl === "" || bulkEmployeeUrl === undefined) ? (bulkEmployeeUpload ? renderLoading({message:"Uploading", size:40}) : this.loadBulkEmployeeUrl())
                         : <h5>{this.loadFileUrlName(bulkEmployeeUrl)}</h5>}
                 </DialogContentText>
             </DialogContent>
@@ -189,7 +189,7 @@ class UserManagement extends Component {
         const { load }=this.state
         return <>
             {this.loadAttendanceModel()}
-            {load ? this.loadingCircle("Loading...") 
+            {load ? renderLoading({message:"Loading...",size:80}) 
             : <RegisterTable
                 fromAction={this.handleRegisterFromActions}
                 handleAttendance={this.handleAttendanceModel}
@@ -278,9 +278,6 @@ class UserManagement extends Component {
         this.setState({ profileImageUrl: (this.props.FileState.fileUrl && this.props.FileState.fileUrl.length > 0) && this.props.FileState.fileUrl[0] })
     }
 
-    // this method used for the show circular progress bar 
-    loadingCircle = (message) => <center> <h3>{message}</h3> <CircularProgress size={50} /> </center>
-
     // this method will used for the saving user data
     RegisterUser = async (sendUserValues) => {
         const { profileImageUrl } = this.state
@@ -307,14 +304,14 @@ class UserManagement extends Component {
 }
 
 let AttendanceForm = (props) => {
-    const { pristine, reset, submitting, handleSubmit, attendanceUrl, attendanceUpload, loadFileUrlName, handleAttendanceModel, loadingCircle,loadAttendanceUrl } = props
+    const { pristine, reset, submitting, handleSubmit, attendanceUrl, attendanceUpload, loadFileUrlName, handleAttendanceModel,loadAttendanceUrl } = props
     const { latestAttFromDate, latestAttToDate}=props.mainProps
     return  <form onSubmit={handleSubmit((values)=>{console.log("Data ", values)})}>
         <DialogContent>
             <Field name="latestAttFromDate" component={renderDateTimePicker} label="From Date" /> &nbsp;&nbsp;&nbsp;
             <Field name="latestAttToDate" component={renderDateTimePicker} label="To Date" /> <br /> <br/>
             {(attendanceUrl === "" || attendanceUrl === undefined) 
-            ? (attendanceUpload ? loadingCircle("Uploading") : 
+            ? (attendanceUpload ? renderLoading({message:"Uploading", size:40}): 
                    (latestAttFromDate && latestAttToDate) && loadAttendanceUrl({latestAttFromDate,latestAttToDate}))
             : <h5>{loadFileUrlName(attendanceUrl)}</h5>
             }

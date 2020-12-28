@@ -8,6 +8,9 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } 
 import { Field } from 'redux-form';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { CheckBox } from '@material-ui/icons';
+import { Snackbar } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 
 // this is render text filed
 const renderTextField = ({ label, name, input, helperText, meta: { touched, invalid, error }, ...custom }) => (
@@ -180,10 +183,10 @@ const renderAutocompleteWithProps=({label,name,optionData,className, input, meta
   <Autocomplete
     id={name}
     key={name}
-    value={input.value}
     autoHighlight
     options={(optionData && optionData.length >0) ? optionData: []}
     getOptionLabel={optionData => (optionData && optionData.title) && optionData.title}
+    getOptionSelected={(option, value) => option.id === value.id}
     onChange={(event, value) => value && input.onChange(value)}
     renderInput={(params) => ( <TextField {...params} label={label} margin="normal"  /> )}
     {...custom}
@@ -191,9 +194,6 @@ const renderAutocompleteWithProps=({label,name,optionData,className, input, meta
 
 // this will be render contact
 const renderContact = ({ classes, open, handleClickOpen, handleClose, fields, initialValues, operation, meta: { error, submitFailed } }) => {
-  // const [open, setOpen] = useState(false);
-  // const handleClickOpen = () => { setOpen(true); fields.push({}) };
-  // const handleClose = () => { setOpen(false) };
   return <span>
       { (operation !== FromActions.VI )&&<Button style={{ float: "Right" }} variant="contained" color="primary" onClick={()=>handleClickOpen(fields)}>ADD</Button>}
       <Dialog open={open} onClose={handleClose} classes={{ paper: classes.dialogPaper }} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
@@ -219,6 +219,7 @@ const renderContact = ({ classes, open, handleClickOpen, handleClose, fields, in
   </span>
 }
 
+// this method will used for render loading
 const renderLoading=({message , size})=>{
   return <center> <h3>{message}</h3> <CircularProgress size={size} /> </center>
 }
@@ -237,6 +238,21 @@ const dwonloadInvoice = () => {
   });
 }
 
+// this will used render matrial checkbox 
+const renderMatiralCheckbox = props => (
+  <CheckBox label={props.label}
+    checked={props.value ? true : false}
+    onCheck={props.onChange}/>
+)
+
+// render sankbar with alert
+const renderSanckbarAlert=(props)=>{
+  const { message, color }=props
+  return <Snackbar open={message !== ""} autoHideDuration={1000} anchorOrigin= {{ vertical: 'top', horizontal: 'right' }}>
+        <Alert severity={color}> {message} </Alert>
+    </Snackbar>
+}
+
 export{
     renderTextField,
     renderTextHiddenField,
@@ -253,5 +269,7 @@ export{
     renderPasswordTextField,
     renderContact,
     renderLoading,
-    dwonloadInvoice
+    dwonloadInvoice,
+    renderMatiralCheckbox,
+    renderSanckbarAlert
 }

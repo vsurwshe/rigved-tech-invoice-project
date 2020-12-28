@@ -13,7 +13,7 @@ const GetInvoiceUserList = (firstIndex, lastIndex, invoiceId, authroizationKey) 
     }
 }
 
-const GenerateInvoice = (invoiceData, authroizationKey) => {
+const GenerateInvoice = (invoiceData, authroizationKey, projectType) => {
     return (dispatch) => {
         return CreateInstance()
             .post('/innvoice/create/',invoiceData,{headers: { 
@@ -29,7 +29,12 @@ const GenerateInvoice = (invoiceData, authroizationKey) => {
                     case "INTERNAL_SERVER_ERROR":
                         return dispatch(loadMessage(AlertColor.danger, InvoiceError.INTERNAL_SERVER_ERROR)); 
                     default:
-                        return SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) 
+                        switch (projectType) {
+                            case "Mile Stone":
+                                return SuccessFunction({ dispatch , "successMethod": saveMileStonePreInvoiceData, "loadMessage":loadMessage, response})         
+                            default:
+                                return "";
+                        }
                 }
             })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
@@ -64,7 +69,7 @@ const GenerateInvoicePDF = (invoiceData, authroizationKey) => {
                     case "INTERNAL_SERVER_ERROR":
                         return dispatch(loadMessage(AlertColor.danger, InvoiceError.INTERNAL_SERVER_ERROR));
                     default:
-                        return SuccessFunction({ dispatch , "successMethod": SaveGenratedInvoiceData, "loadMessage":loadMessage, response}) 
+                        return SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) 
                 }
             })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
@@ -150,6 +155,13 @@ export function SavePaidInvoiceData(invoiceData) {
     return {
         type: "SAVE_PAY_INVOICE_DATA",
         invoiceData
+    }
+}
+
+export function saveMileStonePreInvoiceData(mileStones) {
+    return{
+        type: "SAVE_MILESTONE_PRE_INVOICE_DATA",
+        mileStones
     }
 }
 

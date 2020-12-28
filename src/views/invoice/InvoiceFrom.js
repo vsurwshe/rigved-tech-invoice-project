@@ -2,12 +2,10 @@ import React, { useState, forwardRef } from 'react';
 import { reduxForm, change, Field, formValueSelector } from 'redux-form';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Button, Grid, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Slide, AppBar, Toolbar, IconButton } from '@material-ui/core';
+import { Button, Grid, Dialog, DialogTitle, DialogContent, DialogActions, Slide, AppBar, Toolbar, IconButton } from '@material-ui/core';
 import useStyles from "../client/Styles";
-import { Alert, Autocomplete } from '@material-ui/lab';
-import { renderDateTimePicker, renderAutocompleteWithProps, renderLoading } from '../utilites/FromUtilites';
+import { renderDateTimePicker, renderAutocompleteWithProps, renderLoading, renderTextHiddenField, renderSanckbarAlert } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
-// import { GetBillingData } from "../../redux/actions/DashboardAction"
 import * as ClientAction from "../../redux/actions/ClientAction";
 import * as ProjectAction from "../../redux/actions/ProjectAction"
 import * as InvoiceAction from "../../redux/actions/InvoiceAction"
@@ -16,13 +14,15 @@ import Invoice from './Invoice';
 import CloseIcon from '@material-ui/icons/Close';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import MaterialTable from 'material-table';
 import moment from 'moment';
 import { API_EXE_TIME } from '../../assets/config/Config';
+import { structureOptions } from '../project/ProjectFormUtilites';
+import { MileStonePreInvoiceTable } from './InvoiceFromUtilites';
 
 // this method will used for the transition for model 
 const Transition = forwardRef(function Transition(props, ref) { return <Slide direction="up" ref={ref} {...props} />; });
 
+// this method will load the invoice form
 let InvoiceFrom = (props) => {
     var classes = useStyles();
     const { pristine, reset, submitting, handleSubmit, cancle, initialValues } = props
@@ -30,11 +30,12 @@ let InvoiceFrom = (props) => {
     const [viewInvoice, setViewInvoice] = useState(false);
     const [projectIdList, setProjectIdList] = useState([])
     const [viewSectionThree, setViewSectionThree] = useState(false)
+    const [sectionThreeState, setSectionThreeState] = useState({view:false,projectType:''})
     const [loading, setLoading] = useState(false)
     const [submit, setSubmit] = useState(false)
     return <div className={classes.girdContainer}>
-        <form onSubmit={handleSubmit((values) => PostInvoiceData({ "mainProps": props, values, projectIdList, viewSectionThree, setSubmit, setViewSectionThree, setLoading }))}>
-            {LoadGird({ "mainProps": props, projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, loading, setLoading, setViewInvoice })}
+        <form onSubmit={handleSubmit((values) => PostInvoiceData({ "mainProps": props, values, projectIdList, viewSectionThree, setSubmit, setViewSectionThree, sectionThreeState, setLoading, setSectionThreeState }))}>
+            {LoadGird({ "mainProps": props, projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, setSectionThreeState, sectionThreeState, loading, setLoading, setViewInvoice })}
             {ShowViewInvoice({ "mainProps": props, classes, viewInvoice, setViewInvoice, reset, cancle })}
             <div className={classes.buttonStyle}>
                 <center>
@@ -45,30 +46,6 @@ let InvoiceFrom = (props) => {
             </div>
         </form>
     </div>
-}
-
-// this method will used for the showing invoice after posting successfully resource table
-const ShowViewInvoice = (propsData) => {
-    const { viewInvoice, setViewInvoice, classes, reset, cancle } = propsData
-    const { genratedInvoiceData }=propsData.mainProps.InvoiceState
-    if(viewInvoice && JSON.stringify(genratedInvoiceData) === "[]"){
-        return setViewInvoice(false);
-    }
-    return <Dialog fullScreen open={viewInvoice} onClose={() => setViewInvoice(false)} TransitionComponent={Transition}>
-        <AppBar className={classes.dialogAppBar} style={{ float: "right" }} >
-            <Toolbar >
-                <IconButton classes={{ paper: classes.profileMenuIcon }} color="inherit" onClick={() => setViewInvoice(false)} aria-label="close"> <CloseIcon /> </IconButton>
-                <DialogTitle>Generated Invoice</DialogTitle>
-            </Toolbar>
-        </AppBar>
-        <DialogContent>
-            { JSON.stringify(genratedInvoiceData) !== "[]" && <Invoice inoiceData={genratedInvoiceData}/>}
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={async () => {await reset(); await setViewInvoice(false); await cancle()}} color="primary">Cancel</Button>
-            <Button onClick={() => DwonloadInvoice()} color="secondary">Download Invoice</Button>
-        </DialogActions>
-    </Dialog>
 }
 
 // this method will used for the download the invoice table as pdf
@@ -85,40 +62,16 @@ const DwonloadInvoice = () => {
     });
 }
 
-// this method will used for the saving the genrate invoice
-const PostInvoiceData = async (propsData) => {
-    const { values, setViewSectionThree, projectIdList, setLoading, setSubmit } = propsData
-    const { authorization } = propsData.mainProps.LoginState
-    const { invoiceEmployeeData } = propsData.mainProps.InvoiceState
-    const { GenerateInvoice, SaveInvoiceEmployeeData } = propsData.mainProps.InvoiceAction
-    const { loadMessage } = propsData.mainProps.ClientAction
-    const { dispatch } = propsData.mainProps
-    let newInvoiceData = {
-        "fromDate": (values && values.fromDate) &&  new moment(values.fromDate).format('x'),
-        "toDate": (values && values.toDate) && new moment(values.toDate).format('x'),
-        "projectId": (projectIdList && projectIdList.length > 0) && projectIdList[0].id
-    }
-    await setLoading(true);
-    await SaveInvoiceEmployeeData([]);
-    await GenerateInvoice(newInvoiceData, authorization);
-    setTimeout(async () => {
-        await dispatch(loadMessage());
-        await setLoading(false);
-        await setViewSectionThree(true);
-        (invoiceEmployeeData && invoiceEmployeeData.length >0)&&await setSubmit(true); 
-    }, API_EXE_TIME)
-}
-
 // this method will used for the loading gird structure of invoice form component
 const LoadGird = (props) => {
     var classes = useStyles();
-    const { projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, loading, setLoading, setViewInvoice } = props
+    const { projectIdList, setProjectIdList, setSectionThreeState, sectionThreeState, loading, setLoading, setViewInvoice } = props
     const { color, common_message } = props.mainProps.ClientState
     const { initialValues }=props.mainProps
     return <>
         <Grid container spacing={5}>
             <Grid item xs={12} style={{ padding: 30 }}>
-                {(common_message) && <center><Alert color={color}>{common_message}</Alert></center>}
+                {(common_message) &&  renderSanckbarAlert({message:common_message,color})}
             </Grid>
         </Grid>
         <Grid container spacing={5}>
@@ -135,7 +88,7 @@ const LoadGird = (props) => {
         <center>{loading && renderLoading({message:"", size:40})}</center>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
-                {viewSectionThree && SectionThree({ "mainProps": props.mainProps , viewSectionThree, setViewSectionThree, projectIdList, setLoading, setViewInvoice})}
+                {sectionThreeState.view && SectionThree({ "mainProps": props.mainProps ,setSectionThreeState, sectionThreeState, setLoading, setViewInvoice})}
             </Grid>
         </Grid>
     </>
@@ -161,7 +114,7 @@ const LoadHeader=(props)=>{
         </Grid>
         <Grid item xs={12}>
             <PrepareDataForResourceTable listOfRows={invoiceUserList} data={data} columns={columns} />
-            <LoadInvoiceResourceTable data={data} columns={columns} initialValues={initialValues} title="List of assigned resource" />
+            {/* <LoadInvoiceResourceTable data={data} columns={columns} initialValues={initialValues} title="List of assigned resource" /> */}
         </Grid>
     </>
 }
@@ -173,54 +126,31 @@ const SectionOne = (data) => {
     const { listOfClient } = data.mainProps.ClientState
     const { authorization } = data.mainProps.LoginState
     const { projectListByClient } = data.mainProps.ProjectState
-    // const { purchaseOrderListByName } = data.mainProps.PurchaseOrderState
     const { GetProjectListByClient } = data.mainProps.ProjectAction
-    // const { GetPurchaseOrderListByName,SavePurchaseOrderListByName }=data.mainProps.PurchaseOrderAction
-
-    // let purchaseOrderOptions = purchaseOrderListByName.length > 0 && purchaseOrderListByName.map((item, key) => {
-    //     return { title: item.poNum ? item.poNum : "", id: item.id }
-    // })
-
     // this is returning client option 
-    let clientOptions = (listOfClient && listOfClient.length > 0) && listOfClient.map((item, key) => {
-        return { title: item.clientName ? item.clientName : "", id: item.id }
-    })
-
+    let clientOptions = structureOptions({options:listOfClient,keys: ['clientName'],idKey:'id'}); 
     // this is returning project option
-    let projectOptions = (projectListByClient && projectListByClient.length > 0) && projectListByClient.map((item, key) => {
-        return { title: item.clientName ? item.projectName : "", id: item.id }
-    })
-
+    let projectOptions = structureOptions({options:projectListByClient,keys: ['projectName'],idKey:'id'}); 
     return <>
-        <Field name="clientName" component={renderAutocompleteWithProps}
-            onChange={async(value) => {
-                await setLoading(true)
-                await change('ProjectForm', 'clientName', value.title);
-                // SavePurchaseOrderListByName([]);
-                await GetProjectListByClient(0, 20, value.id, authorization)
-                // GetPurchaseOrderListByName(0, 20, value.id, authorization)
-                await setLoading(false);
-            }}
-            optionData={clientOptions} label="Client Name" validate={[Required]} 
-            style={{marginTop:-15}}
-        />
-        {/* <Field name="poNum" component={renderAutocompleteWithProps}
-            onChange={(value) => {
-                change('ProjectForm', 'poNum', value.title);
-                // GetProjectListByClient(0, 20, value.id, authorization)
-            }}
-            optionData={purchaseOrderOptions} label="Purchase Order Number" validate={[Required]} /> */}
-        <Autocomplete
-            id="projectList"
-            autoHighlight
-            multiple
-            options={(projectOptions && projectOptions.length > 0) ? projectOptions : []}
-            getOptionLabel={projectOptions => (projectOptions && projectOptions.title) && projectOptions.title}
-            getOptionSelected={(option, value) => option.id === value.id}
-            onChange={(event, value) => value && setProjectIdList(value)}
-            renderInput={(params) => (<TextField {...params} label="Project" margin="normal" />)}
-        />
+        <Field name="projectType" component={renderTextHiddenField} type="hidden" />
+        <Field name="clientName" component={renderAutocompleteWithProps} onChange={(value) => onChangeClientName({setLoading, change, GetProjectListByClient, value, authorization})} optionData={clientOptions} label="Select Client Name" validate={[Required]}  style={{marginTop:-35}} />
+        <Field name="projectList" component={renderAutocompleteWithProps} onChange={(value) => onChangeProject({setProjectIdList, change, value, projectListByClient})} optionData={projectOptions} label="Select Client Project" validate={[Required]}  style={{marginTop:-15}} />
     </>
+}
+
+// this method will help to on change of client name
+const onChangeClientName=async(props)=>{
+    const { setLoading, change, GetProjectListByClient,value, authorization}=props
+    await setLoading(true)
+    await change('InvoiceFrom', 'clientName', value.title);
+    await GetProjectListByClient(0, 20, value.id, authorization)
+    await setLoading(false);
+}
+
+// this method will used for on change of project selection
+const onChangeProject=async(props)=>{
+    const { setProjectIdList,value}=props
+    await setProjectIdList(value)
 }
 
 // this method will used for the right side part of this component
@@ -237,55 +167,43 @@ var months = ['', 'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY'
 
 // this sections will used for the showing structure
 const SectionThree = (propsData) => {
-    const { setViewSectionThree, setLoading, setViewInvoice }=propsData
-    const { invoiceEmployeeData } = propsData.mainProps.InvoiceState
-    // this condition checks the invoice employee data is there or not
-    if(invoiceEmployeeData.length >0 ){
-        let columns = [
-            { title: "EMP\u00a0ID", field: "employeeId" },
-            { title: "EMP\u00a0NAME", field: "employeeName" },
-            { title: "PER\u00a0DAY\u00a0RATE", field: "perDayRate" },
-            { title: "TOTAL\u00a0DAYS", field: "totalDays" },
-            { title: "TOTAL\u00a0AMOUNT", field: "totalAmt" }
-        ];
-        let data = [];
-        (invoiceEmployeeData && invoiceEmployeeData.length > 0) && invoiceEmployeeData.map((item, key) => {
-            let monthString = item.attendancepermonth ? item.attendancepermonth : "";
-            let firstArray = monthString && monthString.split(',');
-            let tempColunmsData = [];
-            data.push({
-                "data":item,
-                "employeeId": item.employeeId,
-                "employeeName": item.employeeName,
-                "perDayRate": item.perDayRate,
-                "totalDays": item.totalDays,
-                "totalAmt": item.totalAmt
-            })
-            firstArray.forEach(element => {
-                let monthNumber;
-                let filterEqualArray;
-                if (element.includes("{")) {
-                    let tempArray = element.split('{')
-                    filterEqualArray = tempArray[1].split("=");
-                } else if (element.includes("}")) {
-                    let tempArray = element.split('}')
-                    filterEqualArray = tempArray[0].split("=");
-                } else {
-                    filterEqualArray = element.split("=");
-                }
-                monthNumber = filterEqualArray && filterEqualArray[0].replace(/ /g, "");
-                key === 0 && tempColunmsData.push({ title: months[monthNumber], field: months[monthNumber] })
-                data[key][months[monthNumber]] = (filterEqualArray[1] && filterEqualArray[1].includes("}")) ? (filterEqualArray[1].split('}')[0]) : filterEqualArray[1]
-            });
-            columns.splice(5, 0, ...tempColunmsData)
-            return "";
-        })
-        return LoadInvoiceResourceTable({ columns, data, title:"", "mainProps": propsData.mainProps, projectIdList: propsData.projectIdList, setLoading, setViewInvoice });
-    }else{
-        return setViewSectionThree(false);
+    const { sectionThreeState, setLoading, setViewInvoice }=propsData
+    const { projectType }=sectionThreeState
+    switch (projectType) {
+        case "Mile Stone":
+            return <MileStonePreInvoiceTable setLoading={setLoading} props={propsData} setViewInvoice={setViewInvoice} />
+        default:
+            return <h1>No Content</h1>
     }
 }
 
+// this method will used for the saving the genrate invoice
+const PostInvoiceData = async (propsData) => {
+    const { values, setLoading, setSectionThreeState } = propsData
+    const { authorization } = propsData.mainProps.LoginState
+    const { projectListByClient } = propsData.mainProps.ProjectState
+    const { GenerateInvoice, saveMileStonePreInvoiceData } = propsData.mainProps.InvoiceAction
+    const { preInvoiceMileStonesData } = propsData.mainProps.InvoiceState
+    const { loadMessage } = propsData.mainProps.ClientAction
+    const { dispatch } = propsData.mainProps
+    let filterProject = values.projectList !== {} && projectListByClient.filter(item=> item.id===values.projectList.id)
+    let newInvoiceData = {
+        "fromDate": (values && values.fromDate) &&  new moment(values.fromDate).format('x'),
+        "toDate": (values && values.toDate) && new moment(values.toDate).format('x'),
+        "projectId": (values.projectList !== {} ) && values.projectList.id
+    }
+    await setLoading(true);
+    await saveMileStonePreInvoiceData([]);
+    // here we call api with project type thats we check filter result
+    filterProject.length >=0 && await GenerateInvoice(newInvoiceData, authorization,filterProject[0].projectBillingType);
+    setTimeout(async () => {
+        await dispatch(loadMessage());
+        (preInvoiceMileStonesData && preInvoiceMileStonesData.length >0 ) && await setSectionThreeState({ view: true, projectType:filterProject[0].projectBillingType})
+        await setLoading(false);
+    }, API_EXE_TIME)
+}
+
+// this method will used for payables days
 const PrepareDataForResourceTable=(props)=>{
     const { listOfRows, data, columns}=props
    return (listOfRows && listOfRows.length > 0) && listOfRows.map((item, key) => {
@@ -314,60 +232,30 @@ const PrepareDataForResourceTable=(props)=>{
     })
 }
 
-// this method will used for the loading resource table
-const LoadInvoiceResourceTable = (propsData) => {
-    const { columns, data, projectIdList, setLoading, setViewInvoice, initialValues, title } = propsData
-    return <div style={{ maxWidth: "100%" }}>
-        <MaterialTable
-            title={title}
-            columns={columns}
-            data={data.length > 0 ? data : []}
-            options={{
-                headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
-                search: false,
-                selection: !initialValues ? true : false,
-                actionsColumnIndex: -1
-            }}
-            actions={[
-                (rowData) => { return !initialValues && {   
-                    icon: () => <div><Button variant="contained" color="primary">Generate Invoice</Button></div>,
-                    onClick: (event, rowData) =>{
-                        let tempInvoiceDetails= (rowData && rowData.length >0) && rowData.map((item,key)=>item.data);
-                        if(tempInvoiceDetails){
-                            GenratePDFInvoice({invoiceDetailDtos: tempInvoiceDetails, "mainProps":propsData.mainProps, projectIdList, setLoading, setViewInvoice })
-                        } 
-                    },
-                    tooltip: 'Generate Invoice'
-                }}
-            ]}
-        />
-    </div>
+// this method will used for the showing invoice after posting successfully resource table
+const ShowViewInvoice = (propsData) => {
+    const { viewInvoice, setViewInvoice, classes, reset, cancle } = propsData
+    const { genratedInvoiceData }=propsData.mainProps.InvoiceState
+    if(viewInvoice && JSON.stringify(genratedInvoiceData) === "[]"){
+        return setViewInvoice(false);
+    }
+    return <Dialog fullScreen open={viewInvoice} onClose={() => setViewInvoice(false)} TransitionComponent={Transition}>
+        <AppBar className={classes.dialogAppBar} style={{ float: "right" }} >
+            <Toolbar >
+                <IconButton classes={{ paper: classes.profileMenuIcon }} color="inherit" onClick={() => setViewInvoice(false)} aria-label="close"> <CloseIcon /> </IconButton>
+                <DialogTitle>Generated Invoice</DialogTitle>
+            </Toolbar>
+        </AppBar>
+        <DialogContent>
+            { JSON.stringify(genratedInvoiceData) !== "[]" && <Invoice inoiceData={genratedInvoiceData}/>}
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={async () => {await reset(); await setViewInvoice(false); await cancle()}} color="primary">Cancel</Button>
+            <Button onClick={() => DwonloadInvoice()} color="secondary">Download Invoice</Button>
+        </DialogActions>
+    </Dialog>
 }
 
-const GenratePDFInvoice=async (propsData)=>{
-    const { projectIdList, invoiceDetailDtos, setLoading, setViewInvoice }=propsData
-    const { fromDateProps, toDateProps }=propsData.mainProps
-    const { authorization }=propsData.mainProps.LoginState
-    const { loadMessage } = propsData.mainProps.ClientAction
-    // const { genratedInvoiceData } = propsData.mainProps.InvoiceState
-    const { GenerateInvoicePDF, SaveGenratedInvoiceData, getPDFInvoiceList}=propsData.mainProps.InvoiceAction
-    let newInvoiceGenratePDFData={
-        "fromDate":fromDateProps && fromDateProps ,
-        "toDate": toDateProps && toDateProps ,
-        "projectId": (projectIdList.length>0) && projectIdList[0].id,
-        "invoiceDetailDtos": (invoiceDetailDtos.length>0 )&& invoiceDetailDtos
-    }
-    await setLoading(true);
-    await SaveGenratedInvoiceData([]);
-    await GenerateInvoicePDF(newInvoiceGenratePDFData, authorization);
-    setTimeout(async () => {
-        await loadMessage();
-        // await GetBillingData(authorization,{});
-        await getPDFInvoiceList(0,100,authorization);
-        await setLoading(false);
-        await setViewInvoice(true);
-    }, API_EXE_TIME)
-}
 
 // this function will used for validate 
 const validate = (values) => {
