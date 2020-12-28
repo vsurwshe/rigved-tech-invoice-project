@@ -111,7 +111,7 @@ const MileStoneTabel=(propsData)=>{
 const onTabelRowAdd=(props)=>{
   const { data, newData, dispatch, saveMileStone, projectId }=props
   return new Promise(async (resolve, reject) => {
-    if (newData && (Object.keys(newData).length > 1 && newData.constructor === Object)) {
+    if (newData && (Object.keys(newData).length >= 4 && newData.constructor === Object)) {
       let modifyNewData={
         ...newData,
         projectId,
@@ -122,7 +122,7 @@ const onTabelRowAdd=(props)=>{
       await saveMileStone([...data,modifyNewData])
       await resolve();
     } else {
-      dispatch(loadMessage("error","Please check the provided fileds"))
+      dispatch(loadMessage("error","Please check the values provided in fileds"))
       reject();
     }
   })
@@ -134,7 +134,7 @@ const updateMileStoneTabelRecord=(propsData)=>{
   const { udpateMileStoneData, GetMileStoneListProjectId }=propsData.mainProps.BillingModelAction
   const { authorization }=propsData.mainProps.LoginState
   return new Promise(async (resolve, reject) => {
-    if (newData) {
+    if (newData && Object.keys(newData).length >= 9 && newData.compFlag) {
       let modifyNewData={
         ...newData,
         "active": true,
@@ -146,7 +146,7 @@ const updateMileStoneTabelRecord=(propsData)=>{
         await GetMileStoneListProjectId(0, 20, newData.projectId, authorization);
         resolve();
       }, API_EXE_TIME)
-    } else { dispatch(loadMessage("error","Please check the provided fileds")); reject(); }
+    } else { dispatch(loadMessage("error","Please check the values provided in fileds")); reject(); }
   })
 }
 
@@ -165,7 +165,7 @@ const saveMileStoneRecord=(props)=>{
       setLoad(false);
     },API_EXE_TIME)
   }else{
-    dispatch(loadMessage("error","Please check total of milestone configrations"))
+    dispatch(loadMessage("error","Please check total of milestones configrations"))
   }
 }
 
