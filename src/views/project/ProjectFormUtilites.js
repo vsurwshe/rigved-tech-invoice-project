@@ -42,15 +42,20 @@ const MileStoneTabel=(propsData)=>{
         { title: 'Work\u00a0Completion(%)', field: 'workComPer'},
         { title: 'Invoice(%)', field: 'invoicePer'},
         { title: 'Expected\u00a0of\u00a0Completion Date', 
-          field: 'expComDateModify', 
+          field: 'expComDate', 
           editable:'onAdd',
           width:80 ,
           editComponent: props => {
             return renderTextField({ name: "expComDate", label: "", type: "date", action: { props } })
           },
           render: (rowData)=> {
+<<<<<<< HEAD
             const { expComDateModify }=rowData
             return (mileStoneListProjectId && mileStoneListProjectId.length >0 && rowData.expComDate) ? new moment(rowData.expComDate).format('YYYY-MM-DD'): expComDateModify;
+=======
+            const { expComDate }=rowData
+            return expComDate  ? new moment(expComDate).format("YYYY-MM-DD"):""
+>>>>>>> 0.16.4: Implemented edit and add fixed type billing
           }
         },
         { title: 'Actual\u00a0Complete\u00a0Date', 
@@ -60,8 +65,13 @@ const MileStoneTabel=(propsData)=>{
             return renderTextField({ name: "actualComDate", label: "", type: "date", action: { props } })
           },
           render: (rowData)=> {
+<<<<<<< HEAD
             const { actualComDateModify }=rowData
             return (mileStoneListProjectId && mileStoneListProjectId.length >0 && rowData.actualComDate) ? new moment(rowData.actualComDate).format('YYYY-MM-DD'): actualComDateModify;
+=======
+            const { actualComDate }=rowData
+            return actualComDate  ? new moment(actualComDate).format("YYYY-MM-DD"):""
+>>>>>>> 0.16.4: Implemented edit and add fixed type billing
           }
         },
         {
@@ -127,7 +137,7 @@ const onMileStoneTabelRowAdd=(props)=>{
         projectId,
         compFlag:false, 
         "active": true,
-        "expComDate": new moment(newData.expComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
+        "expComDate": new moment(newData.expComDate+' 00:00','YYYY-MM-DD HH:mm').format('x')
       }
       await saveMileStone([...data,modifyNewData])
       await resolve();
@@ -144,6 +154,7 @@ const updateMileStoneTabelRecord=(propsData)=>{
   const { udpateMileStoneData, GetMileStoneListProjectId }=propsData.mainProps.BillingModelAction
   const { authorization }=propsData.mainProps.LoginState
   return new Promise(async (resolve, reject) => {
+<<<<<<< HEAD
     console.log("New ",newData,Object.keys(newData).length)
     if (newData && Object.keys(newData).length >= 8 && 
     newData.compFlag && 
@@ -152,6 +163,13 @@ const updateMileStoneTabelRecord=(propsData)=>{
       let modifyNewData={
         ...newData,
         "active": true,
+=======
+    if (newData && Object.keys(newData).length >=9) {
+      let modifyNewData={
+        ...newData,
+        "active": true,
+        "expComDate": new moment(newData.expComDate+' 00:00','YYYY-MM-DD HH:mm').format('x'),
+>>>>>>> 0.16.4: Implemented edit and add fixed type billing
         "actualComDate": new moment(newData.actualComDate+' 00:00','YYYY-MM-DD HH:mm').format('x')
       }
       await udpateMileStoneData(modifyNewData, authorization);
@@ -326,22 +344,26 @@ const getMileStoneListByProjectId=async({authorization,projectId,callMileStoneCo
 // this method will used for the load milestone table
 const FixedTypeTabel=(propsData)=>{
   const { data,saveMileStone, dispatch, mainProps, projectId, load }=propsData
-  const { operation }=propsData.mainProps.stateData
+  const { operation }=mainProps.stateData
   // this list of colums
   const columns = [
       { title: "", field: "id", hidden: true },
-      { title: 'Project\u00a0Amount', field: 'amount' },
-      { title: 'Expected\u00a0of\u00a0Completion Date', 
+      { title: 'Fixed\u00a0Amount', field: 'amount' },
+      { title: 'Start\u00a0Date', 
         field: 'startDate', 
         width:80 ,
         editComponent: props => {
-          return renderTextField({ name: "expComDate", label: "", type: "date", action: { props } })
+          return renderTextField({ name: "startDate", label: "", type: "date", action: { props } })
+        },
+        render: (rowData)=> {
+          const { startDate }=rowData
+          return startDate  ? new moment(startDate).format("YYYY-MM-DD"):""
         }
       }
   ]
   return <div style={{ maxWidth: "100%", marginBottom:"18px" }}>
   <MaterialTable
-    title="Fiexd Type Managment"
+    title="Fiexd Cost Managment"
     columns={columns}
     data={data.length > 0 ? data : []}
     isLoading={load}
@@ -351,21 +373,15 @@ const FixedTypeTabel=(propsData)=>{
       search: false,
       actionsColumnIndex:-1,
     }}
-    // actions={[
-    //   { icon: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="primary">Save MileStone</Button>:"",
-    //     onClick: (event, rowData) => saveMileStoneRecord({event, rowData,data, dispatch, "mainProps":mainProps, setLoad, projectId}),
-    //     isFreeAction: true,
-    //     tooltip: 'Save MileStone'}
-    // ]}
     icons={{  
-      Add: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="secondary">Add</Button>:"", 
+      Add: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="secondary">Add Fixed Amount</Button>:"", 
       Edit: () => { return <CreateIcon variant="contained" color="primary" /> },
     }}
     editable={{
       isEditable: rowData => true,
       isDeletable: rowData => false,
       isDeleteHidden: rowData => true,
-      onRowAdd: newData => onFixedTypeTabelRowAdd({data, newData, dispatch, saveMileStone, projectId}),
+      onRowAdd: newData => onFixedTypeTabelRowAdd({data, newData, dispatch, saveMileStone, projectId, "mainProps":propsData.mainProps}),
       onRowUpdate: (newData, oldData) => updateFixedTypeTabelRecord({newData,oldData,dispatch,"mainProps":propsData.mainProps}),
       onRowDelete: oldData => { }
     }}
@@ -375,20 +391,26 @@ const FixedTypeTabel=(propsData)=>{
 
 // this method will used for the add row in table
 const onFixedTypeTabelRowAdd=(props)=>{
-  const { data, newData, dispatch, saveMileStone, projectId }=props
+  const { newData, dispatch, projectId, mainProps }=props
+  const { getFixedTypeListProjectId, saveFixedTypeData}=mainProps.BillingModelAction
+  const { authorization }=mainProps.LoginState
   return new Promise(async (resolve, reject) => {
-    if (newData && (Object.keys(newData).length > 1 && newData.constructor === Object)) {
+    if (newData && (Object.keys(newData).length >= 2 && newData.constructor === Object)) {
       let modifyNewData={
         ...newData,
         projectId,
-        compFlag:false, 
+        "billingType": "Fixed Type", 
         "active": true,
-        "expComDate": new moment(newData.expComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
+        "startDate": new moment(newData.startDate+' 00:00','YYYY-MM-DD HH:mm').format('x'),
+        "formula": ""
       }
-      await saveMileStone([...data,modifyNewData])
-      await resolve();
+      await saveFixedTypeData(modifyNewData,authorization);
+      setTimeout(async()=>{
+        await getFixedTypeListProjectId(0,100,projectId,authorization);
+        await resolve();
+      },API_EXE_TIME)
     } else {
-      dispatch(loadMessage("error","Please check the provided fileds"))
+      dispatch(loadMessage("error","Please check the values provided in fileds"))
       reject();
     }
   })
@@ -396,23 +418,21 @@ const onFixedTypeTabelRowAdd=(props)=>{
 
 // this method will help to update milestone table single record
 const updateFixedTypeTabelRecord=(propsData)=>{
-  const { newData, dispatch }=propsData
-  const { udpateMileStoneData, GetMileStoneListProjectId }=propsData.mainProps.BillingModelAction
-  const { authorization }=propsData.mainProps.LoginState
+  const { newData, dispatch, mainProps }=propsData
+  const { getFixedTypeListProjectId, saveFixedTypeData}=mainProps.BillingModelAction
+  const { authorization }=mainProps.LoginState
   return new Promise(async (resolve, reject) => {
     if (newData) {
       let modifyNewData={
         ...newData,
-        "active": true,
-        "expComDate": new moment(newData.expComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x'),
-        "actualComDate": new moment(newData.actualComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
+        "startDate": new moment(newData.startDate+' 00:00','YYYY-MM-DD HH:mm').format('x'),
       }
-      await udpateMileStoneData(modifyNewData, authorization);
-      setTimeout(async () => {
-        await GetMileStoneListProjectId(0, 20, newData.projectId, authorization);
-        resolve();
-      }, API_EXE_TIME)
-    } else { dispatch(loadMessage("error","Please check the provided fileds")); reject(); }
+      await saveFixedTypeData(modifyNewData,authorization);
+      setTimeout(async()=>{
+        await getFixedTypeListProjectId(0,100,newData.projectId,authorization);
+        await resolve();
+      },API_EXE_TIME)
+    } else { dispatch(loadMessage("error","Please check the values provided in fileds")); reject(); }
   })
 }
 
@@ -428,15 +448,10 @@ const MilestoneTab=(propsData)=>{
   const [milestoneData, setMilestoneData] = useState([])
   const [callMileStoneCount, setCallMileStoneCount] = useState(0)
   let extisMileStoneByProjectId= (mileStoneListProjectId && mileStoneListProjectId.length >0) && mileStoneListProjectId.filter(item=> item.projectId === projectId)
-  if((extisMileStoneByProjectId === false || extisMileStoneByProjectId.length <= 0) && callMileStoneCount === 0){
+  if((extisMileStoneByProjectId === false || extisMileStoneByProjectId.length <= 0) && callMileStoneCount === 0 && projectId){
     getMileStoneListByProjectId({authorization,projectId,setCallMileStoneCount,callMileStoneCount,setMilestoneData,GetMileStoneListProjectId, mileStoneListProjectId})
   }else if(milestoneData.length <=0 && extisMileStoneByProjectId.length >0){ 
-    let modifyExtisMileStoneByProjectId=extisMileStoneByProjectId.map(item=>{
-      return {...item, 
-        expComDateModify: item.expComDate ? new moment(item.expComDate).format('YYYY-MM-DD'):"",
-        actualComDateModify :item.actualComDate ? new moment(item.actualComDate).format('YYYY-MM-DD'):"",
-      }})
-    setMilestoneData(modifyExtisMileStoneByProjectId)
+    setMilestoneData(extisMileStoneByProjectId)
   }
   return <MileStoneTabel
       dispatch={dispatch}
@@ -511,6 +526,7 @@ let FixedTypeTab=(propsData)=>{
 
 // this method will help to get fixed type accrdoing to project id
 const getFixedTypeListByProjectId=async({authorization, projectId, getFixedTypeListProjectId, setLoad})=>{
+<<<<<<< HEAD
     await setLoad(true);
     await getFixedTypeListProjectId(0,100,projectId, authorization)
     await setLoad(false);
@@ -541,15 +557,11 @@ const getFixedTypeListByProjectId=async({authorization, projectId, callFixedType
   let exitsFixedTypeProjectList= (fixedTypeListProjectId && fixedTypeListProjectId.length >0) && fixedTypeListProjectId.filter(item=> item.projectId === projectId)
   if((exitsFixedTypeProjectList === false || exitsFixedTypeProjectList.length <= 0) && callFixedTypeCount === 0){
     console.log("COUNT ",callFixedTypeCount)
+=======
+>>>>>>> 0.16.4: Implemented edit and add fixed type billing
     await setLoad(true);
-    await setCallFixedTypeCount(callFixedTypeCount+1);
     await getFixedTypeListProjectId(0,100,projectId, authorization)
     await setLoad(false);
-    let filterFixedTypeList= (fixedTypeListProjectId && fixedTypeListProjectId.length >0)&& fixedTypeListProjectId.map(item=>{return {...item,  startDate :item.startDate ? new moment(item.startDate).format('YYYY-MM-DD'):"" }});
-    return filterFixedTypeList;
-  }else{ 
-    return exitsFixedTypeProjectList.map(item=>{return {...item,  startDate :item.startDate ? new moment(item.startDate).format('YYYY-MM-DD'):"" }});
-  }
 }
 
 // this method will used for the load billing model accroding to project type
