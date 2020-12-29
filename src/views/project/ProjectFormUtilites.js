@@ -49,13 +49,8 @@ const MileStoneTabel=(propsData)=>{
             return renderTextField({ name: "expComDate", label: "", type: "date", action: { props } })
           },
           render: (rowData)=> {
-<<<<<<< HEAD
             const { expComDateModify }=rowData
             return (mileStoneListProjectId && mileStoneListProjectId.length >0 && rowData.expComDate) ? new moment(rowData.expComDate).format('YYYY-MM-DD'): expComDateModify;
-=======
-            const { expComDate }=rowData
-            return expComDate  ? new moment(expComDate).format("YYYY-MM-DD"):""
->>>>>>> 0.16.4: Implemented edit and add fixed type billing
           }
         },
         { title: 'Actual\u00a0Complete\u00a0Date', 
@@ -65,13 +60,8 @@ const MileStoneTabel=(propsData)=>{
             return renderTextField({ name: "actualComDate", label: "", type: "date", action: { props } })
           },
           render: (rowData)=> {
-<<<<<<< HEAD
             const { actualComDateModify }=rowData
             return (mileStoneListProjectId && mileStoneListProjectId.length >0 && rowData.actualComDate) ? new moment(rowData.actualComDate).format('YYYY-MM-DD'): actualComDateModify;
-=======
-            const { actualComDate }=rowData
-            return actualComDate  ? new moment(actualComDate).format("YYYY-MM-DD"):""
->>>>>>> 0.16.4: Implemented edit and add fixed type billing
           }
         },
         {
@@ -154,8 +144,6 @@ const updateMileStoneTabelRecord=(propsData)=>{
   const { udpateMileStoneData, GetMileStoneListProjectId }=propsData.mainProps.BillingModelAction
   const { authorization }=propsData.mainProps.LoginState
   return new Promise(async (resolve, reject) => {
-<<<<<<< HEAD
-    console.log("New ",newData,Object.keys(newData).length)
     if (newData && Object.keys(newData).length >= 8 && 
     newData.compFlag && 
     (newData.expComDate <= newData.actualComDateModify || newData.expComDate <= newData.actualComDate) && 
@@ -163,13 +151,6 @@ const updateMileStoneTabelRecord=(propsData)=>{
       let modifyNewData={
         ...newData,
         "active": true,
-=======
-    if (newData && Object.keys(newData).length >=9) {
-      let modifyNewData={
-        ...newData,
-        "active": true,
-        "expComDate": new moment(newData.expComDate+' 00:00','YYYY-MM-DD HH:mm').format('x'),
->>>>>>> 0.16.4: Implemented edit and add fixed type billing
         "actualComDate": new moment(newData.actualComDate+' 00:00','YYYY-MM-DD HH:mm').format('x')
       }
       await udpateMileStoneData(modifyNewData, authorization);
@@ -526,7 +507,6 @@ let FixedTypeTab=(propsData)=>{
 
 // this method will help to get fixed type accrdoing to project id
 const getFixedTypeListByProjectId=async({authorization, projectId, getFixedTypeListProjectId, setLoad})=>{
-<<<<<<< HEAD
     await setLoad(true);
     await getFixedTypeListProjectId(0,100,projectId, authorization)
     await setLoad(false);
@@ -557,11 +537,10 @@ const getFixedTypeListByProjectId=async({authorization, projectId, callFixedType
   let exitsFixedTypeProjectList= (fixedTypeListProjectId && fixedTypeListProjectId.length >0) && fixedTypeListProjectId.filter(item=> item.projectId === projectId)
   if((exitsFixedTypeProjectList === false || exitsFixedTypeProjectList.length <= 0) && callFixedTypeCount === 0){
     console.log("COUNT ",callFixedTypeCount)
-=======
->>>>>>> 0.16.4: Implemented edit and add fixed type billing
     await setLoad(true);
     await getFixedTypeListProjectId(0,100,projectId, authorization)
     await setLoad(false);
+  }
 }
 
 // this method will used for the load billing model accroding to project type

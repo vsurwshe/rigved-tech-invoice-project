@@ -29,7 +29,6 @@ const MileStonePreInvoiceTable=(propsData)=>{
 // this component will used for Fixed Cost Invoice Tabel
 const FixedCostPreInvoiceTable=(propsData)=>{
     const { setLoading, setViewInvoice, projectType, tableData, props }=propsData
-    console.log("A",props,propsData)
     const { preInvoiceFixedCostData }=props.InvoiceState
     let columns = [
         { title: "", field: "id", hidden: true },
@@ -141,19 +140,11 @@ const GenratePDFInvoice=async (propsData)=>{
     const { dispatch }=props
     const { authorization }=props.LoginState
     const { loadMessage } = props.ClientAction
-<<<<<<< HEAD
-=======
-    const { invoiceEmployeeData } = props.InvoiceState
->>>>>>> 0.16.3: modifyed loadfixed form to table
     const { GenerateInvoicePDF, getPDFInvoiceList}=props.InvoiceAction
     await setLoading(true);
     await GenerateInvoicePDF(modifyGenrateInvoiceData, authorization);
     setTimeout(async () => {
-<<<<<<< HEAD
         await dispatch(loadMessage());
-=======
-        await loadMessage();
->>>>>>> 0.16.3: modifyed loadfixed form to table
         await getPDFInvoiceList(0,100,authorization);
         await setViewInvoice(true);
         await setLoading(false);
