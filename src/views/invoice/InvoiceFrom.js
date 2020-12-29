@@ -69,6 +69,7 @@ const LoadGird = (props) => {
     const { projectIdList, setProjectIdList, setSectionThreeState, sectionThreeState, loading, setLoading, setViewInvoice, setSubmit } = props
     const { color, common_message } = props.mainProps.ClientState
     const { initialValues }=props.mainProps
+    console.log("IN ",initialValues)
     return <>
         <Grid container spacing={5}>
             <Grid item xs={12} style={{ padding: 30 }}>
