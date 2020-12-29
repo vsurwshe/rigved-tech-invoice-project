@@ -68,6 +68,7 @@ const LoadGird = (props) => {
     const { projectIdList, setProjectIdList, setSectionThreeState, sectionThreeState, loading, setLoading, setViewInvoice } = props
     const { color, common_message } = props.mainProps.ClientState
     const { initialValues }=props.mainProps
+    console.log("IN ",initialValues)
     return <>
         <Grid container spacing={5}>
             <Grid item xs={12} style={{ padding: 30 }}>
@@ -88,7 +89,7 @@ const LoadGird = (props) => {
         <center>{loading && renderLoading({message:"", size:40})}</center>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
-                {sectionThreeState.view && SectionThree({ "mainProps": props.mainProps ,setSectionThreeState, sectionThreeState, setLoading, setViewInvoice})}
+                {(sectionThreeState.view || initialValues ) && SectionThree({ "mainProps": props.mainProps ,setSectionThreeState, sectionThreeState, setLoading, setViewInvoice})}
             </Grid>
         </Grid>
     </>
@@ -169,6 +170,7 @@ var months = ['', 'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY'
 const SectionThree = (propsData) => {
     const { sectionThreeState, setLoading, setViewInvoice }=propsData
     const { projectType }=sectionThreeState
+    console.log("Props ",propsData)
     switch (projectType) {
         case "Mile Stone":
             return <MileStonePreInvoiceTable 
@@ -194,7 +196,7 @@ const PostInvoiceData = async (propsData) => {
     const { values, setLoading, setSectionThreeState } = propsData
     const { authorization } = propsData.mainProps.LoginState
     const { projectListByClient } = propsData.mainProps.ProjectState
-    const { GenerateInvoice, saveMileStonePreInvoiceData } = propsData.mainProps.InvoiceAction
+    const { GenerateInvoice, saveMileStonePreInvoiceData, saveFixedCostPreInvoiceData } = propsData.mainProps.InvoiceAction
     const { preInvoiceMileStonesData, preInvoiceFixedCostData } = propsData.mainProps.InvoiceState
     const { loadMessage } = propsData.mainProps.ClientAction
     const { dispatch } = propsData.mainProps
@@ -206,6 +208,7 @@ const PostInvoiceData = async (propsData) => {
     }
     await setLoading(true);
     await saveMileStonePreInvoiceData([]);
+    await saveFixedCostPreInvoiceData([]);
     // here we call api with project type thats we check filter result
     filterProject.length >=0 && await GenerateInvoice(newInvoiceData, authorization,filterProject[0].projectBillingType);
     setTimeout(async () => {
@@ -256,10 +259,7 @@ const PrepareDataForResourceTable=(props)=>{
 // this method will used for the showing invoice after posting successfully resource table
 const ShowViewInvoice = (propsData) => {
     const { viewInvoice, setViewInvoice, classes, reset, cancle } = propsData
-    const { genratedInvoiceData }=propsData.mainProps.InvoiceState
-    if(viewInvoice && JSON.stringify(genratedInvoiceData) === "[]"){
-        return setViewInvoice(false);
-    }
+    const { invoiceEmployeeData }=propsData.mainProps.InvoiceState
     return <Dialog fullScreen open={viewInvoice} onClose={() => setViewInvoice(false)} TransitionComponent={Transition}>
         <AppBar className={classes.dialogAppBar} style={{ float: "right" }} >
             <Toolbar >
@@ -267,9 +267,7 @@ const ShowViewInvoice = (propsData) => {
                 <DialogTitle>Generated Invoice</DialogTitle>
             </Toolbar>
         </AppBar>
-        <DialogContent>
-            { JSON.stringify(genratedInvoiceData) !== "[]" && <Invoice inoiceData={genratedInvoiceData}/>}
-        </DialogContent>
+        <DialogContent> <Invoice inoiceData={invoiceEmployeeData}/> </DialogContent>
         <DialogActions>
             <Button onClick={async () => {await reset(); await setViewInvoice(false); await cancle()}} color="primary">Cancel</Button>
             <Button onClick={() => DwonloadInvoice()} color="secondary">Download Invoice</Button>

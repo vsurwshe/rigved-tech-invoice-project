@@ -116,16 +116,10 @@ const MainTableSectionThree=(propsData)=>{
         </colgroup>
         <tbody>
             <tr style={{paddingTop:"1em"}}>
-                <td></td>
+                <td>{mainProps && mainProps.description}</td>
                 <td></td>
                 <td>{mainProps && mainProps.billWitoutGST}</td>
                 <td>{mainProps && mainProps.billWitoutGST}</td>
-            </tr>
-            <tr>
-                <td>Consultant name :{mainProps && mainProps.consultantName}</td>
-                <td></td>
-                <td></td>
-                <td></td>
             </tr>
             <tr>
                 <td><b>Total Amount Before Tax</b></td>

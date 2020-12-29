@@ -129,7 +129,8 @@ const loadGenrateInvoiceButton=(propsData)=>{
         let modifyGenrateInvoiceData={ ...tempData, "mileStoneDtos": rowData}
         GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice })
     }else if(projectType === "Fixed Rate"){
-        let modifyGenrateInvoiceData={ ...tempData, "fixedRateInvoiceDetailDtos": rowData}
+        let filterRowData= rowData.length >0 && rowData.map(({tableData, ...rest})=>rest)
+        let modifyGenrateInvoiceData={ ...tempData, "fixedRateInvoiceDetailDtos": filterRowData}
         GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice })
     }
 }
@@ -146,8 +147,8 @@ const GenratePDFInvoice=async (propsData)=>{
     setTimeout(async () => {
         await loadMessage();
         await getPDFInvoiceList(0,100,authorization);
+        (invoiceEmployeeData && Object.keys(invoiceEmployeeData).length >= 2) && await setViewInvoice(true);
         await setLoading(false);
-        (invoiceEmployeeData && invoiceEmployeeData.length !==0) && await setViewInvoice(true);
     }, API_EXE_TIME)
 }
 

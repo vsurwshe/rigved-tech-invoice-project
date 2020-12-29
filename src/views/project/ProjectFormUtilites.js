@@ -43,7 +43,7 @@ const MileStoneTabel=(propsData)=>{
         { title: 'Invoice(%)', field: 'invoicePer'},
         { title: 'Expected\u00a0of\u00a0Completion Date', 
           field: 'expComDate', 
-          editable:'onAdd',
+          editable:'onUpdate',
           width:80 ,
           editComponent: props => {
             return renderTextField({ name: "expComDate", label: "", type: "date", action: { props } })
@@ -127,7 +127,6 @@ const onMileStoneTabelRowAdd=(props)=>{
         projectId,
         compFlag:false, 
         "active": true,
-        "expComDate": new moment(newData.expComDate+' 00:00','YYYY-MM-DD HH:mm').format('x')
       }
       await saveMileStone([...data,modifyNewData])
       await resolve();
@@ -224,7 +223,7 @@ const FixedTypeTabel=(propsData)=>{
       actionsColumnIndex:-1,
     }}
     icons={{  
-      Add: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="secondary">Add Fixed Amount</Button>:"", 
+      Add: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="secondary">Add</Button>:"", 
       Edit: () => { return <CreateIcon variant="contained" color="primary" /> },
     }}
     editable={{
