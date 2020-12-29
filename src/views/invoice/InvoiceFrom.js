@@ -17,7 +17,7 @@ import html2canvas from 'html2canvas';
 import moment from 'moment';
 import { API_EXE_TIME } from '../../assets/config/Config';
 import { structureOptions } from '../project/ProjectFormUtilites';
-import { MileStonePreInvoiceTable } from './InvoiceFromUtilites';
+import { FixedCostPreInvoiceTable, MileStonePreInvoiceTable } from './InvoiceFromUtilites';
 
 // this method will used for the transition for model 
 const Transition = forwardRef(function Transition(props, ref) { return <Slide direction="up" ref={ref} {...props} />; });
@@ -171,7 +171,19 @@ const SectionThree = (propsData) => {
     const { projectType }=sectionThreeState
     switch (projectType) {
         case "Mile Stone":
-            return <MileStonePreInvoiceTable setLoading={setLoading} props={propsData} setViewInvoice={setViewInvoice} />
+            return <MileStonePreInvoiceTable 
+                    setLoading={setLoading} 
+                    props={propsData} 
+                    setViewInvoice={setViewInvoice}
+                    projectType={projectType} 
+                />
+        case "Fixed Rate":
+            return <FixedCostPreInvoiceTable 
+                    setLoading={setLoading} 
+                    props={propsData} 
+                    setViewInvoice={setViewInvoice} 
+                    projectType={projectType}
+                />
         default:
             return <h1>No Content</h1>
     }
@@ -183,13 +195,13 @@ const PostInvoiceData = async (propsData) => {
     const { authorization } = propsData.mainProps.LoginState
     const { projectListByClient } = propsData.mainProps.ProjectState
     const { GenerateInvoice, saveMileStonePreInvoiceData } = propsData.mainProps.InvoiceAction
-    const { preInvoiceMileStonesData } = propsData.mainProps.InvoiceState
+    const { preInvoiceMileStonesData, preInvoiceFixedCostData } = propsData.mainProps.InvoiceState
     const { loadMessage } = propsData.mainProps.ClientAction
     const { dispatch } = propsData.mainProps
     let filterProject = values.projectList !== {} && projectListByClient.filter(item=> item.id===values.projectList.id)
     let newInvoiceData = {
-        "fromDate": (values && values.fromDate) &&  new moment(values.fromDate).format('x'),
-        "toDate": (values && values.toDate) && new moment(values.toDate).format('x'),
+        "fromDate": (values && values.fromDate) &&  new moment(values.fromDate+" 00:00", "YYYY-MM-DD HH:mm").format('x'),
+        "toDate": (values && values.toDate) && new moment(values.toDate+" 00:00","YYYY-MM-DD HH:mm").format('x'),
         "projectId": (values.projectList !== {} ) && values.projectList.id
     }
     await setLoading(true);
@@ -198,7 +210,16 @@ const PostInvoiceData = async (propsData) => {
     filterProject.length >=0 && await GenerateInvoice(newInvoiceData, authorization,filterProject[0].projectBillingType);
     setTimeout(async () => {
         await dispatch(loadMessage());
-        (preInvoiceMileStonesData && preInvoiceMileStonesData.length >0 ) && await setSectionThreeState({ view: true, projectType:filterProject[0].projectBillingType})
+        switch (filterProject.length >0 && filterProject[0].projectBillingType) {
+            case "Mile Stone":
+                (preInvoiceMileStonesData && preInvoiceMileStonesData.length >0 ) && await setSectionThreeState({ view: true, projectType:filterProject[0].projectBillingType})        
+                break;
+            case "Fixed Rate":
+                (preInvoiceFixedCostData && preInvoiceFixedCostData.length >0 ) && await setSectionThreeState({ view: true, projectType:filterProject[0].projectBillingType})        
+                break;
+            default:
+                return "";
+        }
         await setLoading(false);
     }, API_EXE_TIME)
 }
@@ -255,7 +276,6 @@ const ShowViewInvoice = (propsData) => {
         </DialogActions>
     </Dialog>
 }
-
 
 // this function will used for validate 
 const validate = (values) => {

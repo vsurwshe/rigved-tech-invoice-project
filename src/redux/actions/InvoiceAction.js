@@ -32,6 +32,8 @@ const GenerateInvoice = (invoiceData, authroizationKey, projectType) => {
                         switch (projectType) {
                             case "Mile Stone":
                                 return SuccessFunction({ dispatch , "successMethod": saveMileStonePreInvoiceData, "loadMessage":loadMessage, response})         
+                            case "Fixed Rate":
+                                return SuccessFunction({ dispatch , "successMethod": saveFixedCostPreInvoiceData, "loadMessage":loadMessage, response})
                             default:
                                 return "";
                         }
@@ -162,6 +164,13 @@ export function saveMileStonePreInvoiceData(mileStones) {
     return{
         type: "SAVE_MILESTONE_PRE_INVOICE_DATA",
         mileStones
+    }
+}
+
+export function saveFixedCostPreInvoiceData(fixedCost) {
+    return{
+        type: "SAVE_FIXED_COST_PRE_INVOICE_DATA",
+        fixedCost
     }
 }
 

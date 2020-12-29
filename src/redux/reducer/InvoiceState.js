@@ -6,7 +6,8 @@ const initialState = {
     genratedInvoiceData:[],
     pdfInvoiceData:[],
     viewPDFInvoiceData:[],
-    preInvoiceMileStonesData:[]
+    preInvoiceMileStonesData:[],
+    preInvoiceFixedCostData:[]
 }
 
 const InvoiceState=(state=initialState,action)=>{
@@ -15,6 +16,8 @@ const InvoiceState=(state=initialState,action)=>{
             return {...state,invoiceList:action.invoiceList}
         case "SAVE_MILESTONE_PRE_INVOICE_DATA":
             return {...state,preInvoiceMileStonesData:action.mileStones}
+        case "SAVE_FIXED_COST_PRE_INVOICE_DATA":
+            return {...state,preInvoiceFixedCostData:action.fixedCost}
         case "SAVE_INVOICE_PDF_LIST":
             return {...state,invoiceList:action.invoiceList}
         case "SAVE_INVOICE_USER_LIST":
