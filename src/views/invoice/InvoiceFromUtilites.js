@@ -1,12 +1,12 @@
 import React,{ useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@material-ui/core';
 import MaterialTable from 'material-table';
-import { API_EXE_TIME } from '../../assets/config/Config';
+import { API_INVOCIE_EXE_TIME } from '../../assets/config/Config';
 import moment from 'moment';
 
 // this component will used for Milestone Pre Invoice table
 const MileStonePreInvoiceTable=(propsData)=>{
-    const { setLoading, setViewInvoice, projectType }=propsData
+    const { setLoading, setViewInvoice, projectType, tableData }=propsData
     const { preInvoiceMileStonesData }=propsData.props.mainProps.InvoiceState
     let columns = [
         { title: "", field: "id", hidden: true },
@@ -20,7 +20,7 @@ const MileStonePreInvoiceTable=(propsData)=>{
     return <LoadPreCreateInvoiceTable 
         title="Milestone completed on selected project"
         setLoading={setLoading}
-        data={preInvoiceMileStonesData}
+        data={(tableData && tableData.length >0) ? tableData : preInvoiceMileStonesData}
         setViewInvoice={setViewInvoice}
         columns={columns}
         props={propsData.props.mainProps}
@@ -30,7 +30,7 @@ const MileStonePreInvoiceTable=(propsData)=>{
 
 // this component will used for Fixed Cost Invoice Tabel
 const FixedCostPreInvoiceTable=(propsData)=>{
-    const { setLoading, setViewInvoice, projectType }=propsData
+    const { setLoading, setViewInvoice, projectType, tableData }=propsData
     const { preInvoiceFixedCostData }=propsData.props.mainProps.InvoiceState
     let columns = [
         { title: "", field: "id", hidden: true },
@@ -54,7 +54,7 @@ const FixedCostPreInvoiceTable=(propsData)=>{
     return <LoadPreCreateInvoiceTable 
         title="Fixed cost selected project"
         setLoading={setLoading}
-        data={preInvoiceFixedCostData}
+        data={(tableData && tableData.length >0) ? tableData : preInvoiceFixedCostData}
         setViewInvoice={setViewInvoice}
         columns={columns}
         props={propsData.props.mainProps}
@@ -138,6 +138,7 @@ const loadGenrateInvoiceButton=(propsData)=>{
 // this method will used for genrate pdf invoice
 const GenratePDFInvoice=async (propsData)=>{
     const { modifyGenrateInvoiceData, setLoading, setViewInvoice, props }=propsData
+    const { dispatch }=props
     const { authorization }=props.LoginState
     const { loadMessage } = props.ClientAction
     const { invoiceEmployeeData } = props.InvoiceState
@@ -145,11 +146,11 @@ const GenratePDFInvoice=async (propsData)=>{
     await setLoading(true);
     await GenerateInvoicePDF(modifyGenrateInvoiceData, authorization);
     setTimeout(async () => {
-        await loadMessage();
+        await dispatch(loadMessage());
         await getPDFInvoiceList(0,100,authorization);
         (invoiceEmployeeData && Object.keys(invoiceEmployeeData).length >= 2) && await setViewInvoice(true);
         await setLoading(false);
-    }, API_EXE_TIME)
+    }, API_INVOCIE_EXE_TIME)
 }
 
 export{

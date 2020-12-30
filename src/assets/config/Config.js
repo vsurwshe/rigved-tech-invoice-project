@@ -1,5 +1,6 @@
 const API_URL="http://103.224.240.187:9003";
 const API_EXE_TIME=500;
+const API_INVOCIE_EXE_TIME=1000;
 
 const AlertColor={
     success:"success",
@@ -19,5 +20,6 @@ export{
     API_URL,
     AlertColor,
     API_EXE_TIME,
-    FromActions
+    FromActions,
+    API_INVOCIE_EXE_TIME
 }

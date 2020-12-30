@@ -121,7 +121,7 @@ const MileStoneTabel=(propsData)=>{
 const onMileStoneTabelRowAdd=(props)=>{
   const { data, newData, dispatch, saveMileStone, projectId }=props
   return new Promise(async (resolve, reject) => {
-    if (newData && (Object.keys(newData).length >= 4 && newData.constructor === Object)) {
+    if (newData && (Object.keys(newData).length >= 3 && newData.constructor === Object)) {
       let modifyNewData={
         ...newData,
         projectId,

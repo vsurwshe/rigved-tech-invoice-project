@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Grid, Dialog, DialogTitle, DialogContent, DialogActions, Slide, AppBar, Toolbar, IconButton } from '@material-ui/core';
 import useStyles from "../client/Styles";
-import { renderDateTimePicker, renderAutocompleteWithProps, renderLoading, renderTextHiddenField, renderSanckbarAlert } from '../utilites/FromUtilites';
+import { renderDateTimePicker, renderAutocompleteWithProps, renderLoading, renderTextHiddenField, renderSanckbarAlert, dwonloadInvoice } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
 import * as ClientAction from "../../redux/actions/ClientAction";
 import * as ProjectAction from "../../redux/actions/ProjectAction"
@@ -12,10 +12,8 @@ import * as InvoiceAction from "../../redux/actions/InvoiceAction"
 import * as PurchaseOrderAction from "../../redux/actions/PurchaseOrderAction"
 import Invoice from './Invoice';
 import CloseIcon from '@material-ui/icons/Close';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import moment from 'moment';
-import { API_EXE_TIME } from '../../assets/config/Config';
+import { API_INVOCIE_EXE_TIME } from '../../assets/config/Config';
 import { structureOptions } from '../project/ProjectFormUtilites';
 import { FixedCostPreInvoiceTable, MileStonePreInvoiceTable } from './InvoiceFromUtilites';
 
@@ -48,27 +46,12 @@ let InvoiceFrom = (props) => {
     </div>
 }
 
-// this method will used for the download the invoice table as pdf
-const DwonloadInvoice = () => {
-    let htmlTable = document.getElementById('invoiceProject');
-    html2canvas(htmlTable, {
-        allowTaint: true,
-        backgroundColor: "rgba(255, 255, 255, 1)",
-    }).then((canvas) => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'pt', 'a4');
-        pdf.addImage(imgData, 'PNG', 25, 70);
-        pdf.save("downloadInvoice.pdf");
-    });
-}
-
 // this method will used for the loading gird structure of invoice form component
 const LoadGird = (props) => {
     var classes = useStyles();
     const { projectIdList, setProjectIdList, setSectionThreeState, sectionThreeState, loading, setLoading, setViewInvoice } = props
     const { color, common_message } = props.mainProps.ClientState
     const { initialValues }=props.mainProps
-    console.log("IN ",initialValues)
     return <>
         <Grid container spacing={5}>
             <Grid item xs={12} style={{ padding: 30 }}>
@@ -76,7 +59,7 @@ const LoadGird = (props) => {
             </Grid>
         </Grid>
         <Grid container spacing={5}>
-            { initialValues ? <LoadHeader initialValues={initialValues} mainProps={props.mainProps}/>:
+            { initialValues ? <LoadHeader initialValues={initialValues} mainProps={props.mainProps} setLoading={setLoading}/>:
                 <>
                 <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 30 }}>
                     {SectionOne({ classes, "mainProps": props.mainProps, projectIdList, setProjectIdList, setLoading })}
@@ -89,36 +72,53 @@ const LoadGird = (props) => {
         <center>{loading && renderLoading({message:"", size:40})}</center>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
-                {(sectionThreeState.view || initialValues ) && SectionThree({ "mainProps": props.mainProps ,setSectionThreeState, sectionThreeState, setLoading, setViewInvoice})}
+                {sectionThreeState.view && SectionThree({ "mainProps": props.mainProps ,setSectionThreeState, sectionThreeState, setLoading, setViewInvoice})}
             </Grid>
         </Grid>
     </>
 }
 
+// this component will help to view Invoice Display
 const LoadHeader=(props)=>{
-    const { initialValues }=props
-    const { invoiceUserList }=props.mainProps.InvoiceState
-    let columns = [
-        { title: "EMP\u00a0ID", field: "employeeId" },
-        { title: "EMP\u00a0NAME", field: "employeeName" },
-        { title: "PER\u00a0DAY\u00a0RATE", field: "perDayRate" },
-        { title: "TOTAL\u00a0DAYS", field: "totalDays" },
-        { title: "TOTAL\u00a0AMOUNT", field: "totalAmt" }
-    ];
-    let data = [];
+    const { initialValues, mainProps, setLoading }=props
+    const { invoiceUserList, projectBillingType }=mainProps.InvoiceState
     return <>
         <Grid item xs={12} sm={6} style={{ paddingLeft: 20 }}> 
             <h4>Client Name : {initialValues.toCompanyName}</h4>
             <h4>Date : {initialValues.invoiceDate}</h4>
+            <h4>Client Project Type : {projectBillingType}</h4>
             <h4>Total Amount : {initialValues.billWitoutGST}</h4>
             <h4>Total Amount with Tax : {initialValues.billWitGST}</h4>
         </Grid>
         <Grid item xs={12}>
-            <PrepareDataForResourceTable listOfRows={invoiceUserList} data={data} columns={columns} />
-            {/* <LoadInvoiceResourceTable data={data} columns={columns} initialValues={initialValues} title="List of assigned resource" /> */}
+           {showProjectTypeAccordingTabel({projectBillingType, mainProps, setLoading, invoiceUserList})}
         </Grid>
     </>
 }
+
+// this method will help to load according to project type Table
+const showProjectTypeAccordingTabel=(propsData)=>{
+    const { projectBillingType, mainProps, setLoading, invoiceUserList }=propsData
+    switch (projectBillingType) {
+        case "MileStone":
+            return <MileStonePreInvoiceTable 
+                setLoading={setLoading} 
+                props={mainProps} 
+                projectType={projectBillingType} 
+                tableData={invoiceUserList}
+            />
+        case "FixedRate":
+            return <FixedCostPreInvoiceTable 
+                setLoading={setLoading} 
+                props={propsData} 
+                projectType={projectBillingType}
+                tableData={invoiceUserList}
+            />
+        default:
+            return <h2>No Invoice Content</h2>
+    }
+}
+
 
 // this method will used for the load the left side part 
 const SectionOne = (data) => {
@@ -164,13 +164,12 @@ const SectionTwo = (data) => {
 }
 
 // this is month name array
-var months = ['', 'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+// var months = ['', 'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
 
 // this sections will used for the showing structure
 const SectionThree = (propsData) => {
     const { sectionThreeState, setLoading, setViewInvoice }=propsData
     const { projectType }=sectionThreeState
-    console.log("Props ",propsData)
     switch (projectType) {
         case "Mile Stone":
             return <MileStonePreInvoiceTable 
@@ -201,60 +200,65 @@ const PostInvoiceData = async (propsData) => {
     const { loadMessage } = propsData.mainProps.ClientAction
     const { dispatch } = propsData.mainProps
     let filterProject = values.projectList !== {} && projectListByClient.filter(item=> item.id===values.projectList.id)
+    let projectTypeData= filterProject.length >0 && filterProject[0].projectBillingType;
     let newInvoiceData = {
         "fromDate": (values && values.fromDate) &&  new moment(values.fromDate+" 00:00", "YYYY-MM-DD HH:mm").format('x'),
         "toDate": (values && values.toDate) && new moment(values.toDate+" 00:00","YYYY-MM-DD HH:mm").format('x'),
         "projectId": (values.projectList !== {} ) && values.projectList.id
     }
+
     await setLoading(true);
-    await saveMileStonePreInvoiceData([]);
-    await saveFixedCostPreInvoiceData([]);
+    if (projectTypeData === "Mile Stone") {
+        await dispatch(saveMileStonePreInvoiceData([]));
+    } else if(projectTypeData === "Fixed Rate") {
+        await dispatch(saveFixedCostPreInvoiceData([]));
+    }
     // here we call api with project type thats we check filter result
-    filterProject.length >=0 && await GenerateInvoice(newInvoiceData, authorization,filterProject[0].projectBillingType);
+    projectTypeData && await GenerateInvoice(newInvoiceData, authorization,projectTypeData);
     setTimeout(async () => {
         await dispatch(loadMessage());
-        switch (filterProject.length >0 && filterProject[0].projectBillingType) {
+        switch (projectTypeData) {
             case "Mile Stone":
-                (preInvoiceMileStonesData && preInvoiceMileStonesData.length >0 ) && await setSectionThreeState({ view: true, projectType:filterProject[0].projectBillingType})        
+                (preInvoiceMileStonesData && preInvoiceMileStonesData.length >0 ) && await setSectionThreeState({ view: true, projectType:projectTypeData})        
                 break;
             case "Fixed Rate":
-                (preInvoiceFixedCostData && preInvoiceFixedCostData.length >0 ) && await setSectionThreeState({ view: true, projectType:filterProject[0].projectBillingType})        
+                (preInvoiceFixedCostData && preInvoiceFixedCostData.length >0 ) && await setSectionThreeState({ view: true, projectType:projectTypeData})        
                 break;
             default:
                 return "";
         }
         await setLoading(false);
-    }, API_EXE_TIME)
+    }, API_INVOCIE_EXE_TIME)
 }
 
 // this method will used for payables days
-const PrepareDataForResourceTable=(props)=>{
-    const { listOfRows, data, columns}=props
-   return (listOfRows && listOfRows.length > 0) && listOfRows.map((item, key) => {
-        let monthString = item.attendancepermonth ? item.attendancepermonth : "";
-        let firstArray = monthString && monthString.split(',');
-        let tempColunmsData = [];
-        data.push({ "data":item, ...item })
-        firstArray.forEach(element => {
-            let monthNumber;
-            let filterEqualArray;
-            if (element.includes("{")) {
-                let tempArray = element.split('{')
-                filterEqualArray = tempArray[1].split("=");
-            } else if (element.includes("}")) {
-                let tempArray = element.split('}')
-                filterEqualArray = tempArray[0].split("=");
-            } else {
-                filterEqualArray = element.split("=");
-            }
-            monthNumber = filterEqualArray && filterEqualArray[0].replace(/ /g, "");
-            key === 0 && tempColunmsData.push({ title: months[monthNumber], field: months[monthNumber] })
-            data[key][months[monthNumber]] = (filterEqualArray[1] && filterEqualArray[1].includes("}")) ? (filterEqualArray[1].split('}')[0]) : filterEqualArray[1]
-        });
-        columns.splice(5, 0, ...tempColunmsData)
-        return "";
-    })
-}
+// const PrepareDataForResourceTable=(props)=>{
+//     const { listOfRows, data, columns}=props
+//    return (listOfRows && listOfRows.length > 0) && listOfRows.map((item, key) => {
+//         let monthString = item.attendancepermonth ? item.attendancepermonth : "";
+//         let firstArray = monthString && monthString.split(',');
+//         let tempColunmsData = [];
+//         data.push({ "data":item, ...item })
+//         firstArray.forEach(element => {
+//             let monthNumber;
+//             let filterEqualArray;
+//             if (element.includes("{")) {
+//                 let tempArray = element.split('{')
+//                 filterEqualArray = tempArray[1].split("=");
+//             } else if (element.includes("}")) {
+//                 let tempArray = element.split('}')
+//                 filterEqualArray = tempArray[0].split("=");
+//             } else {
+//                 filterEqualArray = element.split("=");
+//             }
+//             monthNumber = filterEqualArray && filterEqualArray[0].replace(/ /g, "");
+//             key === 0 && tempColunmsData.push({ title: months[monthNumber], field: months[monthNumber] })
+//             data[key][months[monthNumber]] = (filterEqualArray[1] && filterEqualArray[1].includes("}")) ? (filterEqualArray[1].split('}')[0]) : filterEqualArray[1]
+//         });
+//         columns.splice(5, 0, ...tempColunmsData)
+//         return "";
+//     })
+// }
 
 // this method will used for the showing invoice after posting successfully resource table
 const ShowViewInvoice = (propsData) => {
@@ -270,7 +274,7 @@ const ShowViewInvoice = (propsData) => {
         <DialogContent> <Invoice inoiceData={invoiceEmployeeData}/> </DialogContent>
         <DialogActions>
             <Button onClick={async () => {await reset(); await setViewInvoice(false); await cancle()}} color="primary">Cancel</Button>
-            <Button onClick={() => DwonloadInvoice()} color="secondary">Download Invoice</Button>
+            <Button onClick={() => dwonloadInvoice()} color="secondary">Download Invoice</Button>
         </DialogActions>
     </Dialog>
 }

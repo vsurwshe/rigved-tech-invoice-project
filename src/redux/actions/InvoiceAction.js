@@ -8,7 +8,14 @@ const GetInvoiceUserList = (firstIndex, lastIndex, invoiceId, authroizationKey) 
     return (dispatch) => {
         return CreateInstance()
             .get('/innvoice/invoiceList/' + firstIndex + '/' + lastIndex+'/'+invoiceId, HeaderConfig(authroizationKey))
-            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceUserList, "loadMessage":loadMessage, response}) })
+            .then(response => { 
+                console.log("SA",response.headers)
+                if(response && response.headers && response.headers.BILLING_TYPE){
+                    SuccessFunction({ dispatch , "successMethod": SaveSingleInvoiceData, "loadMessage":loadMessage, response ,"id":response.headers.BILLING_TYPE}) 
+                }else{
+                    SuccessFunction({ dispatch , "successMethod": SaveSingleInvoiceData, "loadMessage":loadMessage, response}) 
+                }  
+            })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
@@ -110,6 +117,14 @@ const payInvoiceBill = (invoiceId, authroizationKey) => {
 
 
 //-------------------------------------
+
+export function SaveSingleInvoiceData(invoiceData, billingType) {
+    return {
+        type: "SAVE_SINGLE_INVOICE_DATA",
+        invoiceData,
+        billingType
+    }
+}
 
 export function SaveInvoiceUserList(invoiceList) {
     return {
