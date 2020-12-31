@@ -8,7 +8,7 @@ const BillingStateModel=(state=initalState,action)=>{
         case "SAVE_MILE_STONE_LIST":
             return {...state, mileStoneList: action.mileStoneList }
         case "SAVE_MILE_STONE_LIST_PROJECT_ID":
-            return {...state, mileStoneListProjectId: action.mileStoneList }
+            return {...state, mileStoneListProjectId: (action.mileStoneList && action.mileStoneList.Status) ?[]:action.mileStoneList}
         case "SAVE_MILE_STONE_DATA":
             return {...state, milestoneData: action.mileStoneData }
         case "UPDATE_MILE_STONE_DATA":
