@@ -123,12 +123,12 @@ let ResourcesTable = (props) => {
         "projectId": projectId ? projectId : "",
         "accountId": (subitem && subitem.accountId) ? subitem.accountId : "",
         "emploeeMappedId": subitem.emploeeMappedId,
-        "domain": subitem.domain,
+        "domain": subitem.domain && subitem.domain,
         "employeeNumber": subitem.employeeNumber,
         "name": subitem.firstName + " " + subitem.lastName,
-        "category": subitem.category,
-        "experience": subitem.fromExperience + "-" + subitem.toExperience,
-        "skill": subitem.skill,
+        "category": subitem.category && subitem.category,
+        "experience": subitem.fromExperience && subitem.fromExperience + "-" + subitem.toExperience,
+        "skill": subitem.skill && subitem.skill,
         "onbordaingDate": subitem.onbordaingDate && moment(subitem.onbordaingDate).format('YYYY-MM-DD'),
         "exitDate": subitem.exitDate && moment(subitem.exitDate).format('YYYY-MM-DD')
       }

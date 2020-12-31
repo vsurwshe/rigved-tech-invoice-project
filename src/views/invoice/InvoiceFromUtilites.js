@@ -11,9 +11,10 @@ const MileStonePreInvoiceTable=(propsData)=>{
     let columns = [
         { title: "", field: "id", hidden: true },
         { title: 'Milestone\u00a0Name', field: 'mileStoneDesc' },
-        { title: 'Work\u00a0Completion(%)', field: 'workComPer' },
-        { title: 'Invoice(%)', field: 'invoicePer'},
-        { title: 'Completed ', field: 'compFlag'}
+        { title: 'Milestone\u00a0Amount', field: 'mileStoneCost' },
+        // { title: 'Work\u00a0Completion(%)', field: 'workComPer' },
+        // { title: 'Invoice(%)', field: 'invoicePer'},
+        // { title: 'Completed ', field: 'compFlag'}
     ];
     
     return <LoadPreCreateInvoiceTable 

@@ -40,15 +40,15 @@ const MileStoneTabel=(propsData)=>{
         { title: 'Work\u00a0Completion(%)', field: 'workComPer' },
         { title: 'Invoice(%)', field: 'invoicePer'},
         { title: 'Expected\u00a0of\u00a0Completion Date', 
-          field: 'expComDateModify', 
-          editable:'onAdd',
+          field: 'expComDate', 
+          editable:'onUpdate',
           width:80 ,
           editComponent: props => {
             return renderTextField({ name: "expComDate", label: "", type: "date", action: { props } })
           }
         },
         { title: 'Actual\u00a0Complete\u00a0Date', 
-          field: 'actualComDateModify', 
+          field: 'actualComDate', 
           editable:'onUpdate',
           editComponent: props => {
             return renderTextField({ name: "actualComDate", label: "", type: "date", action: { props } })
@@ -111,18 +111,17 @@ const MileStoneTabel=(propsData)=>{
 const onTabelRowAdd=(props)=>{
   const { data, newData, dispatch, saveMileStone, projectId }=props
   return new Promise(async (resolve, reject) => {
-    if (newData && (Object.keys(newData).length > 1 && newData.constructor === Object)) {
+    if (newData && (Object.keys(newData).length >= 3 && newData.constructor === Object)) {
       let modifyNewData={
         ...newData,
         projectId,
         compFlag:false, 
         "active": true,
-        "expComDate": new moment(newData.expComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
       }
       await saveMileStone([...data,modifyNewData])
       await resolve();
     } else {
-      dispatch(loadMessage("error","Please check the provided fileds"))
+      dispatch(loadMessage("error","Please check the values provided in fileds"))
       reject();
     }
   })
@@ -134,19 +133,19 @@ const updateMileStoneTabelRecord=(propsData)=>{
   const { udpateMileStoneData, GetMileStoneListProjectId }=propsData.mainProps.BillingModelAction
   const { authorization }=propsData.mainProps.LoginState
   return new Promise(async (resolve, reject) => {
-    if (newData) {
+    if (newData && Object.keys(newData).length >= 8 && newData.compFlag && newData.expComDate <= newData.actualComDate && newData.id) {
       let modifyNewData={
         ...newData,
         "active": true,
-        "expComDate": new moment(newData.expComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x'),
-        "actualComDate": new moment(newData.actualComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
+        "expComDate": new moment(newData.expComDate+' 00:00','YYYY-MM-DD HH:mm').format('x'),
+        "actualComDate": new moment(newData.actualComDate+' 00:00','YYYY-MM-DD HH:mm').format('x')
       }
       await udpateMileStoneData(modifyNewData, authorization);
       setTimeout(async () => {
         await GetMileStoneListProjectId(0, 20, newData.projectId, authorization);
         resolve();
       }, API_EXE_TIME)
-    } else { dispatch(loadMessage("error","Please check the provided fileds")); reject(); }
+    } else { dispatch(loadMessage("error","Please check the values provided in fileds")); reject(); }
   })
 }
 
@@ -165,7 +164,7 @@ const saveMileStoneRecord=(props)=>{
       setLoad(false);
     },API_EXE_TIME)
   }else{
-    dispatch(loadMessage("error","Please check total of milestone configrations"))
+    dispatch(loadMessage("error","Please check total of milestones configrations"))
   }
 }
 
