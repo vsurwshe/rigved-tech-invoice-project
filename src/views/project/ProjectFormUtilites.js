@@ -3,6 +3,7 @@ import { Button } from '@material-ui/core';
 import MaterialTable from 'material-table';
 import Checkbox from '@material-ui/core/Checkbox';
 import CreateIcon from '@material-ui/icons/Create';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import { Field } from 'redux-form';
 import { loadMessage } from "../../redux/actions/ClientAction"
 import { renderMatiralCheckbox } from '../utilites/FromUtilites';
@@ -32,7 +33,8 @@ const structureOptions=(propsData)=>{
 // this method will used for the load milestone table
 const MileStoneTabel=(propsData)=>{
     const { data,saveMileStone, dispatch, mainProps, projectId }=propsData
-    const { operation }=propsData.mainProps.stateData
+    const { operation }=mainProps.stateData
+    const { mileStoneListProjectId }=mainProps.BillingModelState
     const [load, setLoad] = useState(false)
     const columns = [
         { title: "", field: "id", hidden: true },
@@ -40,18 +42,26 @@ const MileStoneTabel=(propsData)=>{
         { title: 'Work\u00a0Completion(%)', field: 'workComPer' },
         { title: 'Invoice(%)', field: 'invoicePer'},
         { title: 'Expected\u00a0of\u00a0Completion Date', 
-          field: 'expComDate', 
-          editable:'onUpdate',
+          field: 'expComDateModify', 
+          editable:'onAdd',
           width:80 ,
           editComponent: props => {
             return renderTextField({ name: "expComDate", label: "", type: "date", action: { props } })
+          },
+          render: (rowData)=> {
+            const { expComDateModify }=rowData
+            return (mileStoneListProjectId && mileStoneListProjectId.length >0 && rowData.expComDate) ? new moment(rowData.expComDate).format('YYYY-MM-DD'): expComDateModify;
           }
         },
         { title: 'Actual\u00a0Complete\u00a0Date', 
-          field: 'actualComDate', 
+          field: 'actualComDateModify', 
           editable:'onUpdate',
           editComponent: props => {
             return renderTextField({ name: "actualComDate", label: "", type: "date", action: { props } })
+          },
+          render: (rowData)=> {
+            const { actualComDateModify }=rowData
+            return (mileStoneListProjectId && mileStoneListProjectId.length >0 && rowData.actualComDate) ? new moment(rowData.actualComDate).format('YYYY-MM-DD'): actualComDateModify;
           }
         },
         {
@@ -77,7 +87,7 @@ const MileStoneTabel=(propsData)=>{
     <MaterialTable
       title="Milestone Managment"
       columns={columns}
-      data={data.length > 0 ? data : []}
+      data={mileStoneListProjectId.length > 0 ? mileStoneListProjectId : data}
       isLoading={load}
       options={{
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
@@ -93,15 +103,15 @@ const MileStoneTabel=(propsData)=>{
       ]}
       icons={{  
         Add: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="secondary">Add</Button>:"", 
-        Edit: () => { return <CreateIcon variant="contained" color="primary" /> },
+        Edit: () => { return !(mileStoneListProjectId && mileStoneListProjectId.length <=0) && <CreateIcon variant="contained" color="primary" /> },
+        Delete: () => { return (mileStoneListProjectId && mileStoneListProjectId.length <=0) && <DeleteOutlineIcon variant="contained" color="secondary" /> },
       }}
       editable={{
         isEditable: rowData => true,
-        isDeletable: rowData => false,
-        isDeleteHidden: rowData => true,
+        isDeletable: rowData => true,
         onRowAdd: newData => onTabelRowAdd({data, newData, dispatch, saveMileStone, projectId}),
         onRowUpdate: (newData, oldData) => updateMileStoneTabelRecord({newData,oldData,dispatch,"mainProps":propsData.mainProps}),
-        onRowDelete: oldData => { }
+        onRowDelete: oldData => deleteMileStoneTabelRecord({oldData, data, saveMileStone})
       }}
     />
   </div>
@@ -111,12 +121,13 @@ const MileStoneTabel=(propsData)=>{
 const onTabelRowAdd=(props)=>{
   const { data, newData, dispatch, saveMileStone, projectId }=props
   return new Promise(async (resolve, reject) => {
-    if (newData && (Object.keys(newData).length >= 3 && newData.constructor === Object)) {
+    if (newData && (Object.keys(newData).length >= 4 && newData.constructor === Object)) {
       let modifyNewData={
         ...newData,
         projectId,
         compFlag:false, 
         "active": true,
+        "expComDate": new moment(newData.expComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
       }
       await saveMileStone([...data,modifyNewData])
       await resolve();
@@ -133,12 +144,12 @@ const updateMileStoneTabelRecord=(propsData)=>{
   const { udpateMileStoneData, GetMileStoneListProjectId }=propsData.mainProps.BillingModelAction
   const { authorization }=propsData.mainProps.LoginState
   return new Promise(async (resolve, reject) => {
-    if (newData && Object.keys(newData).length >= 8 && newData.compFlag && newData.expComDate <= newData.actualComDate && newData.id) {
+    console.log("New ",newData,Object.keys(newData).length)
+    if (newData && Object.keys(newData).length >= 8 && newData.compFlag && newData.expComDate <= newData.actualComDateModify && newData.id) {
       let modifyNewData={
         ...newData,
         "active": true,
-        "expComDate": new moment(newData.expComDate+' 00:00','YYYY-MM-DD HH:mm').format('x'),
-        "actualComDate": new moment(newData.actualComDate+' 00:00','YYYY-MM-DD HH:mm').format('x')
+        "actualComDate": new moment(newData.actualComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
       }
       await udpateMileStoneData(modifyNewData, authorization);
       setTimeout(async () => {
@@ -147,6 +158,18 @@ const updateMileStoneTabelRecord=(propsData)=>{
       }, API_EXE_TIME)
     } else { dispatch(loadMessage("error","Please check the values provided in fileds")); reject(); }
   })
+}
+
+// this method will used to delete record form milestoen tabel
+const deleteMileStoneTabelRecord=(propsData)=>{
+  const { oldData, data, saveMileStone }=propsData
+  return new Promise(async(resolve, reject) => {
+    if(data && data.length >=0){
+      let filterData= data.filter(item=> item.mileStoneDesc !==oldData.mileStoneDesc && item.expComDateModify !==oldData.expComDateModify )
+      await saveMileStone(filterData);
+      await resolve();
+    }else{ reject(); }
+   })
 }
 
 // this method will used for the create mile stone 
