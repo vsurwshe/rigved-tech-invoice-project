@@ -6,8 +6,8 @@ import moment from 'moment';
 
 // this component will used for Milestone Pre Invoice table
 const MileStonePreInvoiceTable=(propsData)=>{
-    const { setLoading, setViewInvoice, projectType, tableData }=propsData
-    const { preInvoiceMileStonesData }=propsData.props.mainProps.InvoiceState
+    const { setLoading, setViewInvoice, projectType, tableData, props }=propsData
+    const { preInvoiceMileStonesData }=props.InvoiceState
     let columns = [
         { title: "", field: "id", hidden: true },
         { title: 'Milestone\u00a0Name', field: 'mileStoneDesc' },
@@ -18,20 +18,21 @@ const MileStonePreInvoiceTable=(propsData)=>{
     ];
     
     return <LoadPreCreateInvoiceTable 
-        title="Milestone completed on selected project"
+        title=" "
         setLoading={setLoading}
         data={(tableData && tableData.length >0) ? tableData : preInvoiceMileStonesData}
         setViewInvoice={setViewInvoice}
         columns={columns}
-        props={propsData.props.mainProps}
+        initialValues={tableData}
+        props={props}
         projectType={projectType}
     />
 }
 
 // this component will used for Fixed Cost Invoice Tabel
 const FixedCostPreInvoiceTable=(propsData)=>{
-    const { setLoading, setViewInvoice, projectType, tableData }=propsData
-    const { preInvoiceFixedCostData }=propsData.props.mainProps.InvoiceState
+    const { setLoading, setViewInvoice, projectType, tableData, props }=propsData
+    const { preInvoiceFixedCostData }=props.InvoiceState
     let columns = [
         { title: "", field: "id", hidden: true },
         {  title: 'Start\u00a0Date', 
@@ -52,12 +53,13 @@ const FixedCostPreInvoiceTable=(propsData)=>{
     ];
     
     return <LoadPreCreateInvoiceTable 
-        title="Fixed cost selected project"
+        title=" "
         setLoading={setLoading}
         data={(tableData && tableData.length >0) ? tableData : preInvoiceFixedCostData}
         setViewInvoice={setViewInvoice}
+        initialValues={tableData}
         columns={columns}
-        props={propsData.props.mainProps}
+        props={props}
         projectType={projectType}
     />
 }

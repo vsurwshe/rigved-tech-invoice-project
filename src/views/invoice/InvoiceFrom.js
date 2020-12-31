@@ -168,20 +168,20 @@ const SectionTwo = (data) => {
 
 // this sections will used for the showing structure
 const SectionThree = (propsData) => {
-    const { sectionThreeState, setLoading, setViewInvoice }=propsData
+    const { sectionThreeState, setLoading, setViewInvoice, mainProps }=propsData
     const { projectType }=sectionThreeState
     switch (projectType) {
         case "Mile Stone":
             return <MileStonePreInvoiceTable 
                     setLoading={setLoading} 
-                    props={propsData} 
+                    props={mainProps} 
                     setViewInvoice={setViewInvoice}
                     projectType={projectType} 
                 />
         case "Fixed Rate":
             return <FixedCostPreInvoiceTable 
                     setLoading={setLoading} 
-                    props={propsData} 
+                    props={mainProps} 
                     setViewInvoice={setViewInvoice} 
                     projectType={projectType}
                 />

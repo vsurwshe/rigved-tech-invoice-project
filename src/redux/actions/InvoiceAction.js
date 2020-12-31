@@ -9,9 +9,8 @@ const GetInvoiceUserList = (firstIndex, lastIndex, invoiceId, authroizationKey) 
         return CreateInstance()
             .get('/innvoice/invoiceList/' + firstIndex + '/' + lastIndex+'/'+invoiceId, HeaderConfig(authroizationKey))
             .then(response => { 
-                console.log("SA",response.headers)
-                if(response && response.headers && response.headers.BILLING_TYPE){
-                    SuccessFunction({ dispatch , "successMethod": SaveSingleInvoiceData, "loadMessage":loadMessage, response ,"id":response.headers.BILLING_TYPE}) 
+                if(response && response.headers && response.headers.billing_type){
+                    SuccessFunction({ dispatch , "successMethod": SaveSingleInvoiceData, "loadMessage":loadMessage, response ,"id":response.headers.billing_type}) 
                 }else{
                     SuccessFunction({ dispatch , "successMethod": SaveSingleInvoiceData, "loadMessage":loadMessage, response}) 
                 }  
