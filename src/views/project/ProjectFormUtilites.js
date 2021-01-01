@@ -42,8 +42,8 @@ const MileStoneTabel=(propsData)=>{
         { title: 'Work\u00a0Completion(%)', field: 'workComPer'},
         { title: 'Invoice(%)', field: 'invoicePer'},
         { title: 'Expected\u00a0of\u00a0Completion Date', 
-          field: 'expComDate', 
-          editable:'onUpdate',
+          field: 'expComDateModify', 
+          editable:'onAdd',
           width:80 ,
           editComponent: props => {
             return renderTextField({ name: "expComDate", label: "", type: "date", action: { props } })
@@ -103,8 +103,8 @@ const MileStoneTabel=(propsData)=>{
       ]}
       icons={{  
         Add: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="secondary">Add</Button>:"", 
-        Edit: () => { return !(mileStoneListProjectId && mileStoneListProjectId.length <=0) && <CreateIcon variant="contained" color="primary" /> },
-        Delete: () => { return (mileStoneListProjectId && mileStoneListProjectId.length <=0) && <DeleteOutlineIcon variant="contained" color="secondary" /> },
+        Edit: () => { return !(mileStoneListProjectId && mileStoneListProjectId.length <=0) ? <CreateIcon variant="contained" color="primary" />:"" },
+        Delete: () => { return (mileStoneListProjectId && mileStoneListProjectId.length <=0) ? <DeleteOutlineIcon variant="contained" color="secondary" /> :""},
       }}
       editable={{
         isEditable: rowData => true,
@@ -121,12 +121,13 @@ const MileStoneTabel=(propsData)=>{
 const onMileStoneTabelRowAdd=(props)=>{
   const { data, newData, dispatch, saveMileStone, projectId }=props
   return new Promise(async (resolve, reject) => {
-    if (newData && (Object.keys(newData).length >= 3 && newData.constructor === Object)) {
+    if (newData && (Object.keys(newData).length >= 4 && newData.constructor === Object)) {
       let modifyNewData={
         ...newData,
         projectId,
         compFlag:false, 
         "active": true,
+        "expComDate": new moment(newData.expComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
       }
       await saveMileStone([...data,modifyNewData])
       await resolve();
@@ -144,11 +145,14 @@ const updateMileStoneTabelRecord=(propsData)=>{
   const { authorization }=propsData.mainProps.LoginState
   return new Promise(async (resolve, reject) => {
     console.log("New ",newData,Object.keys(newData).length)
-    if (newData && Object.keys(newData).length >= 8 && newData.compFlag && newData.expComDate <= newData.actualComDateModify && newData.id) {
+    if (newData && Object.keys(newData).length >= 8 && 
+    newData.compFlag && 
+    (newData.expComDate <= newData.actualComDateModify || newData.expComDate <= newData.actualComDate) && 
+    newData.id) {
       let modifyNewData={
         ...newData,
         "active": true,
-        "actualComDate": new moment(newData.actualComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
+        "actualComDate": new moment(newData.actualComDate+' 00:00','YYYY-MM-DD HH:mm').format('x')
       }
       await udpateMileStoneData(modifyNewData, authorization);
       setTimeout(async () => {
@@ -164,7 +168,7 @@ const deleteMileStoneTabelRecord=(propsData)=>{
   const { oldData, data, saveMileStone }=propsData
   return new Promise(async(resolve, reject) => {
     if(data && data.length >=0){
-      let filterData= data.filter(item=> item.mileStoneDesc !==oldData.mileStoneDesc && item.expComDateModify !==oldData.expComDateModify )
+      let filterData= data.filter(item=> (item.mileStoneDesc !==oldData.mileStoneDesc && item.expComDateModify !==oldData.expComDateModify) )
       await saveMileStone(filterData);
       await resolve();
     }else{ reject(); }

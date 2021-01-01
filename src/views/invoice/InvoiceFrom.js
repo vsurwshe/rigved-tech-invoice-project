@@ -13,7 +13,7 @@ import * as PurchaseOrderAction from "../../redux/actions/PurchaseOrderAction"
 import Invoice from './Invoice';
 import CloseIcon from '@material-ui/icons/Close';
 import moment from 'moment';
-import { API_INVOCIE_EXE_TIME } from '../../assets/config/Config';
+import { API_EXE_TIME } from '../../assets/config/Config';
 import { structureOptions } from '../project/ProjectFormUtilites';
 import { FixedCostPreInvoiceTable, MileStonePreInvoiceTable } from './InvoiceFromUtilites';
 
@@ -27,18 +27,35 @@ let InvoiceFrom = (props) => {
     const { SaveInvoiceEmployeeData } = props.InvoiceAction
     const [viewInvoice, setViewInvoice] = useState(false);
     const [projectIdList, setProjectIdList] = useState([])
-    const [viewSectionThree, setViewSectionThree] = useState(false)
     const [sectionThreeState, setSectionThreeState] = useState({view:false,projectType:''})
     const [loading, setLoading] = useState(false)
     const [submit, setSubmit] = useState(false)
     return <div className={classes.girdContainer}>
-        <form onSubmit={handleSubmit((values) => PostInvoiceData({ "mainProps": props, values, projectIdList, viewSectionThree, setSubmit, setViewSectionThree, sectionThreeState, setLoading, setSectionThreeState }))}>
-            {LoadGird({ "mainProps": props, projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, setSectionThreeState, sectionThreeState, loading, setLoading, setViewInvoice })}
-            {ShowViewInvoice({ "mainProps": props, classes, viewInvoice, setViewInvoice, reset, cancle })}
+        <form onSubmit={handleSubmit((values) => PostInvoiceData({ "mainProps": props, values, projectIdList, setSubmit, sectionThreeState, setLoading, setSectionThreeState }))}>
+            {   LoadGird ({
+                    mainProps:props,// this is main props
+                    setSectionThreeState, // this will used for setting 3rd section
+                    sectionThreeState, // this will used for showing 3rd section
+                    loading, // this varible used for loading
+                    setLoading, //this method used for setting load operator
+                    setViewInvoice, // this method will used for view invoice
+                    setSubmit, // this method will used setting submit methos
+                    projectIdList, // this variabel will used for projectIdList variable
+                    setProjectIdList // this method will used for setting projectIds List
+                })
+            }
+            {<ShowViewInvoice 
+                mainProps={props} // this is main props
+                classes={classes} // this is style classes 
+                viewInvoice={viewInvoice} // this is viewinvoice variable
+                setViewInvoice={setViewInvoice} // this mos method will used for setting viewinvoice variable
+                reset={reset} // this will used reseting form
+                cancle={cancle} // this will used cancleing form
+            />}
             <div className={classes.buttonStyle}>
                 <center>
                     {!initialValues && <><Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting || submit}>SUBMIT</Button> &nbsp;&nbsp;
-                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={async () => { await reset(); await SaveInvoiceEmployeeData([]); await setViewSectionThree(false); }}> Clear Values</Button>&nbsp;&nbsp;</>}
+                    <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={async () => { await reset(); await SaveInvoiceEmployeeData([]); await setSectionThreeState({view:false, projectType:""}); }}> Clear Values</Button>&nbsp;&nbsp;</>}
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button> &nbsp;&nbsp;
                 </center>
             </div>
@@ -49,7 +66,7 @@ let InvoiceFrom = (props) => {
 // this method will used for the loading gird structure of invoice form component
 const LoadGird = (props) => {
     var classes = useStyles();
-    const { projectIdList, setProjectIdList, setSectionThreeState, sectionThreeState, loading, setLoading, setViewInvoice } = props
+    const { projectIdList, setProjectIdList, setSectionThreeState, sectionThreeState, loading, setLoading, setViewInvoice, setSubmit } = props
     const { color, common_message } = props.mainProps.ClientState
     const { initialValues }=props.mainProps
     return <>
@@ -72,7 +89,7 @@ const LoadGird = (props) => {
         <center>{loading && renderLoading({message:"", size:40})}</center>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
-                {sectionThreeState.view && SectionThree({ "mainProps": props.mainProps ,setSectionThreeState, sectionThreeState, setLoading, setViewInvoice})}
+                {sectionThreeState.view && SectionThree({ "mainProps": props.mainProps ,setSectionThreeState, sectionThreeState, setLoading, setViewInvoice, setSubmit})}
             </Grid>
         </Grid>
     </>
@@ -81,17 +98,17 @@ const LoadGird = (props) => {
 // this component will help to view Invoice Display
 const LoadHeader=(props)=>{
     const { initialValues, mainProps, setLoading }=props
-    const { invoiceUserList, projectBillingType }=mainProps.InvoiceState
+    const { invoiceUserList}=mainProps.InvoiceState
     return <>
         <Grid item xs={12} sm={6} style={{ paddingLeft: 20 }}> 
             <h4>Client Name : {initialValues.toCompanyName}</h4>
             <h4>Date : {initialValues.invoiceDate}</h4>
-            <h4>Client Project Type : {projectBillingType}</h4>
+            <h4>Client Project Billing Type : {initialValues.billingType}</h4>
             <h4>Total Amount : {initialValues.billWitoutGST}</h4>
             <h4>Total Amount with Tax : {initialValues.billWitGST}</h4>
         </Grid>
         <Grid item xs={12}>
-           {showProjectTypeAccordingTabel({projectBillingType, mainProps, setLoading, invoiceUserList})}
+           {showProjectTypeAccordingTabel({projectBillingType: initialValues.billingType, mainProps, setLoading, invoiceUserList})}
         </Grid>
     </>
 }
@@ -100,17 +117,17 @@ const LoadHeader=(props)=>{
 const showProjectTypeAccordingTabel=(propsData)=>{
     const { projectBillingType, mainProps, setLoading, invoiceUserList }=propsData
     switch (projectBillingType) {
-        case "MileStone":
+        case "Mile Stone":
             return <MileStonePreInvoiceTable 
                 setLoading={setLoading} 
                 props={mainProps} 
                 projectType={projectBillingType} 
                 tableData={invoiceUserList}
             />
-        case "FixedRate":
+        case "Fixed Rate":
             return <FixedCostPreInvoiceTable 
                 setLoading={setLoading} 
-                props={propsData} 
+                props={mainProps} 
                 projectType={projectBillingType}
                 tableData={invoiceUserList}
             />
@@ -168,37 +185,44 @@ const SectionTwo = (data) => {
 
 // this sections will used for the showing structure
 const SectionThree = (propsData) => {
-    const { sectionThreeState, setLoading, setViewInvoice, mainProps }=propsData
+    const { sectionThreeState, setLoading, setViewInvoice, mainProps, setSubmit, setSectionThreeState }=propsData
+    const { preInvoiceMileStonesData, preInvoiceFixedCostData } = mainProps.InvoiceState
     const { projectType }=sectionThreeState
-    switch (projectType) {
-        case "Mile Stone":
+    if(projectType ==="Mile Stone") {
+        if(preInvoiceMileStonesData && preInvoiceMileStonesData.length >0){
             return <MileStonePreInvoiceTable 
-                    setLoading={setLoading} 
-                    props={mainProps} 
-                    setViewInvoice={setViewInvoice}
-                    projectType={projectType} 
-                />
-        case "Fixed Rate":
+                setLoading={setLoading} 
+                props={mainProps} 
+                setViewInvoice={setViewInvoice}
+                projectType={projectType} 
+            />
+        }else{
+            setSubmit(true);
+            setSectionThreeState({ view: true, projectType:""})
+        }
+    }else if(projectType ==="Fixed Rate"){
+        if(preInvoiceFixedCostData && preInvoiceFixedCostData.length >0){
             return <FixedCostPreInvoiceTable 
-                    setLoading={setLoading} 
-                    props={mainProps} 
-                    setViewInvoice={setViewInvoice} 
-                    projectType={projectType}
-                />
-        default:
-            return <h1>No Content</h1>
+                setLoading={setLoading} 
+                props={mainProps} 
+                setViewInvoice={setViewInvoice} 
+                projectType={projectType}
+            />
+        }else{
+            setSectionThreeState({ view: true, projectType:""})
+            setSubmit(true);
+        }
     }
 }
 
 // this method will used for the saving the genrate invoice
 const PostInvoiceData = async (propsData) => {
-    const { values, setLoading, setSectionThreeState } = propsData
-    const { authorization } = propsData.mainProps.LoginState
-    const { projectListByClient } = propsData.mainProps.ProjectState
-    const { GenerateInvoice, saveMileStonePreInvoiceData, saveFixedCostPreInvoiceData } = propsData.mainProps.InvoiceAction
-    const { preInvoiceMileStonesData, preInvoiceFixedCostData } = propsData.mainProps.InvoiceState
-    const { loadMessage } = propsData.mainProps.ClientAction
-    const { dispatch } = propsData.mainProps
+    const { values, setLoading, setSectionThreeState, mainProps,setSubmit } = propsData
+    const { dispatch } = mainProps
+    const { authorization } = mainProps.LoginState
+    const { projectListByClient } = mainProps.ProjectState
+    const { GenerateInvoice, saveMileStonePreInvoiceData, saveFixedCostPreInvoiceData } = mainProps.InvoiceAction
+    const { loadMessage } = mainProps.ClientAction
     let filterProject = values.projectList !== {} && projectListByClient.filter(item=> item.id===values.projectList.id)
     let projectTypeData= filterProject.length >0 && filterProject[0].projectBillingType;
     let newInvoiceData = {
@@ -206,7 +230,6 @@ const PostInvoiceData = async (propsData) => {
         "toDate": (values && values.toDate) && new moment(values.toDate+" 00:00","YYYY-MM-DD HH:mm").format('x'),
         "projectId": (values.projectList !== {} ) && values.projectList.id
     }
-
     await setLoading(true);
     if (projectTypeData === "Mile Stone") {
         await dispatch(saveMileStonePreInvoiceData([]));
@@ -215,20 +238,13 @@ const PostInvoiceData = async (propsData) => {
     }
     // here we call api with project type thats we check filter result
     projectTypeData && await GenerateInvoice(newInvoiceData, authorization,projectTypeData);
-    setTimeout(async () => {
+    setTimeout(async() => {
         await dispatch(loadMessage());
-        switch (projectTypeData) {
-            case "Mile Stone":
-                (preInvoiceMileStonesData && preInvoiceMileStonesData.length >0 ) && await setSectionThreeState({ view: true, projectType:projectTypeData})        
-                break;
-            case "Fixed Rate":
-                (preInvoiceFixedCostData && preInvoiceFixedCostData.length >0 ) && await setSectionThreeState({ view: true, projectType:projectTypeData})        
-                break;
-            default:
-                return "";
-        }
+        await setSectionThreeState({ view: true, projectType:projectTypeData})
+        await setSubmit(true);
         await setLoading(false);
-    }, API_INVOCIE_EXE_TIME)
+    }, API_EXE_TIME)
+
 }
 
 // this method will used for payables days
@@ -262,9 +278,10 @@ const PostInvoiceData = async (propsData) => {
 
 // this method will used for the showing invoice after posting successfully resource table
 const ShowViewInvoice = (propsData) => {
-    const { viewInvoice, setViewInvoice, classes, reset, cancle } = propsData
-    const { invoiceEmployeeData }=propsData.mainProps.InvoiceState
-    return <Dialog fullScreen open={viewInvoice} onClose={() => setViewInvoice(false)} TransitionComponent={Transition}>
+    const { viewInvoice, setViewInvoice, classes, reset, cancle, mainProps } = propsData
+    const { invoiceEmployeeData }=mainProps.InvoiceState
+    if(invoiceEmployeeData && Object.keys(invoiceEmployeeData).length >= 8){
+        return <Dialog fullScreen open={viewInvoice} onClose={() => setViewInvoice(false)} TransitionComponent={Transition}>
         <AppBar className={classes.dialogAppBar} style={{ float: "right" }} >
             <Toolbar >
                 <IconButton classes={{ paper: classes.profileMenuIcon }} color="inherit" onClick={() => setViewInvoice(false)} aria-label="close"> <CloseIcon /> </IconButton>
@@ -277,6 +294,10 @@ const ShowViewInvoice = (propsData) => {
             <Button onClick={() => dwonloadInvoice()} color="secondary">Download Invoice</Button>
         </DialogActions>
     </Dialog>
+    }else{
+        setViewInvoice(false);
+        return "";
+    }
 }
 
 // this function will used for validate 

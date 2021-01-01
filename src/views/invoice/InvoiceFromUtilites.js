@@ -12,9 +12,6 @@ const MileStonePreInvoiceTable=(propsData)=>{
         { title: "", field: "id", hidden: true },
         { title: 'Milestone\u00a0Name', field: 'mileStoneDesc' },
         { title: 'Milestone\u00a0Amount', field: 'mileStoneCost' },
-        // { title: 'Work\u00a0Completion(%)', field: 'workComPer' },
-        // { title: 'Invoice(%)', field: 'invoicePer'},
-        // { title: 'Completed ', field: 'compFlag'}
     ];
     
     return <LoadPreCreateInvoiceTable 
@@ -32,6 +29,7 @@ const MileStonePreInvoiceTable=(propsData)=>{
 // this component will used for Fixed Cost Invoice Tabel
 const FixedCostPreInvoiceTable=(propsData)=>{
     const { setLoading, setViewInvoice, projectType, tableData, props }=propsData
+    console.log("A",props,propsData)
     const { preInvoiceFixedCostData }=props.InvoiceState
     let columns = [
         { title: "", field: "id", hidden: true },
@@ -143,14 +141,13 @@ const GenratePDFInvoice=async (propsData)=>{
     const { dispatch }=props
     const { authorization }=props.LoginState
     const { loadMessage } = props.ClientAction
-    const { invoiceEmployeeData } = props.InvoiceState
     const { GenerateInvoicePDF, getPDFInvoiceList}=props.InvoiceAction
     await setLoading(true);
     await GenerateInvoicePDF(modifyGenrateInvoiceData, authorization);
     setTimeout(async () => {
         await dispatch(loadMessage());
         await getPDFInvoiceList(0,100,authorization);
-        (invoiceEmployeeData && Object.keys(invoiceEmployeeData).length >= 2) && await setViewInvoice(true);
+        await setViewInvoice(true);
         await setLoading(false);
     }, API_INVOCIE_EXE_TIME)
 }
