@@ -4,7 +4,10 @@ const initalState={
     mileStoneListProjectId:[],
     fixedTypeList:[],
     fixedTypeListProjectId:[],
-    fixedTypeData:[]
+    fixedTypeData:[],
+    payablesDayList:[],
+    payablesDayListProjectId:[],
+    payablesDayData:[]
 }
 const BillingStateModel=(state=initalState,action)=>{
     switch (action && action.type) {
@@ -22,6 +25,10 @@ const BillingStateModel=(state=initalState,action)=>{
             return {...state, fixedTypeListProjectId: action.fixedTypeList }
         case "SAVE_FIXED_TYPE_DATA":
             return {...state, fixedTypeData: action.fixedTypeData }
+        case "SAVE_PAYABLES_DAYS_TYPE_DATA":
+            return {...state, payablesDayData: action.payablesDayData }
+        case "SAVE_PAYABLE_DAYS_PROJECT_ID":
+            return {...state, payablesDayListProjectId: action.payableDaysList }
         default:
             return state;
     }

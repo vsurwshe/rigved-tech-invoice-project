@@ -57,7 +57,13 @@ const getFixedTypeListProjectId=(firstIndex, lastIndex, projectId, authroization
     return(dispatch)=>{
         return CreateInstance()
             .get('/billingTypeDetail/getBillTypeDetailsList/'+firstIndex+'/'+lastIndex+'/'+projectId,HeaderConfig(authroizationKey))
-            .then(response => { SuccessFunction({ dispatch , "successMethod": saveFixedTypeListProjectId, "loadMessage":loadMessage, response}) })
+            .then(response => { 
+                if(response && response.data && response.data.length >0 && response.data[0].billingType === "Fixed Type"){
+                    SuccessFunction({ dispatch , "successMethod": saveFixedTypeListProjectId, "loadMessage":loadMessage, response}) 
+                }else if(response && response.data && response.data.length >0 && response.data[0].billingType === "Payable Days"){
+                    SuccessFunction({ dispatch , "successMethod": savePayableDaysListProjectId, "loadMessage":loadMessage, response}) 
+                }
+            })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
@@ -82,7 +88,13 @@ const saveFixedTypeData=(fixedTypeData,authroizationKey)=>{
                 Authorization: authroizationKey 
             }
         })
-        .then(response => { SuccessFunction({ dispatch , "successMethod": saveFixedTypeRecordData, "loadMessage":loadMessage, response, "postMethod":true}) })
+        .then(response => { 
+            if(fixedTypeData.billingType=== "Payable Days"){
+                SuccessFunction({ dispatch , "successMethod": savePayablesDaysRecordData, "loadMessage":loadMessage, response, "postMethod":true})
+            }else{
+                SuccessFunction({ dispatch , "successMethod": saveFixedTypeRecordData, "loadMessage":loadMessage, response, "postMethod":true}) 
+            }
+        })
         .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
@@ -117,6 +129,13 @@ export function saveFixedTypeListProjectId(fixedTypeList) {
     }
 }
 
+export function savePayableDaysListProjectId(payableDaysList) {
+    return {
+        type:"SAVE_PAYABLE_DAYS_PROJECT_ID",
+        payableDaysList
+    }
+}
+
 export function saveMileStoneRecordData(mileStoneData) {
     return {
         type:"SAVE_MILE_STONE_DATA",
@@ -128,6 +147,13 @@ export function saveFixedTypeRecordData(fixedTypeData) {
     return {
         type:"SAVE_FIXED_TYPE_DATA",
         fixedTypeData
+    }
+}
+
+export function savePayablesDaysRecordData(payablesDayData) {
+    return {
+        type:"SAVE_PAYABLES_DAYS_TYPE_DATA",
+        payablesDayData
     }
 }
 
