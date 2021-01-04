@@ -8,7 +8,13 @@ const GetInvoiceUserList = (firstIndex, lastIndex, invoiceId, authroizationKey) 
     return (dispatch) => {
         return CreateInstance()
             .get('/innvoice/invoiceList/' + firstIndex + '/' + lastIndex+'/'+invoiceId, HeaderConfig(authroizationKey))
-            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceUserList, "loadMessage":loadMessage, response}) })
+            .then(response => { 
+                if(response && response.headers && response.headers.billing_type){
+                    SuccessFunction({ dispatch , "successMethod": SaveSingleInvoiceData, "loadMessage":loadMessage, response ,"id":response.headers.billing_type}) 
+                }else{
+                    SuccessFunction({ dispatch , "successMethod": SaveSingleInvoiceData, "loadMessage":loadMessage, response}) 
+                }  
+            })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
@@ -32,6 +38,8 @@ const GenerateInvoice = (invoiceData, authroizationKey, projectType) => {
                         switch (projectType) {
                             case "Mile Stone":
                                 return SuccessFunction({ dispatch , "successMethod": saveMileStonePreInvoiceData, "loadMessage":loadMessage, response})         
+                            case "Fixed Rate":
+                                return SuccessFunction({ dispatch , "successMethod": saveFixedCostPreInvoiceData, "loadMessage":loadMessage, response})
                             default:
                                 return "";
                         }
@@ -109,6 +117,14 @@ const payInvoiceBill = (invoiceId, authroizationKey) => {
 
 //-------------------------------------
 
+export function SaveSingleInvoiceData(invoiceData, billingType) {
+    return {
+        type: "SAVE_SINGLE_INVOICE_DATA",
+        invoiceData,
+        billingType
+    }
+}
+
 export function SaveInvoiceUserList(invoiceList) {
     return {
         type: "SAVE_INVOICE_USER_LIST",
@@ -162,6 +178,13 @@ export function saveMileStonePreInvoiceData(mileStones) {
     return{
         type: "SAVE_MILESTONE_PRE_INVOICE_DATA",
         mileStones
+    }
+}
+
+export function saveFixedCostPreInvoiceData(fixedCost) {
+    return{
+        type: "SAVE_FIXED_COST_PRE_INVOICE_DATA",
+        fixedCost
     }
 }
 

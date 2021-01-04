@@ -1,7 +1,10 @@
 const initalState={
     mileStoneList:[],
     milestoneData:[],
-    mileStoneListProjectId:[]
+    mileStoneListProjectId:[],
+    fixedTypeList:[],
+    fixedTypeListProjectId:[],
+    fixedTypeData:[]
 }
 const BillingStateModel=(state=initalState,action)=>{
     switch (action && action.type) {
@@ -13,6 +16,12 @@ const BillingStateModel=(state=initalState,action)=>{
             return {...state, milestoneData: action.mileStoneData }
         case "UPDATE_MILE_STONE_DATA":
             return {...state, milestoneData: action.mileStoneData }
+        case "SAVE_FIXED_TYPE_LIST":
+            return {...state, fixedTypeList: action.fixedTypeList }
+        case "SAVE_FIXED_TYPE_LIST_PROJECT_ID":
+            return {...state, fixedTypeListProjectId: action.fixedTypeList }
+        case "SAVE_FIXED_TYPE_DATA":
+            return {...state, fixedTypeData: action.fixedTypeData }
         default:
             return state;
     }
