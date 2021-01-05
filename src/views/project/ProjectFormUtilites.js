@@ -6,11 +6,11 @@ import CreateIcon from '@material-ui/icons/Create';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import { Field, reduxForm, reset } from 'redux-form';
 import { loadMessage } from "../../redux/actions/ClientAction"
-import { renderNumberField } from '../utilites/FromUtilites';
+import { renderNumberField, renderTextHiddenField } from '../utilites/FromUtilites';
 import ResourcesTable from '../resources/ResourcesTable';
 import ExpensesTable from '../Expenses/ExpensesTable';
 import { CheckBox, CheckBoxOutlineBlankOutlined } from '@material-ui/icons';
-import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
+import { API_EXE_TIME, FromActions, ProjectBillingModelType } from '../../assets/config/Config';
 import TextField from '@material-ui/core/TextField';
 import moment from 'moment';
 
@@ -289,7 +289,7 @@ const updateFixedTypeTabelRecord=(propsData)=>{
 
 // this method will used for the load payables checkbox
 let PayablesDaysForm=(propsData)=>{
-  const { handleSubmit, pristine, submitting, reset, props, projectId}=propsData
+  const { handleSubmit, pristine, submitting, reset, props, projectId, initialValues}=propsData
   const { mainProps }=props
   const { authorization }= mainProps.LoginState
   const { payablesDayListProjectId }=mainProps.BillingModelState
@@ -300,24 +300,25 @@ let PayablesDaysForm=(propsData)=>{
     setCountPayableDay(countPayableDay+1);
     getPayableDaysListByProjectId({ authorization, projectId, getFixedTypeListProjectId })
   }
-  console.log("SAS ",mainProps)
+  console.log("SAS ",mainProps, initialValues)
   return <div style={{ maxWidth: "100%", marginBottom:"18px" }}>
      <form >
+      <center>
+        <Button type="button" variant="outlined" color="primary" disabled={pristine || submitting} onClick={handleSubmit(values=>savePayableDaysFormula({values,props,projectId}))}> Save Formula </Button> &nbsp;&nbsp;
+        <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Form</Button>&nbsp;&nbsp;
+      </center>
       <Grid container spacing={5} style={{paddingBottom:10}}>
         <Grid item xs={12} sm={12} style={{ paddingLeft:30, paddingTop: 20}}>
-          <Field name="DP" component={renderNumberField} label="Days Present" style={{marginRight:20}}/>
-          <Field name="WO" component={renderNumberField} label="Weekly Off" style={{marginRight:20}}/>
-          <Field name="PL" component={renderNumberField} label="Paid Leave" style={{marginRight:20}}/>
-          <Field name="PH" component={renderNumberField} label="Paid Holiday" style={{marginRight:20}}/>
-          <Field name="PHP" component={renderNumberField} label="Paid Holiday Present" style={{marginRight:20}}/>
-          <Field name="WOP" component={renderNumberField} label="Weekly Off Present" style={{marginRight:20}}/>
-          <Field name="LWP" component={renderNumberField} label="Leave without Pay" style={{marginRight:20}}/>
+          <Field name="id" component={renderTextHiddenField} />
+          <Field name="DP" component={renderNumberField} label="Days Present (DP)" style={{marginRight:20}}/>
+          <Field name="WO" component={renderNumberField} label="Weekly Off (WO)" style={{marginRight:20}}/>
+          <Field name="PL" component={renderNumberField} label="Paid Leave (PL)" style={{marginRight:20}}/>
+          <Field name="PH" component={renderNumberField} label="Paid Holiday (PH)" style={{marginRight:20}}/>
+          <Field name="PHP" component={renderNumberField} label="Paid Holiday Present (PHP)" style={{marginRight:20}}/>
+          <Field name="WOP" component={renderNumberField} label="Weekly Off Present (WOP)" style={{marginRight:20}}/>
+          <Field name="LWP" component={renderNumberField} label="Leave without Pay (LWP)" style={{marginRight:20}}/>
         </Grid>
       </Grid>
-      <center>
-        <Button type="button" variant="outlined" color="primary" disabled={pristine || submitting} onClick={handleSubmit(values=>savePayableDaysFormula({values,props,projectId}))}> SUBMIT </Button> &nbsp;&nbsp;
-        <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button>&nbsp;&nbsp;
-      </center>
     </form>
   </div>
 }
@@ -333,13 +334,14 @@ const savePayableDaysFormula=async(propsData)=>{
   const { mainProps }=props
   const { saveFixedTypeData }=mainProps.BillingModelAction
   const { authorization }=mainProps.LoginState
-  const { DP, WO, PL, PH, PHP, WOP, LWP}= values
+  const { DP, WO, PL, PH, PHP, WOP, LWP, id}= values
   let formula= "DPx"+DP+",WOx"+WO+",PLx"+PL+",PHx"+PH+",PHPx"+PHP+",WOPx"+WOP+",LWPx"+LWP;
   let payablesDayBodyData={
     "projectId":projectId,
     "active": true,
     "billingType": "Payable Days",
-    formula
+    formula,
+    id
   }
   await saveFixedTypeData(payablesDayBodyData,authorization);
 }
@@ -363,7 +365,7 @@ const LoadResourcesTab = (propsData) => {
   let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
   return <ResourcesTable 
       projectId={projectId} 
-      disableResourceModel={projectBillingType === "Mile Stone" || projectBillingType === "Fixed Rate"} 
+      disableResourceModel={projectBillingType === ProjectBillingModelType.MILE_STONE || projectBillingType === ProjectBillingModelType .FIXED_TYPE} 
       stateData={props.mainProps.stateData} 
       resource={resource}
       setResource={setResource}
@@ -450,11 +452,11 @@ const LoadBillingModelTab=(propsData)=>{
   const [countPayableDay, setCountPayableDay] = useState(0)
   let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
   switch ( showTabs && values && values.projectBillingType) {
-      case "Mile Stone":
+      case ProjectBillingModelType.MILE_STONE:
         return <MilestoneTab data={props} projectId={projectId} />           
-      case "Fixed Rate":
+      case ProjectBillingModelType.FIXED_TYPE:
         return <FixedTypeTab data={props} projectId={projectId} />          
-      case "Payable Days":
+      case ProjectBillingModelType.PAYABLES_DAY:
         let formData = getPayablesFormula({props,projectId, countPayableDay, setCountPayableDay})
         let initialData={ "DP": 0, WO: 0, "PL": 0, PH: 0, PHP: 0, WOP: 0, LWP: 0}
         return <PayablesDaysForm initialValues={(formData && formData.length >0)? formData[0] :initialData}  props={props} projectId={projectId} />          

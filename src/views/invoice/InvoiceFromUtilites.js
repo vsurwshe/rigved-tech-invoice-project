@@ -1,7 +1,7 @@
 import React,{ useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@material-ui/core';
 import MaterialTable from 'material-table';
-import { API_INVOCIE_EXE_TIME } from '../../assets/config/Config';
+import { API_INVOCIE_EXE_TIME, ProjectBillingModelType } from '../../assets/config/Config';
 import moment from 'moment';
 
 // this component will used for Milestone Pre Invoice table
@@ -124,10 +124,10 @@ const loadGenrateInvoiceButton=(propsData)=>{
         "projectId": values.projectList.id,
         "description":description
     }
-    if(projectType === "Mile Stone"){
+    if(projectType === ProjectBillingModelType.MILE_STONE){
         let modifyGenrateInvoiceData={ ...tempData, "mileStoneDtos": rowData}
         GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice })
-    }else if(projectType === "Fixed Rate"){
+    }else if(projectType === ProjectBillingModelType.FIXED_TYPE){
         let filterRowData= rowData.length >0 && rowData.map(({tableData, ...rest})=>rest)
         let modifyGenrateInvoiceData={ ...tempData, "fixedRateInvoiceDetailDtos": filterRowData}
         GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice })

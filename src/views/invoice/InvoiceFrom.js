@@ -13,7 +13,7 @@ import * as PurchaseOrderAction from "../../redux/actions/PurchaseOrderAction"
 import Invoice from './Invoice';
 import CloseIcon from '@material-ui/icons/Close';
 import moment from 'moment';
-import { API_EXE_TIME } from '../../assets/config/Config';
+import { API_EXE_TIME, ProjectBillingModelType } from '../../assets/config/Config';
 import { structureOptions } from '../project/ProjectFormUtilites';
 import { FixedCostPreInvoiceTable, MileStonePreInvoiceTable } from './InvoiceFromUtilites';
 
@@ -109,27 +109,27 @@ const LoadHeader=(props)=>{
             <h4>Total Amount with Tax : {initialValues.billWitGST}</h4>
         </Grid>
         <Grid item xs={12}>
-           {showProjectTypeAccordingTabel({projectBillingType: initialValues.billingType, mainProps, setLoading, invoiceUserList})}
+           {showProjectTypeAccordingTabel({projectBillingModel: initialValues.billingType, mainProps, setLoading, invoiceUserList})}
         </Grid>
     </>
 }
 
 // this method will help to load according to project type Table
 const showProjectTypeAccordingTabel=(propsData)=>{
-    const { projectBillingType, mainProps, setLoading, invoiceUserList }=propsData
-    switch (projectBillingType) {
-        case "Mile Stone":
+    const { projectBillingModel, mainProps, setLoading, invoiceUserList }=propsData
+    switch (projectBillingModel) {
+        case ProjectBillingModelType.MILE_STONE:
             return <MileStonePreInvoiceTable 
                 setLoading={setLoading} 
                 props={mainProps} 
-                projectType={projectBillingType} 
+                projectType={projectBillingModel} 
                 tableData={invoiceUserList}
             />
-        case "Fixed Rate":
+        case ProjectBillingModelType.FIXED_TYPE:
             return <FixedCostPreInvoiceTable 
                 setLoading={setLoading} 
                 props={mainProps} 
-                projectType={projectBillingType}
+                projectType={projectBillingModel}
                 tableData={invoiceUserList}
             />
         default:
@@ -189,7 +189,7 @@ const SectionThree = (propsData) => {
     const { sectionThreeState, setLoading, setViewInvoice, mainProps, setSubmit, setSectionThreeState }=propsData
     const { preInvoiceMileStonesData, preInvoiceFixedCostData } = mainProps.InvoiceState
     const { projectType }=sectionThreeState
-    if(projectType ==="Mile Stone") {
+    if(projectType === ProjectBillingModelType.MILE_STONE) {
         if(preInvoiceMileStonesData && preInvoiceMileStonesData.length >0){
             return <MileStonePreInvoiceTable 
                 setLoading={setLoading} 
@@ -201,7 +201,7 @@ const SectionThree = (propsData) => {
             setSubmit(true);
             setSectionThreeState({ view: true, projectType:""})
         }
-    }else if(projectType ==="Fixed Rate"){
+    }else if(projectType === ProjectBillingModelType.FIXED_TYPE){
         if(preInvoiceFixedCostData && preInvoiceFixedCostData.length >0){
             return <FixedCostPreInvoiceTable 
                 setLoading={setLoading} 
@@ -232,9 +232,9 @@ const PostInvoiceData = async (propsData) => {
         "projectId": (values.projectList !== {} ) && values.projectList.id
     }
     await setLoading(true);
-    if (projectTypeData === "Mile Stone") {
+    if (projectTypeData === ProjectBillingModelType.MILE_STONE) {
         await dispatch(saveMileStonePreInvoiceData([]));
-    } else if(projectTypeData === "Fixed Rate") {
+    } else if(projectTypeData === ProjectBillingModelType.FIXED_TYPE) {
         await dispatch(saveFixedCostPreInvoiceData([]));
     }
     // here we call api with project type thats we check filter result
