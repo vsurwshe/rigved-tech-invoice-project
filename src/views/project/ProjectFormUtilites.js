@@ -332,7 +332,7 @@ enableReinitialize : true
 const savePayableDaysFormula=async(propsData)=>{
   const { values, props, projectId}=propsData
   const { mainProps }=props
-  const { saveFixedTypeData }=mainProps.BillingModelAction
+  const { saveFixedTypeData, getFixedTypeListProjectId }=mainProps.BillingModelAction
   const { authorization }=mainProps.LoginState
   const { DP, WO, PL, PH, PHP, WOP, LWP, id}= values
   let formula= "DPx"+DP+",WOx"+WO+",PLx"+PL+",PHx"+PH+",PHPx"+PHP+",WOPx"+WOP+",LWPx"+LWP;
@@ -344,6 +344,7 @@ const savePayableDaysFormula=async(propsData)=>{
     id
   }
   await saveFixedTypeData(payablesDayBodyData,authorization);
+  await getFixedTypeListProjectId(0,100,projectId,authorization);
 }
 
 // this method will help to get fixed type accrdoing to project id

@@ -43,7 +43,7 @@ const GenerateInvoice = (invoiceData, authroizationKey, projectType) => {
                             case ProjectBillingModelType.FIXED_TYPE:
                                 return SuccessFunction({ dispatch , "successMethod": saveFixedCostPreInvoiceData, "loadMessage":loadMessage, response})
                             case ProjectBillingModelType.PAYABLES_DAY:
-                                return SuccessFunction({ dispatch , "successMethod": saveFixedCostPreInvoiceData, "loadMessage":loadMessage, response})
+                                return SuccessFunction({ dispatch , "successMethod": savePayableDaysPreInvoiceData, "loadMessage":loadMessage, response})
                             default:
                                 return "";
                         }
@@ -194,6 +194,13 @@ export function saveFixedCostPreInvoiceData(fixedCost) {
     return{
         type: "SAVE_FIXED_COST_PRE_INVOICE_DATA",
         fixedCost
+    }
+}
+
+export function savePayableDaysPreInvoiceData(payableDays) {
+    return{
+        type: "SAVE_PAYABLE_DAYS_PRE_INVOICE_DATA",
+        payableDays
     }
 }
 

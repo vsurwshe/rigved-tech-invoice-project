@@ -1,4 +1,5 @@
 import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
+import { ProjectBillingModelType } from '../../assets/config/Config';
 import { loadMessage } from './ClientAction';
 import { ErrorFunction, SuccessFunction } from './CommonAction';
 
@@ -58,9 +59,9 @@ const getFixedTypeListProjectId=(firstIndex, lastIndex, projectId, authroization
         return CreateInstance()
             .get('/billingTypeDetail/getBillTypeDetailsList/'+firstIndex+'/'+lastIndex+'/'+projectId,HeaderConfig(authroizationKey))
             .then(response => { 
-                if(response && response.data && response.data.length >0 && response.data[0].billingType === "Fixed Type"){
+                if(response && response.data && response.data.length >0 && response.data[0].billingType === ProjectBillingModelType.FIXED_TYPE){
                     SuccessFunction({ dispatch , "successMethod": saveFixedTypeListProjectId, "loadMessage":loadMessage, response}) 
-                }else if(response && response.data && response.data.length >0 && response.data[0].billingType === "Payable Days"){
+                }else if(response && response.data && response.data.length >0 && response.data[0].billingType === ProjectBillingModelType.PAYABLES_DAY){
                     SuccessFunction({ dispatch , "successMethod": savePayableDaysListProjectId, "loadMessage":loadMessage, response}) 
                 }
             })
