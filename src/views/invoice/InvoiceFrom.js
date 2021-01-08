@@ -15,7 +15,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import moment from 'moment';
 import { API_EXE_TIME, ProjectBillingModelType } from '../../assets/config/Config';
 import { structureOptions } from '../project/ProjectFormUtilites';
-import { FixedCostPreInvoiceTable, MileStonePreInvoiceTable, PayableDaysPreInvoiceTable } from './InvoiceFromUtilites';
+import { ClientBillingPreInvoiceTable, FixedCostPreInvoiceTable, MileStonePreInvoiceTable, PayableDaysPreInvoiceTable } from './InvoiceFromUtilites';
 
 // this method will used for the transition for model 
 const Transition = forwardRef(function Transition(props, ref) { return <Slide direction="up" ref={ref} {...props} />; });
@@ -228,6 +228,13 @@ const SectionThree = (propsData) => {
             setSectionThreeState({ view: true, projectType:""})
             setSubmit(true);
         }
+    }else if(projectType === ProjectBillingModelType.CLIENT_BILLING){
+        return <ClientBillingPreInvoiceTable 
+            setLoading={setLoading} 
+            props={mainProps} 
+            setViewInvoice={setViewInvoice} 
+            projectType={projectType}
+        />
     }
 }
 
@@ -241,28 +248,32 @@ const PostInvoiceData = async (propsData) => {
     const { loadMessage } = mainProps.ClientAction
     let filterProject = values.projectList !== {} && projectListByClient.filter(item=> item.id===values.projectList.id)
     let projectTypeData= filterProject.length >0 && filterProject[0].projectBillingType;
-    let newInvoiceData = {
-        "fromDate": (values && values.fromDate) &&  new moment(values.fromDate+" 00:00", "YYYY-MM-DD HH:mm").format('x'),
-        "toDate": (values && values.toDate) && new moment(values.toDate+" 00:00","YYYY-MM-DD HH:mm").format('x'),
-        "projectId": (values.projectList !== {} ) && values.projectList.id
-    }
-    await setLoading(true);
-    if (projectTypeData === ProjectBillingModelType.MILE_STONE) {
-        await dispatch(saveMileStonePreInvoiceData([]));
-    } else if(projectTypeData === ProjectBillingModelType.FIXED_TYPE) {
-        await dispatch(saveFixedCostPreInvoiceData([]));
-    }else if(projectTypeData === ProjectBillingModelType.PAYABLES_DAY) {
-        await dispatch(savePayableDaysPreInvoiceData([]));
-    }
-    // here we call api with project type thats we check filter result
-    projectTypeData && await GenerateInvoice(newInvoiceData, authorization,projectTypeData);
-    setTimeout(async() => {
-        await dispatch(loadMessage());
-        await setSectionThreeState({ view: true, projectType:projectTypeData})
+    if(projectTypeData === ProjectBillingModelType.CLIENT_BILLING){
+        await setSectionThreeState({ view: true, projectType:projectTypeData});
         await setSubmit(true);
-        await setLoading(false);
-    }, API_EXE_TIME)
-
+    }else{
+        let newInvoiceData = {
+            "fromDate": (values && values.fromDate) &&  new moment(values.fromDate+" 00:00", "YYYY-MM-DD HH:mm").format('x'),
+            "toDate": (values && values.toDate) && new moment(values.toDate+" 00:00","YYYY-MM-DD HH:mm").format('x'),
+            "projectId": (values.projectList !== {} ) && values.projectList.id
+        }
+        await setLoading(true);
+        if (projectTypeData === ProjectBillingModelType.MILE_STONE) {
+            await dispatch(saveMileStonePreInvoiceData([]));
+        } else if(projectTypeData === ProjectBillingModelType.FIXED_TYPE) {
+            await dispatch(saveFixedCostPreInvoiceData([]));
+        }else if(projectTypeData === ProjectBillingModelType.PAYABLES_DAY) {
+            await dispatch(savePayableDaysPreInvoiceData([]));
+        }
+        // here we call api with project type thats we check filter result
+        projectTypeData && await GenerateInvoice(newInvoiceData, authorization,projectTypeData);
+        setTimeout(async() => {
+            await dispatch(loadMessage());
+            await setSectionThreeState({ view: true, projectType:projectTypeData})
+            await setLoading(false);
+            await setSubmit(true);
+        }, API_EXE_TIME)
+    }
 }
 
 

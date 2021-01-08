@@ -460,7 +460,9 @@ const LoadBillingModelTab=(propsData)=>{
       case ProjectBillingModelType.PAYABLES_DAY:
         let formData = getPayablesFormula({props,projectId, countPayableDay, setCountPayableDay})
         let initialData={ "DP": 0, WO: 0, "PL": 0, PH: 0, PHP: 0, WOP: 0, LWP: 0}
-        return <PayablesDaysForm initialValues={(formData && formData.length >0)? formData[0] :initialData}  props={props} projectId={projectId} />          
+        return <PayablesDaysForm initialValues={(formData && formData.length >0)? formData[0] :initialData}  props={props} projectId={projectId} />
+      case ProjectBillingModelType.CLIENT_BILLING:
+          return <h4>You selected client billing</h4>          
       default:
           return <h3>Select Proper Billing Type</h3>
   }
