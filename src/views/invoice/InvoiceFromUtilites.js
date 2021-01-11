@@ -3,6 +3,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } 
 import MaterialTable from 'material-table';
 import { API_INVOCIE_EXE_TIME, ProjectBillingModelType } from '../../assets/config/Config';
 import moment from 'moment';
+import InfoIcon from '@material-ui/icons/Info';
 
 // this component will used for Milestone Pre Invoice table
 const MileStonePreInvoiceTable=(propsData)=>{
@@ -65,16 +66,27 @@ const FixedCostPreInvoiceTable=(propsData)=>{
 const PayableDaysPreInvoiceTable=(propsData)=>{
     const { setLoading, props, setViewInvoice, projectType,tableData }=propsData
     const { preInvoicePayablesData }=props.InvoiceState
+    const [formulaState, setFormulaState] = useState({view:false, projectData:[]})
     let columns = [
         { title: "EMP\u00a0ID", field: "employeeId" },
         { title: "EMP\u00a0NAME", field: "employeeName" },
         { title: "PER\u00a0DAY\u00a0RATE", field: "perDayRate" },
         { title: "TOTAL\u00a0DAYS", field: "totalDays" },
-        { title: "TOTAL\u00a0AMOUNT", field: "totalAmt" }
+        { title: "TOTAL\u00a0AMOUNT", 
+          field: "totalAmt",
+           render: (rowData)=> {
+            const { totalAmt }=rowData
+            return <>
+            <label>{totalAmt}</label>
+            <InfoIcon variant="contained" color="primary" style={{marginLeft:20, marginBottom:-6}} onClick={()=>setFormulaState({view:true, projectData:rowData})}/>
+            </>
+          }
+        }
     ];
     let data = [];
     return<> 
     {PrepareDataForResourceTable({listOfRows:tableData ? tableData: preInvoicePayablesData, data, columns})}
+    { openFormulaDiaglog({open:formulaState.view, handleClose:setFormulaState, data:formulaState.projectData})}
     <LoadPreCreateInvoiceTable 
         title=" "
         setLoading={setLoading}
@@ -88,12 +100,29 @@ const PayableDaysPreInvoiceTable=(propsData)=>{
     </>
 }
 
+// this will help to show formula dialog
+const openFormulaDiaglog=(propsData)=>{
+    const { open, handleClose, data }=propsData
+    console.log("Data ", data)
+    return <div>
+        <Dialog open={open} onClose={()=>handleClose({view:false, projectData:[]})} aria-labelledby="draggable-dialog-title" >
+          <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title"> Billing Formula </DialogTitle>
+          <DialogContent>
+            <label>Formula</label>
+          </DialogContent>
+          <DialogActions>
+            <Button autoFocus onClick={()=>handleClose({view:false, projectData:[]})} color="primary"> Cancel </Button>
+            {/* <Button onClick={()=>loadGenrateInvoiceButton({rowData, props, description, setLoading, setViewInvoice, projectType})} color="secondary"> Save Invoice </Button> */}
+          </DialogActions>
+        </Dialog>
+    </div>
+}
 // this is month name array
 var months = ['', 'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
 
 // this method will used for payables days
 const PrepareDataForResourceTable=(props)=>{
-    const { listOfRows, data, columns}=props
+   const { listOfRows, data, columns}=props
    return (listOfRows && listOfRows.length > 0) && listOfRows.map((item, key) => {
         let monthString = item.attendancepermonth ? item.attendancepermonth : "";
         let firstArray = monthString && monthString.split(',');
@@ -119,7 +148,6 @@ const PrepareDataForResourceTable=(props)=>{
         return "";
     })
 }
-
 
 // this component will used for the Loading Table before genrate invoice for selecting resource
 const LoadPreCreateInvoiceTable=(propsData)=>{
@@ -161,17 +189,17 @@ const InvoiceDiscriptionDialog=(propsData)=>{
     const { open, handleClose, rowData, props, setLoading, setViewInvoice, projectType }=propsData
     const [description, setDescription] = useState("")
     return <div>
-    <Dialog open={open} onClose={()=>handleClose({view:false, rowData:[]})} aria-labelledby="draggable-dialog-title" >
-      <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title"> Invoice Discription </DialogTitle>
-      <DialogContent>
-        <TextField value={description} onChange={(event)=> setDescription(event.target.value)} autoFocus margin="dense" id="description" label="Invoice Description" type="text" fullWidth />
-      </DialogContent>
-      <DialogActions>
-        <Button autoFocus onClick={()=>handleClose({view:false, rowData:[]})} color="primary"> Cancel </Button>
-        <Button onClick={()=>loadGenrateInvoiceButton({rowData, props, description, setLoading, setViewInvoice, projectType})} color="secondary"> Save Invoice </Button>
-      </DialogActions>
-    </Dialog>
-  </div>
+        <Dialog open={open} onClose={()=>handleClose({view:false, rowData:[]})} aria-labelledby="draggable-dialog-title" >
+          <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title"> Invoice Discription </DialogTitle>
+          <DialogContent>
+            <TextField value={description} onChange={(event)=> setDescription(event.target.value)} autoFocus margin="dense" id="description" label="Invoice Description" type="text" fullWidth />
+          </DialogContent>
+          <DialogActions>
+            <Button autoFocus onClick={()=>handleClose({view:false, rowData:[]})} color="primary"> Cancel </Button>
+            <Button onClick={()=>loadGenrateInvoiceButton({rowData, props, description, setLoading, setViewInvoice, projectType})} color="secondary"> Save Invoice </Button>
+          </DialogActions>
+        </Dialog>
+    </div>
 }
 
 // this method will help to handel onclick of genrate invoice
