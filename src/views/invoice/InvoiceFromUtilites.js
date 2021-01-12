@@ -71,17 +71,17 @@ const PayableDaysPreInvoiceTable=(propsData)=>{
         { title: "EMP\u00a0ID", field: "employeeId" },
         { title: "EMP\u00a0NAME", field: "employeeName" },
         { title: "PER\u00a0DAY\u00a0RATE", field: "perDayRate" },
-        { title: "TOTAL\u00a0DAYS", field: "totalDays" },
-        { title: "TOTAL\u00a0AMOUNT", 
-          field: "totalAmt",
-           render: (rowData)=> {
-            const { totalAmt }=rowData
-            return <>
-            <label>{totalAmt}</label>
-            <InfoIcon variant="contained" color="primary" style={{marginLeft:20, marginBottom:-6}} onClick={()=>setFormulaState({view:true, projectData:rowData})}/>
-            </>
-          }
-        }
+        { title: "TOTAL\u00a0DAYS", 
+          field: "totalDays",
+          render: (rowData)=> {
+           const { totalDays }=rowData
+           return <>
+           <label>{totalDays}</label>
+           <InfoIcon variant="contained" color="primary" style={{marginLeft:20, marginBottom:-6}} onClick={()=>setFormulaState({view:true, projectData:rowData})}/>
+           </>
+         } 
+        },
+        { title: "TOTAL\u00a0AMOUNT",  field: "totalAmt"}
     ];
     let data = [];
     return<> 
@@ -103,15 +103,15 @@ const PayableDaysPreInvoiceTable=(propsData)=>{
 // this will help to show formula dialog
 const openFormulaDiaglog=(propsData)=>{
     const { open, handleClose, data }=propsData
-    console.log("Data ", data)
+    const { attDetailFrFormula }=data 
     return <div>
         <Dialog open={open} onClose={()=>handleClose({view:false, projectData:[]})} aria-labelledby="draggable-dialog-title" >
-          <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title"> Billing Formula </DialogTitle>
+          <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title"> Days calculation </DialogTitle>
           <DialogContent>
-            <label>Formula</label>
+            <label>{attDetailFrFormula}</label>
           </DialogContent>
           <DialogActions>
-            <Button autoFocus onClick={()=>handleClose({view:false, projectData:[]})} color="primary"> Cancel </Button>
+            <Button autoFocus onClick={()=>handleClose({view:false, projectData:[]})} color="primary"> Ok </Button>
             {/* <Button onClick={()=>loadGenrateInvoiceButton({rowData, props, description, setLoading, setViewInvoice, projectType})} color="secondary"> Save Invoice </Button> */}
           </DialogActions>
         </Dialog>
