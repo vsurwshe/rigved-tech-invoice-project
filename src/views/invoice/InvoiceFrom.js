@@ -13,9 +13,9 @@ import * as PurchaseOrderAction from "../../redux/actions/PurchaseOrderAction"
 import Invoice from './Invoice';
 import CloseIcon from '@material-ui/icons/Close';
 import moment from 'moment';
-import { API_EXE_TIME } from '../../assets/config/Config';
+import { API_EXE_TIME, ProjectBillingModelType } from '../../assets/config/Config';
 import { structureOptions } from '../project/ProjectFormUtilites';
-import { FixedCostPreInvoiceTable, MileStonePreInvoiceTable } from './InvoiceFromUtilites';
+import { FixedCostPreInvoiceTable, MileStonePreInvoiceTable, PayableDaysPreInvoiceTable } from './InvoiceFromUtilites';
 
 // this method will used for the transition for model 
 const Transition = forwardRef(function Transition(props, ref) { return <Slide direction="up" ref={ref} {...props} />; });
@@ -108,27 +108,34 @@ const LoadHeader=(props)=>{
             <h4>Total Amount with Tax : {initialValues.billWitGST}</h4>
         </Grid>
         <Grid item xs={12}>
-           {showProjectTypeAccordingTabel({projectBillingType: initialValues.billingType, mainProps, setLoading, invoiceUserList})}
+           {showProjectTypeAccordingTabel({projectBillingModel: initialValues.billingType, mainProps, setLoading, invoiceUserList})}
         </Grid>
     </>
 }
 
 // this method will help to load according to project type Table
 const showProjectTypeAccordingTabel=(propsData)=>{
-    const { projectBillingType, mainProps, setLoading, invoiceUserList }=propsData
-    switch (projectBillingType) {
-        case "Mile Stone":
+    const { projectBillingModel, mainProps, setLoading, invoiceUserList }=propsData
+    switch (projectBillingModel) {
+        case ProjectBillingModelType.MILE_STONE:
             return <MileStonePreInvoiceTable 
                 setLoading={setLoading} 
                 props={mainProps} 
-                projectType={projectBillingType} 
+                projectType={projectBillingModel} 
                 tableData={invoiceUserList}
             />
-        case "Fixed Rate":
+        case ProjectBillingModelType.FIXED_TYPE:
             return <FixedCostPreInvoiceTable 
                 setLoading={setLoading} 
                 props={mainProps} 
-                projectType={projectBillingType}
+                projectType={projectBillingModel}
+                tableData={invoiceUserList}
+            />
+        case ProjectBillingModelType.PAYABLES_DAY:
+            return <PayableDaysPreInvoiceTable 
+                setLoading={setLoading} 
+                props={mainProps} 
+                projectType={projectBillingModel}
                 tableData={invoiceUserList}
             />
         default:
@@ -180,15 +187,12 @@ const SectionTwo = (data) => {
     </>
 }
 
-// this is month name array
-// var months = ['', 'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
-
 // this sections will used for the showing structure
 const SectionThree = (propsData) => {
     const { sectionThreeState, setLoading, setViewInvoice, mainProps, setSubmit, setSectionThreeState }=propsData
-    const { preInvoiceMileStonesData, preInvoiceFixedCostData } = mainProps.InvoiceState
+    const { preInvoiceMileStonesData, preInvoiceFixedCostData, preInvoicePayablesData } = mainProps.InvoiceState
     const { projectType }=sectionThreeState
-    if(projectType ==="Mile Stone") {
+    if(projectType === ProjectBillingModelType.MILE_STONE) {
         if(preInvoiceMileStonesData && preInvoiceMileStonesData.length >0){
             return <MileStonePreInvoiceTable 
                 setLoading={setLoading} 
@@ -200,9 +204,21 @@ const SectionThree = (propsData) => {
             setSubmit(true);
             setSectionThreeState({ view: true, projectType:""})
         }
-    }else if(projectType ==="Fixed Rate"){
+    }else if(projectType === ProjectBillingModelType.FIXED_TYPE){
         if(preInvoiceFixedCostData && preInvoiceFixedCostData.length >0){
             return <FixedCostPreInvoiceTable 
+                setLoading={setLoading} 
+                props={mainProps} 
+                setViewInvoice={setViewInvoice} 
+                projectType={projectType}
+            />
+        }else{
+            setSectionThreeState({ view: true, projectType:""})
+            setSubmit(true);
+        }
+    }else if(projectType === ProjectBillingModelType.PAYABLES_DAY){
+        if(preInvoicePayablesData && preInvoicePayablesData.length >0){
+            return <PayableDaysPreInvoiceTable
                 setLoading={setLoading} 
                 props={mainProps} 
                 setViewInvoice={setViewInvoice} 
@@ -221,7 +237,7 @@ const PostInvoiceData = async (propsData) => {
     const { dispatch } = mainProps
     const { authorization } = mainProps.LoginState
     const { projectListByClient } = mainProps.ProjectState
-    const { GenerateInvoice, saveMileStonePreInvoiceData, saveFixedCostPreInvoiceData } = mainProps.InvoiceAction
+    const { GenerateInvoice, saveMileStonePreInvoiceData, saveFixedCostPreInvoiceData, savePayableDaysPreInvoiceData } = mainProps.InvoiceAction
     const { loadMessage } = mainProps.ClientAction
     let filterProject = values.projectList !== {} && projectListByClient.filter(item=> item.id===values.projectList.id)
     let projectTypeData= filterProject.length >0 && filterProject[0].projectBillingType;
@@ -231,10 +247,12 @@ const PostInvoiceData = async (propsData) => {
         "projectId": (values.projectList !== {} ) && values.projectList.id
     }
     await setLoading(true);
-    if (projectTypeData === "Mile Stone") {
+    if (projectTypeData === ProjectBillingModelType.MILE_STONE) {
         await dispatch(saveMileStonePreInvoiceData([]));
-    } else if(projectTypeData === "Fixed Rate") {
+    } else if(projectTypeData === ProjectBillingModelType.FIXED_TYPE) {
         await dispatch(saveFixedCostPreInvoiceData([]));
+    }else if(projectTypeData === ProjectBillingModelType.PAYABLES_DAY) {
+        await dispatch(savePayableDaysPreInvoiceData([]));
     }
     // here we call api with project type thats we check filter result
     projectTypeData && await GenerateInvoice(newInvoiceData, authorization,projectTypeData);
@@ -247,34 +265,6 @@ const PostInvoiceData = async (propsData) => {
 
 }
 
-// this method will used for payables days
-// const PrepareDataForResourceTable=(props)=>{
-//     const { listOfRows, data, columns}=props
-//    return (listOfRows && listOfRows.length > 0) && listOfRows.map((item, key) => {
-//         let monthString = item.attendancepermonth ? item.attendancepermonth : "";
-//         let firstArray = monthString && monthString.split(',');
-//         let tempColunmsData = [];
-//         data.push({ "data":item, ...item })
-//         firstArray.forEach(element => {
-//             let monthNumber;
-//             let filterEqualArray;
-//             if (element.includes("{")) {
-//                 let tempArray = element.split('{')
-//                 filterEqualArray = tempArray[1].split("=");
-//             } else if (element.includes("}")) {
-//                 let tempArray = element.split('}')
-//                 filterEqualArray = tempArray[0].split("=");
-//             } else {
-//                 filterEqualArray = element.split("=");
-//             }
-//             monthNumber = filterEqualArray && filterEqualArray[0].replace(/ /g, "");
-//             key === 0 && tempColunmsData.push({ title: months[monthNumber], field: months[monthNumber] })
-//             data[key][months[monthNumber]] = (filterEqualArray[1] && filterEqualArray[1].includes("}")) ? (filterEqualArray[1].split('}')[0]) : filterEqualArray[1]
-//         });
-//         columns.splice(5, 0, ...tempColunmsData)
-//         return "";
-//     })
-// }
 
 // this method will used for the showing invoice after posting successfully resource table
 const ShowViewInvoice = (propsData) => {

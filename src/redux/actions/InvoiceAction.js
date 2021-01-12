@@ -1,9 +1,10 @@
-import {AlertColor} from '../../assets/config/Config';
+import {AlertColor, ProjectBillingModelType} from '../../assets/config/Config';
 import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
 import { loadMessage } from "../actions/ClientAction";
 import { SuccessFunction, ErrorFunction } from "./CommonAction"
 import { InvoiceError } from '../../assets/config/ErrorStringFile';
 
+// this method will used to fetch invoice list by id
 const GetInvoiceUserList = (firstIndex, lastIndex, invoiceId, authroizationKey) => {
     return (dispatch) => {
         return CreateInstance()
@@ -19,6 +20,7 @@ const GetInvoiceUserList = (firstIndex, lastIndex, invoiceId, authroizationKey) 
     }
 }
 
+// this method will used for fetch data accroding to billing model before creating invoice
 const GenerateInvoice = (invoiceData, authroizationKey, projectType) => {
     return (dispatch) => {
         return CreateInstance()
@@ -36,10 +38,12 @@ const GenerateInvoice = (invoiceData, authroizationKey, projectType) => {
                         return dispatch(loadMessage(AlertColor.danger, InvoiceError.INTERNAL_SERVER_ERROR)); 
                     default:
                         switch (projectType) {
-                            case "Mile Stone":
+                            case ProjectBillingModelType.MILE_STONE:
                                 return SuccessFunction({ dispatch , "successMethod": saveMileStonePreInvoiceData, "loadMessage":loadMessage, response})         
-                            case "Fixed Rate":
+                            case ProjectBillingModelType.FIXED_TYPE:
                                 return SuccessFunction({ dispatch , "successMethod": saveFixedCostPreInvoiceData, "loadMessage":loadMessage, response})
+                            case ProjectBillingModelType.PAYABLES_DAY:
+                                return SuccessFunction({ dispatch , "successMethod": savePayableDaysPreInvoiceData, "loadMessage":loadMessage, response})
                             default:
                                 return "";
                         }
@@ -49,6 +53,7 @@ const GenerateInvoice = (invoiceData, authroizationKey, projectType) => {
     }
 }
 
+// this method will used to get details accroding to invoice id
 const GetPDFInvoiceData = (invoiceId, authroizationKey) => {
     return (dispatch) => {
         return CreateInstance()
@@ -61,6 +66,7 @@ const GetPDFInvoiceData = (invoiceId, authroizationKey) => {
     }
 }
 
+// this method will used for the genrate the pdf data for selecting data
 const GenerateInvoicePDF = (invoiceData, authroizationKey) => {
     return (dispatch) => {
         return CreateInstance()
@@ -84,6 +90,7 @@ const GenerateInvoicePDF = (invoiceData, authroizationKey) => {
     }
 }
 
+// this method will used for get list of invoice pdf data list
 const getPDFInvoiceList=(firstIndex, lastIndex,authroizationKey)=>{
     return (dispatch) => {
         return CreateInstance()
@@ -93,6 +100,7 @@ const getPDFInvoiceList=(firstIndex, lastIndex,authroizationKey)=>{
     }
 }
 
+// this method will used get single data for invoice pdf data id
 const viewInvoicePDFData = (invoiceId, authroizationKey) => {
     return (dispatch) => {
         return CreateInstance()
@@ -105,6 +113,7 @@ const viewInvoicePDFData = (invoiceId, authroizationKey) => {
     }
 }
 
+// this method will used to call pay invoice  
 const payInvoiceBill = (invoiceId, authroizationKey) => {
     return (dispatch) => {
         return CreateInstance()
@@ -185,6 +194,13 @@ export function saveFixedCostPreInvoiceData(fixedCost) {
     return{
         type: "SAVE_FIXED_COST_PRE_INVOICE_DATA",
         fixedCost
+    }
+}
+
+export function savePayableDaysPreInvoiceData(payableDays) {
+    return{
+        type: "SAVE_PAYABLE_DAYS_PRE_INVOICE_DATA",
+        payableDays
     }
 }
 

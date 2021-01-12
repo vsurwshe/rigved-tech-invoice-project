@@ -8,6 +8,7 @@ const initialState = {
     viewPDFInvoiceData:[],
     preInvoiceMileStonesData:[],
     preInvoiceFixedCostData:[],
+    preInvoicePayablesData:[],
     projectBillingType:""
 }
 
@@ -19,6 +20,8 @@ const InvoiceState=(state=initialState,action)=>{
             return {...state,preInvoiceMileStonesData:action.mileStones}
         case "SAVE_FIXED_COST_PRE_INVOICE_DATA":
             return {...state,preInvoiceFixedCostData:action.fixedCost}
+        case "SAVE_PAYABLE_DAYS_PRE_INVOICE_DATA":
+            return {...state,preInvoicePayablesData:action.payableDays}
         case "SAVE_INVOICE_PDF_LIST":
             return {...state,invoiceList:action.invoiceList}
         case "SAVE_INVOICE_USER_LIST":

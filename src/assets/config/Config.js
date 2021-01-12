@@ -16,10 +16,18 @@ const FromActions={
     "VIED":"VIEWEDIT"
 }
 
+const ProjectBillingModelType={
+    MILE_STONE:"Mile Stone",
+    FIXED_TYPE:"Fixed Rate",
+    PAYABLES_DAY:"Payable Days",
+    FREE_STYLE:""
+}
+
 export{
     API_URL,
     AlertColor,
     API_EXE_TIME,
     FromActions,
-    API_INVOCIE_EXE_TIME
+    API_INVOCIE_EXE_TIME,
+    ProjectBillingModelType
 }

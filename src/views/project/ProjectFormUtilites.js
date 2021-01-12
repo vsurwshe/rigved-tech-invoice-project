@@ -1,16 +1,16 @@
 import React,{ useState } from 'react';
-import { Button } from '@material-ui/core';
+import { Button, Grid } from '@material-ui/core';
 import MaterialTable from 'material-table';
 import Checkbox from '@material-ui/core/Checkbox';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
-import { Field } from 'redux-form';
+import { Field, reduxForm, reset } from 'redux-form';
 import { loadMessage } from "../../redux/actions/ClientAction"
-import { renderMatiralCheckbox } from '../utilites/FromUtilites';
+import { renderNumberField, renderTextHiddenField } from '../utilites/FromUtilites';
 import ResourcesTable from '../resources/ResourcesTable';
 import ExpensesTable from '../Expenses/ExpensesTable';
 import { CheckBox, CheckBoxOutlineBlankOutlined } from '@material-ui/icons';
-import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
+import { API_EXE_TIME, FromActions, ProjectBillingModelType } from '../../assets/config/Config';
 import TextField from '@material-ui/core/TextField';
 import moment from 'moment';
 
@@ -42,8 +42,8 @@ const MileStoneTabel=(propsData)=>{
         { title: 'Work\u00a0Completion(%)', field: 'workComPer'},
         { title: 'Invoice(%)', field: 'invoicePer'},
         { title: 'Expected\u00a0of\u00a0Completion Date', 
-          field: 'expComDateModify', 
-          editable:'onAdd',
+          field: 'expComDate', 
+          editable:'onUpdate',
           width:80 ,
           editComponent: props => {
             return renderTextField({ name: "expComDate", label: "", type: "date", action: { props } })
@@ -127,7 +127,6 @@ const onMileStoneTabelRowAdd=(props)=>{
         projectId,
         compFlag:false, 
         "active": true,
-        "expComDate": new moment(newData.expComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
       }
       await saveMileStone([...data,modifyNewData])
       await resolve();
@@ -144,7 +143,6 @@ const updateMileStoneTabelRecord=(propsData)=>{
   const { udpateMileStoneData, GetMileStoneListProjectId }=propsData.mainProps.BillingModelAction
   const { authorization }=propsData.mainProps.LoginState
   return new Promise(async (resolve, reject) => {
-    console.log("New ",newData,Object.keys(newData).length)
     if (newData && Object.keys(newData).length >= 8 && 
     newData.compFlag && 
     (newData.expComDate <= newData.actualComDateModify || newData.expComDate <= newData.actualComDate) && 
@@ -289,7 +287,99 @@ const updateFixedTypeTabelRecord=(propsData)=>{
   })
 }
 
+// this method will used for the load payables checkbox
+let PayablesDaysForm=(propsData)=>{
+  const { handleSubmit, pristine, submitting, reset, props, projectId, initialValues}=propsData
+  const { mainProps }=props
+  const { authorization }= mainProps.LoginState
+  const { payablesDayListProjectId }=mainProps.BillingModelState
+  const { getFixedTypeListProjectId }=mainProps.BillingModelAction
+  const [countPayableDay, setCountPayableDay] = useState(0)
+  let exitsPayableDaysProjectList= (payablesDayListProjectId && payablesDayListProjectId.length >0) && payablesDayListProjectId.filter(item=> item.projectId === projectId)
+  if((exitsPayableDaysProjectList === false || exitsPayableDaysProjectList.length <= 0) && countPayableDay === 0 ){
+    setCountPayableDay(countPayableDay+1);
+    getPayableDaysListByProjectId({ authorization, projectId, getFixedTypeListProjectId })
+  }
+  console.log("SAS ",mainProps, initialValues)
+  return <div style={{ maxWidth: "100%", marginBottom:"18px" }}>
+     <form >
+      <center>
+        <Button type="button" variant="outlined" color="primary" disabled={pristine || submitting} onClick={handleSubmit(values=>savePayableDaysFormula({values,props,projectId}))}> Save Formula </Button> &nbsp;&nbsp;
+        <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Form</Button>&nbsp;&nbsp;
+      </center>
+      <Grid container spacing={5} style={{paddingBottom:10}}>
+        <Grid item xs={12} sm={12} style={{ paddingLeft:30, paddingTop: 20}}>
+          <Field name="id" component={renderTextHiddenField} />
+          <Field name="DP" component={renderNumberField} label="Days Present (DP)" style={{marginRight:20}}/>
+          <Field name="WO" component={renderNumberField} label="Weekly Off (WO)" style={{marginRight:20}}/>
+          <Field name="PL" component={renderNumberField} label="Paid Leave (PL)" style={{marginRight:20}}/>
+          <Field name="PH" component={renderNumberField} label="Paid Holiday (PH)" style={{marginRight:20}}/>
+          <Field name="PHP" component={renderNumberField} label="Paid Holiday Present (PHP)" style={{marginRight:20}}/>
+          <Field name="WOP" component={renderNumberField} label="Weekly Off Present (WOP)" style={{marginRight:20}}/>
+          <Field name="LWP" component={renderNumberField} label="Leave without Pay (LWP)" style={{marginRight:20}}/>
+        </Grid>
+      </Grid>
+    </form>
+  </div>
+}
+
+const afterSubmit = (result, dispatch) => dispatch(reset('PayablesDays'));
+PayablesDaysForm= reduxForm({ form:"PayablesDays", 
+afterSubmit, 
+enableReinitialize : true
+})(PayablesDaysForm)
+
+const savePayableDaysFormula=async(propsData)=>{
+  const { values, props, projectId}=propsData
+  const { mainProps }=props
+  const { saveFixedTypeData, getFixedTypeListProjectId }=mainProps.BillingModelAction
+  const { authorization }=mainProps.LoginState
+  const { DP, WO, PL, PH, PHP, WOP, LWP, id}= values
+  let formula= "DPx"+DP+",WOx"+WO+",PLx"+PL+",PHx"+PH+",PHPx"+PHP+",WOPx"+WOP+",LWPx"+LWP;
+  let payablesDayBodyData={
+    "projectId":projectId,
+    "active": true,
+    "billingType": "Payable Days",
+    formula,
+    id
+  }
+  await saveFixedTypeData(payablesDayBodyData,authorization);
+  await getFixedTypeListProjectId(0,100,projectId,authorization);
+}
+
+// this method will help to get fixed type accrdoing to project id
+const getPayableDaysListByProjectId=async({authorization, projectId, getFixedTypeListProjectId, setLoad})=>{
+  // await setLoad(true);
+  await getFixedTypeListProjectId(0,100,projectId, authorization)
+  // await setLoad(false);
+}
+
+
 // ----------------------------------------------------------------------------
+
+//this method will used for load the resource tab
+const LoadResourcesTab = (propsData) => {
+  const { props }=propsData
+  const { initialValues } = props.mainProps
+  const [resource, setResource] = useState([]);
+  const { projectBillingType }=(props.mainProps.form.ProjectForm && props.mainProps.form.ProjectForm.values) ? props.mainProps.form.ProjectForm.values : ""
+  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
+  return <ResourcesTable 
+      projectId={projectId} 
+      disableResourceModel={projectBillingType === ProjectBillingModelType.MILE_STONE || projectBillingType === ProjectBillingModelType .FIXED_TYPE} 
+      stateData={props.mainProps.stateData} 
+      resource={resource}
+      setResource={setResource}
+  />
+}
+
+// this method will used for the load the expense tab
+const LoadExpensesTab = (propsData) => {
+  const { props }=propsData
+  const { initialValues } = props.mainProps
+  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
+  return <ExpensesTable projectId={projectId} stateData={props.mainProps.stateData} />
+}
 
 // this method will used for the loading milestone tab
 const MilestoneTab=(propsData)=>{
@@ -323,44 +413,14 @@ const getMileStoneListByProjectId=async({authorization,projectId,callMileStoneCo
   return "";
 }
 
-// this method will used for the load payables checkbox
-const PayablesCheckbox=(propsData)=>{
-  return <div style={{ maxWidth: "100%", marginBottom:"18px" }}>
-    <Field name="employed" component={renderMatiralCheckbox} label="Employed"/>
-  </div>
-}
-
-//this method will used for load the resource tab
-const LoadResourcesTab = (propsData) => {
-  const { props }=propsData
-  const { initialValues } = props.mainProps
-  const [resource, setResource] = useState([]);
-  const { projectBillingType }=(props.mainProps.form.ProjectForm && props.mainProps.form.ProjectForm.values) ? props.mainProps.form.ProjectForm.values : ""
-  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
-  return <ResourcesTable 
-      projectId={projectId} 
-      disableResourceModel={projectBillingType === "Mile Stone" || projectBillingType === "Fixed Rate"} 
-      stateData={props.mainProps.stateData} 
-      resource={resource}
-      setResource={setResource}
-  />
-}
-
-// this method will used for the load the expense tab
-const LoadExpensesTab = (propsData) => {
-  const { props }=propsData
-  const { initialValues } = props.mainProps
-  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
-  return <ExpensesTable projectId={projectId} stateData={props.mainProps.stateData} />
-}
-
 // this will load the fixed type billing model
 let FixedTypeTab=(propsData)=>{
-  const { projectId }=propsData
-  const { dispatch }=propsData.data.mainProps
-  const { authorization }= propsData.data.mainProps.LoginState ? propsData.data.mainProps.LoginState :[]
-  const { fixedTypeListProjectId }= propsData.data.mainProps.BillingModelState ? propsData.data.mainProps.BillingModelState :[]
-  const { getFixedTypeListProjectId }= propsData.data.mainProps.BillingModelAction ? propsData.data.mainProps.BillingModelAction :[]
+  const { projectId, data }=propsData
+  const { mainProps }= data
+  const { dispatch }=mainProps
+  const { authorization }= mainProps.LoginState ? mainProps.LoginState :[]
+  const { fixedTypeListProjectId }= mainProps.BillingModelState ? mainProps.BillingModelState :[]
+  const { getFixedTypeListProjectId }= mainProps.BillingModelAction ? mainProps.BillingModelAction :[]
   const [load, setLoad] = useState(false)
   const [callFixedTypeCount, setCallFixedTypeCount] = useState(0)
   let exitsFixedTypeProjectList= (fixedTypeListProjectId && fixedTypeListProjectId.length >0) && fixedTypeListProjectId.filter(item=> item.projectId === projectId)
@@ -390,15 +450,42 @@ const LoadBillingModelTab=(propsData)=>{
   const { initialValues } = props.mainProps
   const { values }=props.mainProps.form.ProjectForm
   const { showTabs}=props.mainProps.stateData
+  const [countPayableDay, setCountPayableDay] = useState(0)
   let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
   switch ( showTabs && values && values.projectBillingType) {
-      case "Mile Stone":
+      case ProjectBillingModelType.MILE_STONE:
         return <MilestoneTab data={props} projectId={projectId} />           
-      case "Fixed Rate":
+      case ProjectBillingModelType.FIXED_TYPE:
         return <FixedTypeTab data={props} projectId={projectId} />          
+      case ProjectBillingModelType.PAYABLES_DAY:
+        let formData = getPayablesFormula({props,projectId, countPayableDay, setCountPayableDay})
+        let initialData={ "DP": 0, WO: 0, "PL": 0, PH: 0, PHP: 0, WOP: 0, LWP: 0}
+        return <PayablesDaysForm initialValues={(formData && formData.length >0)? formData[0] :initialData}  props={props} projectId={projectId} />          
       default:
           return <h3>Select Proper Billing Type</h3>
   }
+}
+// this method will help to loading formula
+const getPayablesFormula=(propsData)=>{
+  const { projectId, countPayableDay, setCountPayableDay }=propsData
+  const { mainProps }=propsData.props
+  const { authorization }= mainProps.LoginState
+  const { payablesDayListProjectId }=mainProps.BillingModelState
+  const { getFixedTypeListProjectId }=mainProps.BillingModelAction
+  let exitsPayableDaysProjectList= (payablesDayListProjectId && payablesDayListProjectId.length >0) && payablesDayListProjectId.filter(item=> item.projectId === projectId)
+  if((exitsPayableDaysProjectList === false || exitsPayableDaysProjectList.length <= 0) && countPayableDay === 0 ){
+    setCountPayableDay(countPayableDay+1);
+    getPayableDaysListByProjectId({ authorization, projectId, getFixedTypeListProjectId })
+    exitsPayableDaysProjectList= (payablesDayListProjectId && payablesDayListProjectId.length >0) && payablesDayListProjectId.filter(item=> item.projectId === projectId)
+  }
+  return (exitsPayableDaysProjectList && exitsPayableDaysProjectList.length >0) && exitsPayableDaysProjectList.map((item)=>{
+    if(item.formula !== ""){
+      let formulaMainArray= item.formula.split(",")
+      var result={};
+      (formulaMainArray && formulaMainArray.length >0) && formulaMainArray.map(subitem=>result[subitem.split("x")[0]]=subitem.split("x")[1])
+      return {...result,id:item.id};
+    }
+  })
 }
 
 // this is render the text fileds in tables
@@ -420,7 +507,7 @@ const renderTextField = (props) => {
 export{
     structureOptions,
     MileStoneTabel,
-    PayablesCheckbox,
+    PayablesDaysForm,
     LoadResourcesTab,
     LoadExpensesTab,
     LoadBillingModelTab

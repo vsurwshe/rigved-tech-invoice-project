@@ -69,7 +69,7 @@ const renderTextAreaField = ({ maxRows,name,label,helperText, input, meta: { tou
 )
 
 // this is render text filed
-const renderNumberField = ({ label, name,input,helperText, meta: { touched, invalid, error }, ...custom }) => (
+const renderNumberField = ({ label, name, input, helperText, meta: { touched, invalid, error }, ...custom }) => (
   <TextField
     id={name}
     type="number"
@@ -103,7 +103,6 @@ const handleChange = async(event, input, successFunction) => {
     await reader.readAsDataURL(imageFile);
   }
 };
-
 
 // this is render the checkbox 
 const renderCheckbox = ({ input, label }) => (
@@ -219,7 +218,7 @@ const renderContact = ({ classes, open, handleClickOpen, handleClose, fields, in
   </span>
 }
 
-// this method will used for render loading
+// this will used for the loading icons show
 const renderLoading=({message , size})=>{
   return <center> <h3>{message}</h3> <CircularProgress size={size} /> </center>
 }
