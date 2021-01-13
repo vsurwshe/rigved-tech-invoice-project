@@ -29,7 +29,7 @@ let ClientForm = (props) => {
             <div className={classes.buttonStyle}>
                 <center>
                     {(operation === FromActions.ED || operation === FromActions.CR) && <>
-                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting }>SUBMIT</Button> &nbsp;&nbsp;
+                    <Button type="submit" variant="outlined" color="primary">SUBMIT</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button></>}&nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await clearFile(); await reset(); cancle() }}> Cancel</Button>
                 </center>
@@ -175,13 +175,13 @@ const LoadFileUrlName = (fileUrl) => {
 let LoadFileUrl = (parameter) => {
     const { listOfFiles } = parameter.props.FileState
     const exitsData = (listOfFiles.length > 0) && listOfFiles.filter(x => (x.cid === parameter.cid && x.fileName === parameter.url));
-    if (exitsData === false || exitsData.length <= 0) { GetPhotos(parameter) }
+    if ((exitsData === false || exitsData.length <= 0) && parameter.url) { GetPhotos(parameter) }
     return <>{parameter.componentName}:<img src={exitsData.length > 0 && exitsData[0].fileData} alt={parameter.componentName} style={{ height: "50%", width: "70%" }} /></>;
 }
 
 const GetPhotos = async (parameter) => {
-    const { FetchPhoto } = parameter.props
-    const { authorization } = parameter.props.LoginState
+    const { FetchPhoto, props } = parameter.props
+    const { authorization } = props.LoginState
     return await FetchPhoto(parameter.url, authorization, parameter.cid);
 }
 
