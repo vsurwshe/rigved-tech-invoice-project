@@ -1,13 +1,13 @@
 import React from 'react';
 import { TextField, Button, FormControl, Select, InputLabel } from '@material-ui/core';
 import MaterialTable from 'material-table';
-import { API_EXE_TIME } from '../../assets/config/Config';
+import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
 import CreateIcon from '@material-ui/icons/Create';
 import { Autocomplete } from '@material-ui/lab';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 const RateCardTable = (propsData) => {
-  const { rateCardDtos,setRateCardDtos, Domains, SkillCategory, SkillSet, rateOptions, initialValues }=propsData
+  const { rateCardDtos,setRateCardDtos, Domains, SkillCategory, SkillSet, rateOptions, initialValues, operation }=propsData
   const columns =[
       {   title: "Domain", 
           field: "domainName",
@@ -66,7 +66,7 @@ const RateCardTable = (propsData) => {
         actionsColumnIndex: -1
       }}
       icons={{
-        Add: () => { return initialValues === undefined && <Button variant="contained" color="primary">Add Rate Card</Button>},
+        Add: () => { return (operation !== FromActions.VI) && <Button variant="contained" color="primary">Add Rate Card</Button>},
         Edit:() => { return <CreateIcon variant="contained" color="primary" /> },
         Delete: () => {return <DeleteOutlineIcon variant="contained" color="secondary" />}
       }}
