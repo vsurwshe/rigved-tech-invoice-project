@@ -375,9 +375,10 @@ const LoadResourcesTab = (propsData) => {
 // this method will used for the load the expense tab
 const LoadExpensesTab = (propsData) => {
   const { props }=propsData
-  const { initialValues } = props.mainProps
-  let projectId = initialValues ? initialValues.id : (props.mainProps.ProjectState.projectDetails && props.mainProps.ProjectState.projectDetails.Id)
-  return <ExpensesTable projectId={projectId} stateData={props.mainProps.stateData} />
+  const { mainProps }=props
+  const { initialValues } = mainProps
+  let projectId = initialValues ? initialValues.id : (mainProps.ProjectState.projectDetails && mainProps.ProjectState.projectDetails.Id)
+  return <ExpensesTable projectId={projectId} stateData={mainProps.stateData} />
 }
 
 // this method will used for the loading milestone tab
