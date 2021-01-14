@@ -138,6 +138,13 @@ const showProjectTypeAccordingTabel=(propsData)=>{
                 projectType={projectBillingModel}
                 tableData={invoiceUserList}
             />
+        case ProjectBillingModelType.CLIENT_BILLING:
+            return <ClientBillingPreInvoiceTable 
+                setLoading={setLoading} 
+                props={mainProps} 
+                projectType={projectBillingModel}
+                tableData={invoiceUserList}
+            />
         default:
             return <h2>No Invoice Content</h2>
     }

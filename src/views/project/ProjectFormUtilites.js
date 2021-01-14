@@ -79,7 +79,7 @@ const MileStoneTabel=(propsData)=>{
           },
           render: (rowData)=> {
             const { compFlag }=rowData
-            return (compFlag ) ? <CheckBox variant="contained" color="primary" />:<CheckBoxOutlineBlankOutlined  variant="contained" color="secondary" onClick={()=>console.log(rowData)} />;
+            return (compFlag ) ? <CheckBox variant="contained" color="primary" />:<CheckBoxOutlineBlankOutlined  variant="contained" color="secondary" />;
           }
         }
     ]
@@ -300,7 +300,6 @@ let PayablesDaysForm=(propsData)=>{
     setCountPayableDay(countPayableDay+1);
     getPayableDaysListByProjectId({ authorization, projectId, getFixedTypeListProjectId })
   }
-  console.log("SAS ",mainProps, initialValues)
   return <div style={{ maxWidth: "100%", marginBottom:"18px" }}>
      <form >
       <center>

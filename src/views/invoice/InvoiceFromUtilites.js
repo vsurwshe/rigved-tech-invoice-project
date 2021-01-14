@@ -150,7 +150,6 @@ const PrepareDataForResourceTable=(props)=>{
     })
 }
 
-
 // this compoent will used for the client billing Invoice Tabel
 const ClientBillingPreInvoiceTable=(propsData)=>{
     const { setLoading, setViewInvoice, projectType, tableData, props }=propsData
@@ -160,16 +159,16 @@ const ClientBillingPreInvoiceTable=(propsData)=>{
         {  title: 'Amount', field: 'amount'},
     ];
     return <LoadPreCreateInvoiceTable 
-    title=" "
-    setLoading={setLoading}
-    data={(tableData && tableData.length >0) ? tableData : billingData}
-    setViewInvoice={setViewInvoice}
-    initialValues={tableData}
-    columns={columns}
-    props={props}
-    projectType={projectType}
-    setBillingData={setBillingData}
-/>
+        title=" "
+        setLoading={setLoading}
+        data={(tableData && tableData.length >0) ? tableData : billingData}
+        setViewInvoice={setViewInvoice}
+        initialValues={tableData}
+        columns={columns}
+        props={props}
+        projectType={projectType}
+        setBillingData={setBillingData}
+    />
 }
 
 // this component will used for the Loading Table before genrate invoice for selecting resource
@@ -193,20 +192,13 @@ const LoadPreCreateInvoiceTable=(propsData)=>{
             options={{
                 headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
                 search: false,
-                selection: (!initialValues && projectType !== ProjectBillingModelType.CLIENT_BILLING) ? true : false,
+                selection: (!initialValues) ? true : false,
                 actionsColumnIndex: -1
             }}
-            actions={[
-                (rowData) => { return !initialValues && {   
-                    icon: () => <div><Button variant="contained" color="primary">Generate Invoice</Button></div>,
-                    onClick: (event, rowData) => setOpenDiscription({view:true,rowData}),
-                    isFreeAction: true,
-                    tooltip: 'Generate Invoice'
-                }}
-            ]}
+            actions={[ (rowData) => LoadActionButtons({initialValues,setOpenDiscription}) ]}
             icons={{
-                Add: () => (projectType === ProjectBillingModelType.CLIENT_BILLING && <Button variant="contained" color="secondary">Add</Button>),
-                Delete: () => (projectType === ProjectBillingModelType.CLIENT_BILLING && <DeleteOutlineIcon variant="contained" color="secondary" />)
+                Add: () => (projectType === ProjectBillingModelType.CLIENT_BILLING && !initialValues) && <Button variant="contained" color="secondary">Add</Button>,
+                Delete: () => (projectType === ProjectBillingModelType.CLIENT_BILLING && !initialValues) && <DeleteOutlineIcon variant="contained" color="secondary" />
             }}
             editable={{
                 isEditable: rowData => false,
@@ -220,12 +212,30 @@ const LoadPreCreateInvoiceTable=(propsData)=>{
     </div>
 }
 
+// this method will help to loading actions button
+const LoadActionButtons=(propsData)=>{
+    const { initialValues,setOpenDiscription}=propsData
+    return !initialValues && {   
+        icon: () => <div><Button variant="contained" color="primary">Generate Invoice</Button></div>,
+        onClick: (event, rowData) => setOpenDiscription({view:true,rowData}),
+        isFreeAction: false,
+        tooltip: 'Generate Invoice'
+    }
+}
+
 // this method help LoadPreCreateInvoiceTable to save data on click add
 const saveLoadPreCreateInvoiceTableRecord=(propsData)=>{
     const { newData, mainProps, setBillingData, data }=propsData
+    const { values }=mainProps.form.InvoiceFrom
+    console.log("MAIN ",mainProps);
     return new Promise(async (resolve, reject) => {
-        if(newData){
-            await setBillingData([...data,newData]);
+        if(newData && values){
+            let modifyData={
+                startDate: (values && values.fromDate) && values.fromDate,
+                endDate: (values && values.toDate) && values.toDate,
+                ...newData
+            }
+            await setBillingData([...data,modifyData]);
             resolve();
         }else{
             reject();
@@ -236,8 +246,13 @@ const saveLoadPreCreateInvoiceTableRecord=(propsData)=>{
 
 // this method help LoadPreCreateInvoiceTable to save data on click add
 const deleteLoadPreCreateInvoiceTableRecord=(propsData)=>{
+    const { oldData, data, setBillingData }=propsData
     return new Promise(async (resolve, reject) => {
-        resolve();
+        if(data && data.length >=0){
+            let filterData= data.filter(item=> (item.amount !==oldData.description && item.amount !==oldData.amount) )
+            await setBillingData(filterData);
+            await resolve();
+        }else{ reject(); }
     })
 }
 
@@ -279,6 +294,11 @@ const loadGenrateInvoiceButton=(propsData)=>{
     }else if(projectType === ProjectBillingModelType.PAYABLES_DAY){
         let filterRowData= rowData.length >0 && rowData.map(({tableData, data, ...rest})=>rest)
         let modifyGenrateInvoiceData={ ...tempData, "invoiceDetailDtos": filterRowData}
+        GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice })
+    }else if(projectType === ProjectBillingModelType.CLIENT_BILLING){
+        let filterRowData= rowData.length >0 && rowData.map(({tableData, data, ...rest})=>rest)
+        console.log("Filter Data ",filterRowData)
+        let modifyGenrateInvoiceData={ ...tempData, "clientBillingDtos": filterRowData}
         GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice })
     }
 }
