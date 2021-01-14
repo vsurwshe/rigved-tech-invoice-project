@@ -4,6 +4,7 @@ import MaterialTable from 'material-table';
 import { API_INVOCIE_EXE_TIME, ProjectBillingModelType } from '../../assets/config/Config';
 import moment from 'moment';
 import InfoIcon from '@material-ui/icons/Info';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 // this component will used for Milestone Pre Invoice table
 const MileStonePreInvoiceTable=(propsData)=>{
@@ -149,9 +150,30 @@ const PrepareDataForResourceTable=(props)=>{
     })
 }
 
+// this compoent will used for the client billing Invoice Tabel
+const ClientBillingPreInvoiceTable=(propsData)=>{
+    const { setLoading, setViewInvoice, projectType, tableData, props }=propsData
+    const [billingData, setBillingData] = useState([])
+    let columns = [
+        {  title: 'Description', field: 'description'},
+        {  title: 'Amount', field: 'amount'},
+    ];
+    return <LoadPreCreateInvoiceTable 
+        title=" "
+        setLoading={setLoading}
+        data={(tableData && tableData.length >0) ? tableData : billingData}
+        setViewInvoice={setViewInvoice}
+        initialValues={tableData}
+        columns={columns}
+        props={props}
+        projectType={projectType}
+        setBillingData={setBillingData}
+    />
+}
+
 // this component will used for the Loading Table before genrate invoice for selecting resource
 const LoadPreCreateInvoiceTable=(propsData)=>{
-    const { columns, data, setLoading, setViewInvoice, initialValues, title, props, projectType } = propsData
+    const { columns, data, setLoading, setViewInvoice, initialValues, title, props, projectType, setBillingData } = propsData
     const [openDiscription, setOpenDiscription] = useState({view:false,rowData:[]})
     return <div style={{ maxWidth: "100%" }}>
         {openDiscription.view && <InvoiceDiscriptionDialog 
@@ -170,18 +192,68 @@ const LoadPreCreateInvoiceTable=(propsData)=>{
             options={{
                 headerStyle: { backgroundColor: '#01579b', color: '#FFF' },
                 search: false,
-                selection: !initialValues ? true : false,
+                selection: (!initialValues) ? true : false,
                 actionsColumnIndex: -1
             }}
-            actions={[
-                (rowData) => { return !initialValues && {   
-                    icon: () => <div><Button variant="contained" color="primary">Generate Invoice</Button></div>,
-                    onClick: (event, rowData) => setOpenDiscription({view:true,rowData}),
-                    tooltip: 'Generate Invoice'
-                }}
-            ]}
+            actions={[ (rowData) => LoadActionButtons({initialValues,setOpenDiscription}) ]}
+            icons={{
+                Add: () => (projectType === ProjectBillingModelType.CLIENT_BILLING && !initialValues) && <Button variant="contained" color="secondary">Add</Button>,
+                Delete: () => (projectType === ProjectBillingModelType.CLIENT_BILLING && !initialValues) && <DeleteOutlineIcon variant="contained" color="secondary" />
+            }}
+            editable={{
+                isEditable: rowData => false,
+                isEditHidden: rowData => true,
+                isDeletable: rowData => true,
+                onRowAdd: newData => saveLoadPreCreateInvoiceTableRecord({newData,"mainProps":props, setBillingData, data}),
+                onRowUpdate: (newData, oldData) => {},
+                onRowDelete: oldData => deleteLoadPreCreateInvoiceTableRecord({oldData, "mainProps":props, setBillingData, data})
+            }}
         />
     </div>
+}
+
+// this method will help to loading actions button
+const LoadActionButtons=(propsData)=>{
+    const { initialValues,setOpenDiscription}=propsData
+    return !initialValues && {   
+        icon: () => <div><Button variant="contained" color="primary">Generate Invoice</Button></div>,
+        onClick: (event, rowData) => setOpenDiscription({view:true,rowData}),
+        isFreeAction: false,
+        tooltip: 'Generate Invoice'
+    }
+}
+
+// this method help LoadPreCreateInvoiceTable to save data on click add
+const saveLoadPreCreateInvoiceTableRecord=(propsData)=>{
+    const { newData, mainProps, setBillingData, data }=propsData
+    const { values }=mainProps.form.InvoiceFrom
+    console.log("MAIN ",mainProps);
+    return new Promise(async (resolve, reject) => {
+        if(newData && values){
+            let modifyData={
+                startDate: (values && values.fromDate) && values.fromDate,
+                endDate: (values && values.toDate) && values.toDate,
+                ...newData
+            }
+            await setBillingData([...data,modifyData]);
+            resolve();
+        }else{
+            reject();
+        }
+        
+    })
+}
+
+// this method help LoadPreCreateInvoiceTable to save data on click add
+const deleteLoadPreCreateInvoiceTableRecord=(propsData)=>{
+    const { oldData, data, setBillingData }=propsData
+    return new Promise(async (resolve, reject) => {
+        if(data && data.length >=0){
+            let filterData= data.filter(item=> (item.amount !==oldData.description && item.amount !==oldData.amount) )
+            await setBillingData(filterData);
+            await resolve();
+        }else{ reject(); }
+    })
 }
 
 // this compoent will used for the show dailog box for enter description
@@ -223,6 +295,11 @@ const loadGenrateInvoiceButton=(propsData)=>{
         let filterRowData= rowData.length >0 && rowData.map(({tableData, data, ...rest})=>rest)
         let modifyGenrateInvoiceData={ ...tempData, "invoiceDetailDtos": filterRowData}
         GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice })
+    }else if(projectType === ProjectBillingModelType.CLIENT_BILLING){
+        let filterRowData= rowData.length >0 && rowData.map(({tableData, data, ...rest})=>rest)
+        console.log("Filter Data ",filterRowData)
+        let modifyGenrateInvoiceData={ ...tempData, "clientBillingDtos": filterRowData}
+        GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice })
     }
 }
 
@@ -247,5 +324,6 @@ export{
     LoadPreCreateInvoiceTable,
     MileStonePreInvoiceTable,
     FixedCostPreInvoiceTable,
-    PayableDaysPreInvoiceTable
+    PayableDaysPreInvoiceTable,
+    ClientBillingPreInvoiceTable
 }

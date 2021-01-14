@@ -9,6 +9,7 @@ const initialState = {
     preInvoiceMileStonesData:[],
     preInvoiceFixedCostData:[],
     preInvoicePayablesData:[],
+    preInvoiceClientBillingData:[],
     projectBillingType:""
 }
 
@@ -22,6 +23,8 @@ const InvoiceState=(state=initialState,action)=>{
             return {...state,preInvoiceFixedCostData:action.fixedCost}
         case "SAVE_PAYABLE_DAYS_PRE_INVOICE_DATA":
             return {...state,preInvoicePayablesData:action.payableDays}
+        case "SAVE_CLIENT_BILLING_PRE_INVOICE_DATA":
+            return {...state,preInvoiceClientBillingData:action.clientBilling}
         case "SAVE_INVOICE_PDF_LIST":
             return {...state,invoiceList:action.invoiceList}
         case "SAVE_INVOICE_USER_LIST":

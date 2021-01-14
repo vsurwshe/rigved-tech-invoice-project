@@ -20,7 +20,7 @@ const ProjectBillingModelType={
     MILE_STONE:"Mile Stone",
     FIXED_TYPE:"Fixed Rate",
     PAYABLES_DAY:"Payable Days",
-    FREE_STYLE:""
+    CLIENT_BILLING:"Client Billing"
 }
 
 export{

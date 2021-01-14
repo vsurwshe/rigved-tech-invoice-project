@@ -245,7 +245,6 @@ class UserManagement extends Component {
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
             (this.props.ClientState.common_message && this.props.ClientState.common_message !=="") && await alert(this.props.ClientState.common_message);
-            await console.log(this.props.ClientState.common_message)
             await this.clearFileUrl();
             await SaveFileData();
             await GetEmployeeList(0,100,authorization);
