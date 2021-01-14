@@ -8,7 +8,7 @@ import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 // this is main component
 const RateCardTable = (propsData) => {
-  const { rateCardDtos,setRateCardDtos, Domains, SkillCategory, SkillSet, rateOptions, initialValues, operation }=propsData
+  const { rateCardDtos,setRateCardDtos, Domains, SkillCategory, SkillSet, rateOptions, operation }=propsData
   const columns =[
       {   title: "Domain", 
           field: "domainName",
