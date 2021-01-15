@@ -268,7 +268,7 @@ const InvoiceDiscriptionDialog=(propsData)=>{
           </DialogContent>
           <DialogActions>
             <Button autoFocus onClick={()=>handleClose({view:false, rowData:[]})} color="primary"> Cancel </Button>
-            <Button onClick={()=>loadGenrateInvoiceButton({rowData, props, description, setLoading, setViewInvoice, projectType})} color="secondary"> Save Invoice </Button>
+            <Button onClick={()=>loadGenrateInvoiceButton({rowData, props, description, setLoading, setViewInvoice, projectType, handleClose})} color="secondary"> Save Invoice </Button>
           </DialogActions>
         </Dialog>
     </div>
@@ -276,7 +276,7 @@ const InvoiceDiscriptionDialog=(propsData)=>{
 
 // this method will help to handel onclick of genrate invoice
 const loadGenrateInvoiceButton=(propsData)=>{
-    const { rowData, props, description, setLoading, setViewInvoice, projectType }=propsData
+    const { rowData, props, description, setLoading, setViewInvoice, projectType, handleClose }=propsData
     const { values }=props.form.InvoiceFrom
     let tempData={
         "fromDate": new moment(values.fromDate).format('x'),
@@ -286,35 +286,36 @@ const loadGenrateInvoiceButton=(propsData)=>{
     }
     if(projectType === ProjectBillingModelType.MILE_STONE){
         let modifyGenrateInvoiceData={ ...tempData, "mileStoneDtos": rowData}
-        GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice })
+        GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice, handleClose })
     }else if(projectType === ProjectBillingModelType.FIXED_TYPE){
         let filterRowData= rowData.length >0 && rowData.map(({tableData, ...rest})=>rest)
         let modifyGenrateInvoiceData={ ...tempData, "fixedRateInvoiceDetailDtos": filterRowData}
-        GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice })
+        GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice, handleClose })
     }else if(projectType === ProjectBillingModelType.PAYABLES_DAY){
         let filterRowData= rowData.length >0 && rowData.map(({tableData, data, ...rest})=>rest)
         let modifyGenrateInvoiceData={ ...tempData, "invoiceDetailDtos": filterRowData}
-        GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice })
+        GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice, handleClose })
     }else if(projectType === ProjectBillingModelType.CLIENT_BILLING){
         let filterRowData= rowData.length >0 && rowData.map(({tableData, data, ...rest})=>rest)
-        console.log("Filter Data ",filterRowData)
         let modifyGenrateInvoiceData={ ...tempData, "clientBillingDtos": filterRowData}
-        GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice })
+        GenratePDFInvoice({modifyGenrateInvoiceData, props, setLoading, setViewInvoice, handleClose })
     }
 }
 
 // this method will used for genrate pdf invoice
 const GenratePDFInvoice=async (propsData)=>{
-    const { modifyGenrateInvoiceData, setLoading, setViewInvoice, props }=propsData
+    const { modifyGenrateInvoiceData, setLoading, setViewInvoice, props, handleClose }=propsData
     const { dispatch }=props
     const { authorization }=props.LoginState
     const { loadMessage } = props.ClientAction
-    const { GenerateInvoicePDF, getPDFInvoiceList}=props.InvoiceAction
+    const { GenerateInvoicePDF, getPDFInvoiceList, SaveInvoiceEmployeeData}=props.InvoiceAction
     await setLoading(true);
+    await dispatch(SaveInvoiceEmployeeData([]));
     await GenerateInvoicePDF(modifyGenrateInvoiceData, authorization);
     setTimeout(async () => {
         await dispatch(loadMessage());
         await getPDFInvoiceList(0,100,authorization);
+        await handleClose({view:false, rowData:[]});
         await setViewInvoice(true);
         await setLoading(false);
     }, API_INVOCIE_EXE_TIME)

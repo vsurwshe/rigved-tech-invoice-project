@@ -151,8 +151,8 @@ let ResourcesTable = (props) => {
         actions={[ {icon: () => LoadAddButtonAction({operation, disableResourceModel,handleClickOpen}), isFreeAction: true}]}
         icons={{
           Add: () => (disableResourceModel && operation && (operation === FromActions.ED || operation === FromActions.VIED)) ? <Button variant="contained" color="secondary">Add</Button> :"",
-          Edit: () => { return <CreateIcon variant="contained" color="primary" /> },
-          Delete: () => { return <DeleteOutlineIcon variant="contained" color="secondary" /> }
+          Edit: () => { return (operation !== FromActions.VI) && <CreateIcon variant="contained" color="primary" /> },
+          Delete: () => { return (operation !== FromActions.VI) && <DeleteOutlineIcon variant="contained" color="secondary" /> }
         }}
         editable={{
           isEditable: rowData => true,
@@ -360,8 +360,6 @@ const LoadEmployeeList = (props) => {
     headerText={employeeTableHeaderText}
   />
 }
-
-
 
 
 const mapStateToProps = state => { return state; };
