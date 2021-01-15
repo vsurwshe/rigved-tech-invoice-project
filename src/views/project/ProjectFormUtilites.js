@@ -42,19 +42,20 @@ const MileStoneTabel=(propsData)=>{
         { title: 'Work\u00a0Completion(%)', field: 'workComPer'},
         { title: 'Invoice(%)', field: 'invoicePer'},
         { title: 'Expected\u00a0of\u00a0Completion Date', 
-          field: 'expComDate', 
-          editable:'onUpdate',
+          field: 'expComDateModify', 
+          editable:'onAdd',
           width:80 ,
           editComponent: props => {
             return renderTextField({ name: "expComDate", label: "", type: "date", action: { props } })
           },
           render: (rowData)=> {
             const { expComDateModify }=rowData
+            console.log("Data ",mileStoneListProjectId,rowData.expComDate)
             return (mileStoneListProjectId && mileStoneListProjectId.length >0 && rowData.expComDate) ? new moment(rowData.expComDate).format('YYYY-MM-DD'): expComDateModify;
           }
         },
         { title: 'Actual\u00a0Complete\u00a0Date', 
-          field: 'actualComDate', 
+          field: 'actualComDateModify', 
           editable:'onUpdate',
           editComponent: props => {
             return renderTextField({ name: "actualComDate", label: "", type: "date", action: { props } })
@@ -103,8 +104,8 @@ const MileStoneTabel=(propsData)=>{
       ]}
       icons={{  
         Add: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="secondary">Add</Button>:"", 
-        Edit: () => { return !(mileStoneListProjectId && mileStoneListProjectId.length <=0) ? <CreateIcon variant="contained" color="primary" />:"" },
-        Delete: () => { return (mileStoneListProjectId && mileStoneListProjectId.length <=0) ? <DeleteOutlineIcon variant="contained" color="secondary" /> :""},
+        Edit: () => { return (!(mileStoneListProjectId && mileStoneListProjectId.length <=0) && operation && operation !== FromActions.VI) && <CreateIcon variant="contained" color="primary" />},
+        Delete: () => { return (mileStoneListProjectId && mileStoneListProjectId.length <=0 && operation && operation !== FromActions.VI) && <DeleteOutlineIcon variant="contained" color="secondary" />},
       }}
       editable={{
         isEditable: rowData => true,
@@ -125,6 +126,7 @@ const onMileStoneTabelRowAdd=(props)=>{
       let modifyNewData={
         ...newData,
         projectId,
+        expComDate: new moment(newData.expComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x'),
         compFlag:false, 
         "active": true,
       }
@@ -150,7 +152,7 @@ const updateMileStoneTabelRecord=(propsData)=>{
       let modifyNewData={
         ...newData,
         "active": true,
-        "actualComDate": new moment(newData.actualComDate+' 00:00','YYYY-MM-DD HH:mm').format('x')
+        "actualComDate": new moment(newData.actualComDateModify+' 00:00','YYYY-MM-DD HH:mm').format('x')
       }
       await udpateMileStoneData(modifyNewData, authorization);
       setTimeout(async () => {
@@ -225,8 +227,8 @@ const FixedTypeTabel=(propsData)=>{
       actionsColumnIndex:-1,
     }}
     icons={{  
-      Add: () =>(operation && operation !== FromActions.VI)? <Button variant="contained" color="secondary">Add</Button>:"", 
-      Edit: () => { return <CreateIcon variant="contained" color="primary" /> },
+      Add: () =>(operation && operation !== FromActions.VI)&& <Button variant="contained" color="secondary">Add</Button>, 
+      Edit: () => { return (operation && operation !== FromActions.VI) && <CreateIcon variant="contained" color="primary" /> },
     }}
     editable={{
       isEditable: rowData => true,
@@ -420,13 +422,13 @@ let FixedTypeTab=(propsData)=>{
   const { dispatch }=mainProps
   const { authorization }= mainProps.LoginState ? mainProps.LoginState :[]
   const { fixedTypeListProjectId }= mainProps.BillingModelState ? mainProps.BillingModelState :[]
-  const { getFixedTypeListProjectId }= mainProps.BillingModelAction ? mainProps.BillingModelAction :[]
+  const { getFixedTypeListProjectId, saveFixedTypeListProjectId }= mainProps.BillingModelAction ? mainProps.BillingModelAction :[]
   const [load, setLoad] = useState(false)
   const [callFixedTypeCount, setCallFixedTypeCount] = useState(0)
   let exitsFixedTypeProjectList= (fixedTypeListProjectId && fixedTypeListProjectId.length >0) && fixedTypeListProjectId.filter(item=> item.projectId === projectId)
   if((exitsFixedTypeProjectList === false || exitsFixedTypeProjectList.length <= 0) && callFixedTypeCount === 0 ){
     setCallFixedTypeCount(callFixedTypeCount+1);
-    getFixedTypeListByProjectId({ authorization, projectId, callFixedTypeCount, setCallFixedTypeCount, getFixedTypeListProjectId, fixedTypeListProjectId, setLoad })
+    getFixedTypeListByProjectId({saveFixedTypeListProjectId, authorization, projectId, callFixedTypeCount, setCallFixedTypeCount, getFixedTypeListProjectId, fixedTypeListProjectId, setLoad })
   }
   return <FixedTypeTabel
       dispatch={dispatch}
@@ -438,8 +440,9 @@ let FixedTypeTab=(propsData)=>{
 }
 
 // this method will help to get fixed type accrdoing to project id
-const getFixedTypeListByProjectId=async({authorization, projectId, getFixedTypeListProjectId, setLoad})=>{
+const getFixedTypeListByProjectId=async({saveFixedTypeListProjectId,authorization, projectId, getFixedTypeListProjectId, setLoad})=>{
     await setLoad(true);
+    await saveFixedTypeListProjectId([]);
     await getFixedTypeListProjectId(0,100,projectId, authorization)
     await setLoad(false);
 }
