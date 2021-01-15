@@ -154,21 +154,24 @@ class ProjectManagement extends Component {
     }
 
     // this method used for the call the save project api
-    SaveProject=async(sendUserValues)=>{
+    SaveProject=async(propsData)=>{
+        const { values, setProjectLoad }=propsData
         const { projectContractFileUrl }=this.state
         const { dispatch }=this.props
         const { SaveProjectRecord, GetProjectList } = this.props.ProjectAction;
         const { authorization } = this.props.LoginState
         const newProjectData = {
-            ...sendUserValues,
-            "purchaseOrder":sendUserValues.purchaseOrder && sendUserValues.purchaseOrder.title,
-            "contractAttachmentUrl":(projectContractFileUrl === "" || projectContractFileUrl === undefined) ? sendUserValues.contractAttachmentUrl  : projectContractFileUrl,
+            ...values,
+            "purchaseOrder":values.purchaseOrder && values.purchaseOrder.title,
+            "contractAttachmentUrl":(projectContractFileUrl === "" || projectContractFileUrl === undefined) ? values.contractAttachmentUrl  : projectContractFileUrl,
             "active": true,
         }
+        await setProjectLoad(true);
         await SaveProjectRecord(newProjectData, authorization)
         setTimeout(async () => {
             await dispatch(loadMessage());
             await GetProjectList(0, 20, authorization);
+            await setProjectLoad(false);
             this.handleShowTabs(FromActions.VIED);
         }, API_EXE_TIME)
     }

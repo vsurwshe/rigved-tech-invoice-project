@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{ useState} from 'react';
 import { reduxForm, Field, formValueSelector, change } from 'redux-form';
 import { connect } from 'react-redux';
 import { Button, Grid} from '@material-ui/core';
@@ -20,9 +20,10 @@ let ProjectForm = (props) => {
     var classes = useStyles();
     const { SaveMethod, pristine, reset, submitting, handleSubmit, cancle, clearFile } = props
     const { operation } = props.stateData
+    const [projectLoad, setProjectLoad] = useState(false);
     return <div className={classes.girdContainer}>
-        <form onSubmit={handleSubmit(SaveMethod)}>
-            {LoadGird(props)}
+        <form onSubmit={handleSubmit(values => SaveMethod({values, setProjectLoad}))}>
+            {LoadGird({props ,projectLoad})}
             <div className={classes.buttonStyle}>
                 <center>
                     {(operation === FromActions.CR || operation === FromActions.ED) && <>
@@ -36,8 +37,9 @@ let ProjectForm = (props) => {
 }
 
 // this method will used for the gird structure of this component
-const LoadGird = (props) => {
+const LoadGird = (propsData) => {
     var classes = useStyles();
+    const { props, projectLoad }=propsData
     const {color, common_message}=props.ClientState
     const { initialValues, dispatch } = props
     return <><Grid container spacing={5}>
@@ -51,6 +53,7 @@ const LoadGird = (props) => {
                 {SectionTwo({ classes, props, initialValues })}
             </Grid>
         </Grid>
+        {projectLoad && renderLoading({message:"Saving....", size:40 })}
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
                 {SectionThree({ classes, "mainProps": props })}

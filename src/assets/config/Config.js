@@ -18,7 +18,15 @@ const FromActions={
 
 const ProjectBillingModelType={
     MILE_STONE:"Mile Stone",
+    // Fixed Type
     FIXED_TYPE:"Fixed Rate",
+    PAYABLES_DAY:"Payable Days",
+    CLIENT_BILLING:"Client Billing"
+}
+
+const ResponseBillingModelType={
+    MILE_STONE:"Mile Stone",
+    FIXED_TYPE:"Fixed Type",
     PAYABLES_DAY:"Payable Days",
     CLIENT_BILLING:"Client Billing"
 }
@@ -29,5 +37,6 @@ export{
     API_EXE_TIME,
     FromActions,
     API_INVOCIE_EXE_TIME,
-    ProjectBillingModelType
+    ProjectBillingModelType,
+    ResponseBillingModelType
 }
