@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { Grid, Button, FormLabel } from '@material-ui/core';
 import { reset, reduxForm, Field, FieldArray, formValueSelector, getFormSyncErrors } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
-import { renderTextField, renderContact, renderTextHiddenField, renderFileInput, renderTextAreaField, renderLoading } from '../utilites/FromUtilites';
+import { renderTextField, renderContact, renderTextHiddenField, renderFileInput, renderTextAreaField, renderLoading, renderSanckbarAlert } from '../utilites/FromUtilites';
 import useStyles from "../client/Styles";
 import { connect } from 'react-redux';
 import RateCardTable from '../rateCard/RateCardTable';
 import ContactTable from '../contact/ContactTable';
-import { Alert } from '@material-ui/lab';
 import { Required,  GSTIN, TAN, IFSCCode, BankAccount } from '../utilites/FormValidation';
 import * as FileActions from "../../redux/actions/FileAction";
 import { FromActions } from '../../assets/config/Config';
 
 
+// this is main compoent
 let ClientForm = (props) => {
     var classes = useStyles();
     const { SaveClientMethod, pristine, reset, submitting, handleSubmit, cancle, clearFile,rateCardDtosProps } = props
@@ -40,25 +40,29 @@ let ClientForm = (props) => {
 
 const LoadGird = (propsData) => {
     var classes = useStyles();
-    const { rateCardDtos,setRateCardDtos } = propsData
-    const { contactPersonDtos, initialValues } = propsData.mainProps
-    const { Domains, SkillCategory, SkillSet } = propsData.mainProps.MasterDataSet
-    return <><Grid container spacing={5}>
-        <Grid item style={{ paddingLeft: 30 }}>
-            {HeaderPart({ classes, initialValues, mainProps:propsData.mainProps })}
+    const { rateCardDtos,setRateCardDtos, mainProps } = propsData
+    const { contactPersonDtos, initialValues } = mainProps
+    const { Domains, SkillCategory, SkillSet } = mainProps.MasterDataSet
+    const { clientDetails }=mainProps.ClientState
+    const { message, Status}=clientDetails
+    return <>
+        {(message && Status) && ((Status === 'OK')? renderSanckbarAlert({ message,color:"success"}) :renderSanckbarAlert({ message,color:"error"}))}
+        <Grid container spacing={5}>
+            <Grid item style={{ paddingLeft: 30 }}>
+                {HeaderPart({ classes, initialValues, mainProps:mainProps })}
+            </Grid>
         </Grid>
-    </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30 }}>
-                {(initialValues === undefined) ? SectionOne({ classes, "mainProps":propsData.mainProps }) : EditSectionOne({ classes, initialValues })}
+                {(initialValues === undefined) ? SectionOne({ classes, "mainProps":mainProps }) : EditSectionOne({ classes, initialValues })}
             </Grid>
             <Grid item xs={12} sm={6}>
-                {SectionTwo({ classes,"mainProps":propsData.mainProps })}
+                {SectionTwo({ classes,"mainProps":mainProps })}
             </Grid>
         </Grid>
         <Grid container spacing={5} style={{ paddingLeft: 10 }}>
             <Grid item xs={12}>
-                {SectionThree({ classes, contactPersonDtos, Domains, SkillCategory, SkillSet,"mainProps":propsData.mainProps,rateCardDtos,setRateCardDtos })}
+                {SectionThree({ classes, contactPersonDtos, Domains, SkillCategory, SkillSet,"mainProps":mainProps,rateCardDtos,setRateCardDtos })}
             </Grid>
         </Grid>
     </>
@@ -66,10 +70,8 @@ const LoadGird = (propsData) => {
 // this method used for the load header part
 const HeaderPart = (propsData) => {
     const { initialValues } = propsData
-    const { color, common_message } = propsData.mainProps.ClientState
     return <Grid item container direction="row" justify="center" alignItems="center" >
         {(initialValues !== undefined) && <h2>{initialValues.clientName}</h2>}
-        <center>{common_message && <Alert color={color} >{common_message}</Alert>}</center>
     </Grid>
 }
 

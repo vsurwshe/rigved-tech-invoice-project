@@ -152,7 +152,7 @@ class ClientManagment extends Component {
 
     // this method used for the save the client details
     SaveClientDetails = async (propsData) => {
-        const { SaveClientData, loadMessage, GetClientList } = this.props.ClientAction;
+        const { SaveClientData, loadMessage, GetClientList, SaveClientDetails } = this.props.ClientAction;
         const { authorization } = this.props.LoginState
         const { clientDetails } = this.props.ClientState
         const { gstFileUrl, tanFileUrl} =this.state
@@ -169,7 +169,7 @@ class ClientManagment extends Component {
         }
         await SaveClientData(newUserData, authorization)
         setTimeout(async () => {
-            await dispatch(loadMessage());
+            await dispatch(SaveClientDetails([]));
             await GetClientList(0, 20, authorization);
             await this.setState({tanFileUrl : "", gstFileUrl:""})
             clientDetails.Status === "OK" && await alert("Your client details are saved");
