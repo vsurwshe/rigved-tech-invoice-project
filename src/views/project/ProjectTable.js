@@ -19,14 +19,7 @@ const ProjectTable = (props) => {
     { title: 'Project\u00a0Name', field: 'projectName' },
     { title: 'Client\u00a0Name', field: 'clientName' },
     { title: 'Resources', field: 'empCount', width: 30 },
-    // {
-    //   title: "PO\u00a0Recieved",
-    //   width: 8,
-    //   render: (rowData) => {
-    //     return <Checkbox onChange={() => console.log("Checkbox Clicked")} name="jason" />
-    //   }
-    // },
-    // { title: 'Status', field: 'status', width: 60 },
+    { title: 'Billing\u00a0Type', field: 'projectBillingType', width: 30 },
     {
       title: "",
       width:8,

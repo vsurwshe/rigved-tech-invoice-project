@@ -247,7 +247,7 @@ const renderMatiralCheckbox = props => (
 // render sankbar with alert
 const renderSanckbarAlert=(props)=>{
   const { message, color }=props
-  return <Snackbar open={message !== ""} autoHideDuration={1000} anchorOrigin= {{ vertical: 'top', horizontal: 'right' }}>
+  return <Snackbar open={message !== ""} autoHideDuration={1500} anchorOrigin= {{ vertical: 'top', horizontal: 'right' }}>
         <Alert severity={color}> {message} </Alert>
     </Snackbar>
 }

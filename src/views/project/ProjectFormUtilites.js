@@ -41,7 +41,7 @@ const MileStoneTabel=(propsData)=>{
         { title: 'Milestone\u00a0Name', field: 'mileStoneDesc'},
         { title: 'Work\u00a0Completion(%)', field: 'workComPer'},
         { title: 'Invoice(%)', field: 'invoicePer'},
-        { title: 'Expected\u00a0of\u00a0Completion Date', 
+        { title: 'Completion\u00a0Date', 
           field: 'expComDateModify', 
           editable:'onAdd',
           width:80 ,
